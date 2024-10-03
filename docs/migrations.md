@@ -1,6 +1,5 @@
 Sure! Below is a guide in Markdown format that you can use as documentation for setting up and using `golang-migrate` for managing migrations in your Go project.
 
-```markdown
 # Setting Up `golang-migrate` for Database Migrations
 
 This guide will help you set up and use `golang-migrate` in your Go project to manage your database schema migrations.
