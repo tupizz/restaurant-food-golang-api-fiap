@@ -19,6 +19,15 @@ git clone https://github.com/your-username/fastfood-golang.git
 cd fastfood-golang
 ```
 
+### 1.1 Install Dependencies
+
+Ensure you have Go installed and set up on your machine.
+
+```bash 
+# binary will be /usr/local/bin/air
+curl -sSfL https://goblin.run/github.com/air-verse/air | sh
+````
+
 ### 2. Set Up Environment Variables
 
 Create a `.env` file in the root directory of the project to store environment variables:
@@ -30,7 +39,7 @@ touch .env
 Add the following content to the `.env` file:
 
 ```env
-DATABASE_URL=postgres://postgres:postgres@db:5432/yourdb?sslmode=disable
+DATABASE_URL=postgres://postgres:postgres@db:5432/fiap_fast_food?sslmode=disable
 ```
 
 ### 3. Build and Run with Docker Compose

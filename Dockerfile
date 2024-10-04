@@ -12,7 +12,9 @@ RUN go mod download
 COPY . .
 
 # Build the Go application for Linux and amd64 architecture
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp
+# Build the Go app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./cmd/main.go
 
 # Run stage
 FROM alpine:latest
@@ -21,11 +23,11 @@ FROM alpine:latest
 WORKDIR /app
 
 # Copy the binary from the builder stage
-COPY --from=builder /app/myapp .
+COPY --from=builder /app/main .
 
 # Expose port (replace with your application's port if different)
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./myapp"]
+CMD ["./main"]
 

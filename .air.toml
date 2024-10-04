@@ -1,0 +1,29 @@
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+# Config file for Air
+[build]
+  cmd = "go build -o ./tmp/main ./cmd/main.go"
+  bin = "./tmp/main"
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  exclude_dir = ["vendor", "tmp", "scripts", "dist"]
+  exclude_file = ["README.md"]
+  delay = 1000 # ms
+  kill_delay = 500 # ms
+  log = "air_errors.log"
+  thread = true
+  stop_on_error = true
+
+[log]
+  color = true
+  timestamp = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

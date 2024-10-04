@@ -1,9 +1,9 @@
 package main
 
 import (
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/di"
-
 	"log"
 )
 
