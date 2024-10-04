@@ -36,7 +36,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *userRepository) Create(ctx context.Context, user entity.User) (entity.User, error) {
-	err := r.db.QueryRow(ctx, "INSERT INTO users (name) VALUES ($1) RETURNING id", user.Name).Scan(&user.ID)
+	err := r.db.QueryRow(ctx, "INSERT INTO users (name, email, age) VALUES ($1, $2, $3) RETURNING id", user.Name, user.Email, user.Age).Scan(&user.ID)
 	if err != nil {
 		return entity.User{}, err
 	}

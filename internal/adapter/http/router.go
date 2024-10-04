@@ -19,9 +19,7 @@ func NewRouter(userHandler handler.UserHandler /* Add other handlers */) Router 
 		{
 			userGroup.GET("/", userHandler.GetAll)
 			userGroup.POST("/", userHandler.Create)
-			// More routes...
 		}
-		// Other groups...
 	}
 
 	return Router{engine: engine}
