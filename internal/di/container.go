@@ -23,12 +23,15 @@ func BuildContainer() *dig.Container {
 
 	// Repositories
 	container.Provide(repository.NewUserRepository)
+	container.Provide(repository.NewClientRepository)
 
 	// Services
 	container.Provide(service.NewUserService)
+	container.Provide(service.NewClientService)
 
 	// Handlers
 	container.Provide(handler.NewUserHandler)
+	container.Provide(handler.NewClientHandler)
 
 	return container
 }

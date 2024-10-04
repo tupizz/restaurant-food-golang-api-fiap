@@ -1,0 +1,55 @@
+package handler
+
+import (
+	"errors"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type ClientHandler interface {
+	Create(c *gin.Context)
+	GetByCPF(c *gin.Context)
+}
+
+type clientHandler struct {
+	clientService service.ClientService
+}
+
+func NewClientHandler(clientService service.ClientService) ClientHandler {
+	return &clientHandler{clientService: clientService}
+}
+
+func (h *clientHandler) Create(c *gin.Context) {
+	var input dto.ClientInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	client, err := h.clientService.CreateClient(c.Request.Context(), input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, client)
+}
+
+func (h *clientHandler) GetByCPF(c *gin.Context) {
+	cpf := c.Param("cpf")
+	client, err := h.clientService.GetClientByCpf(c.Request.Context(), cpf)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, client)
+}

@@ -9,16 +9,25 @@ type Router struct {
 	engine *gin.Engine
 }
 
-func NewRouter(userHandler handler.UserHandler /* Add other handlers */) Router {
+func NewRouter(
+	userHandler handler.UserHandler,
+	clientHandler handler.ClientHandler,
+) Router {
 	engine := gin.Default()
 
 	// Set up routes
 	v1 := engine.Group("/api/v1")
 	{
-		userGroup := v1.Group("/users")
+		users := v1.Group("/users")
 		{
-			userGroup.GET("/", userHandler.GetAll)
-			userGroup.POST("/", userHandler.Create)
+			users.GET("/", userHandler.GetAll)
+			users.POST("/", userHandler.Create)
+		}
+
+		clients := v1.Group("/clients")
+		{
+			clients.POST("/", clientHandler.Create)
+			clients.GET("/:cpf", clientHandler.GetByCPF)
 		}
 	}
 
