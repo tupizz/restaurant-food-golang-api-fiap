@@ -9,6 +9,7 @@ Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** e
 - **Docker** e **Docker Compose**: Se preferir executar a aplicação em contêineres.
 - **Air**: Ferramenta para live reloading durante o desenvolvimento.
 - **Golang-Migrate**: Para gerenciar migrações de banco de dados.
+- **Swagger**: Para documentação da API.
 
 ---
 

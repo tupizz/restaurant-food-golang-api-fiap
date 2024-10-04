@@ -1,0 +1,108 @@
+basePath: /api/v1
+definitions:
+  dto.ClientInput:
+    properties:
+      cpf:
+        type: string
+      name:
+        maxLength: 100
+        type: string
+    required:
+    - cpf
+    - name
+    type: object
+  dto.ClientOutput:
+    properties:
+      cpf:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      code:
+        example: 400
+        type: integer
+      details:
+        example: Additional information
+        type: string
+      error:
+        example: Invalid request
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: suporte@seu-site.com
+    name: Suporte
+    url: http://seu-site.com/support
+  description: API do projeto FastFood Golang.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://seu-site.com/terms/
+  title: FastFood Golang API
+  version: "1.0"
+paths:
+  /clients:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo cliente com os dados fornecidos
+      parameters:
+      - description: Dados do Cliente
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClientInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ClientOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Cria um novo cliente
+      tags:
+      - clients
+  /clients/{cpf}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados de um cliente específico pelo CPF
+      parameters:
+      - description: CPF do Cliente
+        in: path
+        name: cpf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClientOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Obtém um cliente pelo CPF
+      tags:
+      - clients
+swagger: "2.0"

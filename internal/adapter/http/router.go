@@ -1,6 +1,9 @@
 package http
 
 import (
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/gin-gonic/gin"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
 )
@@ -14,6 +17,9 @@ func NewRouter(
 	clientHandler handler.ClientHandler,
 ) Router {
 	engine := gin.Default()
+
+	// Rota do Swagger
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Set up routes
 	v1 := engine.Group("/api/v1")
