@@ -1,3 +1,184 @@
+# Guia de Instalação e Execução do Projeto
+
+Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** em sua máquina, seja utilizando Docker ou rodando a aplicação diretamente. Siga as instruções abaixo para preparar o ambiente de desenvolvimento e executar a aplicação.
+
+## Pré-requisitos
+
+- **Git**: Para clonar o repositório.
+- **Golang**: Versão 1.18 ou superior.
+- **Docker** e **Docker Compose**: Se preferir executar a aplicação em contêineres.
+- **Air**: Ferramenta para live reloading durante o desenvolvimento.
+- **Golang-Migrate**: Para gerenciar migrações de banco de dados.
+
+---
+
+## Configuração do Ambiente
+
+### 1. Clonar o Repositório
+
+Abra o terminal e clone o repositório para a sua máquina local:
+
+```bash
+git clone https://github.com/tupizz/restaurant-food-golang-api-fiap
+cd fastfood-golang
+```
+
+### 2. Instalar Dependências Go
+
+Certifique-se de ter o Go instalado e configurado em sua máquina. Baixe as dependências do projeto:
+
+```bash
+go mod download
+```
+
+### 3. Instalar o Air para Live Reloading
+
+Air é uma ferramenta que recompila e reinicia automaticamente a aplicação quando mudanças no código são detectadas.
+
+#### Instalação
+
+Ou, se preferir, instale via Go (confirme que o diretório `$GOPATH/bin` está no seu `PATH`):
+
+```bash
+go install github.com/cosmtrek/air@latest
+```
+
+### 4. Instalar o Golang-Migrate para Migrações de Banco de Dados
+
+Golang-Migrate é usado para gerenciar migrações do banco de dados.
+
+#### Instalação
+
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+Certifique-se de que o diretório `$GOPATH/bin` está no seu `PATH` para acessar o comando `migrate`.
+
+---
+
+## Executando o Projeto com Docker
+
+### 1. Configurar Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@db:5432/yourdb?sslmode=disable
+```
+
+### 2. Construir e Iniciar os Serviços com Docker Compose
+
+Execute o seguinte comando para construir as imagens e iniciar os contêineres:
+
+```bash
+docker-compose up --build
+```
+
+Isso irá:
+
+- Construir a imagem Docker da aplicação Go.
+- Iniciar o contêiner do banco de dados PostgreSQL.
+- Executar as migrações do banco de dados.
+- Iniciar o contêiner da aplicação Go com o Air para live reloading.
+
+### 3. Acessar a Aplicação
+
+A aplicação estará disponível em `http://localhost:8080`.
+
+#### Testar Endpoints
+
+- **Listar Usuários:**
+
+  ```bash
+  curl http://localhost:8080/api/v1/users
+  ```
+
+- **Criar Usuário:**
+
+  ```bash
+  curl -X POST -H "Content-Type: application/json" -d '{"name":"João Silva", "email":"joao.silva@example.com", "age":30}' http://localhost:8080/api/v1/users
+  ```
+
+---
+
+## Executando o Projeto sem Docker
+
+### 1. Configurar o Banco de Dados PostgreSQL
+
+Instale o PostgreSQL em sua máquina e crie um banco de dados chamado `yourdb`.
+
+Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu banco de dados local:
+
+```env
+DATABASE_URL=postgres://postgres:suasenha@localhost:5432/yourdb?sslmode=disable
+```
+
+### 2. Executar Migrações do Banco de Dados
+
+Execute as migrações para criar as tabelas necessárias:
+
+```bash
+migrate -database ${DATABASE_URL} -path ./migrations up
+```
+
+### 3. Iniciar a Aplicação com Air
+
+Inicie a aplicação usando o Air para habilitar o live reloading:
+
+```bash
+air
+```
+
+**Observação:** Certifique-se de que o comando `air` está disponível no seu `PATH`. Se instalou o Air via Go, o binário estará em `$GOPATH/bin`.
+
+### 4. Acessar a Aplicação
+
+A aplicação estará disponível em `http://localhost:8080`. Utilize os mesmos comandos mencionados anteriormente para testar os endpoints.
+
+---
+
+## Dicas e Solução de Problemas
+
+- **Portas em Uso:** Verifique se as portas `8080` (aplicação) e `5432` (banco de dados) estão livres.
+- **Variáveis de Ambiente:** Certifique-se de que o `DATABASE_URL` está corretamente configurado no arquivo `.env`.
+- **Permissões de Arquivo:** Se encontrar problemas de permissão, ajuste as permissões dos arquivos e diretórios:
+
+  ```bash
+  chmod -R 755 ./fastfood-golang
+  ```
+
+- **Logs da Aplicação:** Monitore os logs para identificar possíveis erros:
+
+  ```bash
+  docker-compose logs -f
+  ```
+
+- **Reinstalar Dependências:** Se encontrar erros relacionados a dependências, execute:
+
+  ```bash
+  go mod tidy
+  go mod download
+  ```
+
+---
+
+## Estrutura do Projeto
+
+- **`cmd/main.go`**: Ponto de entrada da aplicação.
+- **`internal/`**: Código interno da aplicação.
+    - **`adapter/`**: Adaptadores para handlers HTTP e implementações de repositórios.
+    - **`application/`**: Lógica de negócio e serviços.
+    - **`domain/`**: Entidades de negócio e interfaces de repositórios.
+    - **`config/`**: Carregamento e gerenciamento de configurações.
+    - **`di/`**: Configuração de injeção de dependências com o Uber Dig.
+- **`migrations/`**: Arquivos de migração do banco de dados.
+- **`Dockerfile`**: Arquivo Docker para construir a imagem da aplicação.
+- **`docker-compose.yml`**: Configuração do Docker Compose.
+- **`go.mod` e `go.sum`**: Arquivos de módulos do Go.
+
+---
+
 # Explicação Detalhada das Camadas e Interações no Projeto
 
 O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arquitetura Limpa** e **Arquitetura Hexagonal**, com o objetivo de criar um sistema modular, escalável e de fácil manutenção. Abaixo, detalhamos cada camada, suas responsabilidades, como elas interagem entre si e referências aos arquivos relevantes.
