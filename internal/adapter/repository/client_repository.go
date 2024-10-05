@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
@@ -26,7 +27,7 @@ func (r *clientRepository) Create(ctx context.Context, client entity.Client) (en
 }
 
 func (r *clientRepository) GetByCpf(ctx context.Context, cpf string) (entity.Client, error) {
-	query := `SELECT id, name, cpf FROM clients WHERE cpf = $1`
+	query := `SELECT id, name, cpf FROM clients WHERE cpf = $1 AND deleted_at IS NULL`
 	var client entity.Client
 	err := r.db.QueryRow(ctx, query, cpf).Scan(&client.ID, &client.Name, &client.CPF)
 	if err != nil {

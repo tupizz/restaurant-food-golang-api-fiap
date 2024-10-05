@@ -1,13 +1,19 @@
 package entity
 
+import "time"
+
 type ProductImage struct {
-	ID       int
-	ImageURL string
+	ID        int
+	ImageURL  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type ProductCategory struct {
-	ID   int
-	Name string
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type Product struct {
@@ -17,4 +23,6 @@ type Product struct {
 	Price       float64
 	Category    ProductCategory
 	Images      []ProductImage
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

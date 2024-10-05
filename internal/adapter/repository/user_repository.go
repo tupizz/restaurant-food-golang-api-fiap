@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 
@@ -17,7 +18,7 @@ func NewUserRepository(db *pgxpool.Pool) domain.UserRepository {
 }
 
 func (r *userRepository) GetAll(ctx context.Context) ([]entity.User, error) {
-	rows, err := r.db.Query(ctx, "SELECT id, name FROM users")
+	rows, err := r.db.Query(ctx, "SELECT id, name FROM users WHERE deleted_at IS NULL")
 	if err != nil {
 		return nil, err
 	}

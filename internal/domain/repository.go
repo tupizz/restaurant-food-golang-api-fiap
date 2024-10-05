@@ -19,5 +19,7 @@ type ClientRepository interface {
 type ProductRepository interface {
 	Create(ctx context.Context, product entity.Product) (entity.Product, error)
 	GetById(ctx context.Context, id int) (entity.Product, error)
-	GetAll(ctx context.Context) ([]entity.Product, error)
+	GetAll(ctx context.Context, page int, pageSize int) ([]entity.Product, int, error)
+	Delete(ctx context.Context, id int) error
+	Update(ctx context.Context, product entity.Product) (entity.Product, error)
 }

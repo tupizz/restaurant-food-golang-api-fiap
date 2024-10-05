@@ -71,7 +71,7 @@ docker-down:
 
 test:
 	@echo "Running tests..."
-	$(GO) test ./...
+	$(GO) test -v ./...
 
 clean:
 	@echo "Cleaning up..."
