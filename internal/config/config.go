@@ -1,8 +1,10 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"fmt"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -10,7 +12,10 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	fmt.Println("Loading config")
 	viper.AutomaticEnv()
+
+	fmt.Println(viper.GetString("DATABASE_URL"))
 
 	config := &Config{
 		DatabaseURL: viper.GetString("DATABASE_URL"),

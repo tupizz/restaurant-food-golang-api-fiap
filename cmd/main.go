@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/tupizz/restaurant-food-golang-api-fiap/docs"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/di"
-	"log"
 )
 
 // @title           FastFood Golang API
@@ -24,6 +26,8 @@ import (
 // @BasePath  /api/v1
 func main() {
 	container := di.BuildContainer()
+
+	fmt.Println("Starting server")
 
 	err := container.Invoke(func(router http.Router) {
 		router.Start(":8080")

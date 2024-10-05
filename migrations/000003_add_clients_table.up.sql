@@ -1,8 +1,13 @@
-CREATE TABLE clients (
+CREATE TABLE IF NOT EXISTS clients (
      id SERIAL PRIMARY KEY,
      name VARCHAR(100) NOT NULL,
      cpf VARCHAR(11) NOT NULL UNIQUE
 );
 
--- Add index to cpf
-CREATE INDEX idx_cpf ON clients (cpf);
+-- Add index to cpf only if it doesn't already exist
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'idx_cpf' AND relkind = 'i') THEN
+        CREATE INDEX idx_cpf ON clients (cpf);
+    END IF;
+END $$;
