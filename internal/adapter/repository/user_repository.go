@@ -18,7 +18,7 @@ func NewUserRepository(db *pgxpool.Pool) domain.UserRepository {
 }
 
 func (r *userRepository) GetAll(ctx context.Context) ([]entity.User, error) {
-	rows, err := r.db.Query(ctx, "SELECT id, name FROM users WHERE deleted_at IS NULL")
+	rows, err := r.db.Query(ctx, "SELECT id, name, email, age, created_at, updated_at FROM users WHERE deleted_at IS NULL")
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]entity.User, error) {
 	var users []entity.User
 	for rows.Next() {
 		var user entity.User
-		if err := rows.Scan(&user.ID, &user.Name); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Age, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -37,7 +37,17 @@ func (r *userRepository) GetAll(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *userRepository) Create(ctx context.Context, user entity.User) (entity.User, error) {
-	err := r.db.QueryRow(ctx, "INSERT INTO users (name, email, age) VALUES ($1, $2, $3) RETURNING id", user.Name, user.Email, user.Age).Scan(&user.ID)
+	err := r.db.
+		QueryRow(ctx, "INSERT INTO users (name, email, age) VALUES ($1, $2, $3) RETURNING id, created_at, updated_at",
+			user.Name,
+			user.Email,
+			user.Age,
+		).
+		Scan(
+			&user.ID,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
 	if err != nil {
 		return entity.User{}, err
 	}

@@ -18,8 +18,8 @@ func NewClientRepository(db *pgxpool.Pool) domain.ClientRepository {
 }
 
 func (r *clientRepository) Create(ctx context.Context, client entity.Client) (entity.Client, error) {
-	query := `INSERT INTO clients (name, cpf) VALUES ($1, $2) RETURNING id`
-	err := r.db.QueryRow(ctx, query, client.Name, client.CPF).Scan(&client.ID)
+	query := `INSERT INTO clients (name, cpf) VALUES ($1, $2) RETURNING id, created_at, updated_at`
+	err := r.db.QueryRow(ctx, query, client.Name, client.CPF).Scan(&client.ID, &client.CreatedAt, &client.UpdatedAt)
 	if err != nil {
 		return entity.Client{}, err
 	}
@@ -27,9 +27,9 @@ func (r *clientRepository) Create(ctx context.Context, client entity.Client) (en
 }
 
 func (r *clientRepository) GetByCpf(ctx context.Context, cpf string) (entity.Client, error) {
-	query := `SELECT id, name, cpf FROM clients WHERE cpf = $1 AND deleted_at IS NULL`
+	query := `SELECT id, name, cpf, created_at, updated_at FROM clients WHERE cpf = $1 AND deleted_at IS NULL`
 	var client entity.Client
-	err := r.db.QueryRow(ctx, query, cpf).Scan(&client.ID, &client.Name, &client.CPF)
+	err := r.db.QueryRow(ctx, query, cpf).Scan(&client.ID, &client.Name, &client.CPF, &client.CreatedAt, &client.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return entity.Client{}, domain.ErrNotFound

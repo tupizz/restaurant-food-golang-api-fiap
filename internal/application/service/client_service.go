@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
@@ -45,9 +46,11 @@ func (s *clientService) CreateClient(ctx context.Context, input dto.ClientInput)
 	}
 
 	output := dto.ClientOutput{
-		ID:   createdClient.ID,
-		Name: createdClient.Name,
-		CPF:  createdClient.CPF,
+		ID:        createdClient.ID,
+		Name:      createdClient.Name,
+		CPF:       createdClient.CPF,
+		CreatedAt: createdClient.CreatedAt,
+		UpdatedAt: createdClient.UpdatedAt,
 	}
 
 	return output, nil
@@ -60,9 +63,11 @@ func (s *clientService) GetClientByCpf(ctx context.Context, cpf string) (dto.Cli
 	}
 
 	output := dto.ClientOutput{
-		ID:   client.ID,
-		Name: client.Name,
-		CPF:  client.CPF,
+		ID:        client.ID,
+		Name:      client.Name,
+		CPF:       client.CPF,
+		CreatedAt: client.CreatedAt,
+		UpdatedAt: client.UpdatedAt,
 	}
 
 	return output, nil
