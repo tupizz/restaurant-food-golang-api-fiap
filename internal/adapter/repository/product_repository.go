@@ -57,7 +57,19 @@ func (r *productRepository) Create(ctx context.Context, product entity.Product) 
 		}
 	}()
 
-	query := `INSERT INTO products (name, description, price, category_id) VALUES ($1, $2, $3, $4) RETURNING id`
+	// search for category by handle and add id to product
+	query := `SELECT id FROM categories WHERE handle = $1`
+	err = tx.QueryRow(ctx, query, product.Category.Handle).Scan(&product.Category.ID)
+	if err != nil {
+		return entity.Product{}, err
+	}
+
+	// if category not found, throw error
+	if product.Category.ID == 0 {
+		return entity.Product{}, domain.ErrNotFound
+	}
+
+	query = `INSERT INTO products (name, description, price, category_id) VALUES ($1, $2, $3, $4) RETURNING id`
 	err = tx.QueryRow(ctx, query, product.Name, product.Description, product.Price, product.Category.ID).Scan(&product.ID)
 	if err != nil {
 		return entity.Product{}, err

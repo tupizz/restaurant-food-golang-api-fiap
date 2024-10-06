@@ -28,13 +28,16 @@ func BuildContainer() *dig.Container {
 	container.Provide(repository.NewUserRepository)
 	container.Provide(repository.NewClientRepository)
 	container.Provide(repository.NewProductRepository)
+
 	// Services
 	container.Provide(service.NewUserService)
 	container.Provide(service.NewClientService)
+	container.Provide(service.NewProductService)
 
 	// Handlers
 	container.Provide(handler.NewUserHandler)
 	container.Provide(handler.NewClientHandler)
+	container.Provide(handler.NewProductHandler)
 
 	return container
 }

@@ -24,7 +24,7 @@ func TestProductRepository_Create(t *testing.T) {
 			Description: "Descrição do produto novo",
 			Price:       10.0,
 			Category: entity.ProductCategory{
-				ID: 1,
+				Handle: "categoria-nova",
 			},
 			Images: []entity.ProductImage{
 				{

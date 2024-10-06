@@ -12,6 +12,7 @@ type ProductImage struct {
 type ProductCategory struct {
 	ID        int
 	Name      string
+	Handle    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

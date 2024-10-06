@@ -15,6 +15,7 @@ type Router struct {
 func NewRouter(
 	userHandler handler.UserHandler,
 	clientHandler handler.ClientHandler,
+	productHandler handler.ProductHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -34,6 +35,11 @@ func NewRouter(
 		{
 			clients.POST("/", clientHandler.Create)
 			clients.GET("/:cpf", clientHandler.GetByCPF)
+		}
+
+		products := v1.Group("/products")
+		{
+			products.GET("/", productHandler.GetProducts)
 		}
 	}
 
