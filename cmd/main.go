@@ -5,9 +5,9 @@ import (
 	"log"
 
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/tupizz/restaurant-food-golang-api-fiap/docs"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/di"
+	_ "github.com/tupizz/restaurant-food-golang-api-fiap/swagger"
 )
 
 // @title           FastFood Golang API

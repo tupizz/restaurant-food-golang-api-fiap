@@ -59,7 +59,7 @@ migrate-down:
 
 swag-init:
 	@echo "Generating Swagger documentation..."
-	$(SWAG) init -g cmd/main.go
+	$(SWAG) init -g cmd/main.go -o ./swagger
 
 docker-up:
 	@echo "Starting Docker containers..."
