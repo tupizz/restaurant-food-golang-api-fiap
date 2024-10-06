@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"log/slog"
 
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
@@ -39,7 +40,7 @@ func (s *productService) GetProducts(ctx context.Context, page int, pageSize int
 		images := make([]string, 0, len(product.Images))
 		for _, image := range product.Images {
 			if image.ImageURL != "" {
-				log.Println(image.ImageURL)
+				slog.Info("Processing image URL", "url", image.ImageURL)
 				images = append(images, image.ImageURL)
 			}
 		}
@@ -54,6 +55,8 @@ func (s *productService) GetProducts(ctx context.Context, page int, pageSize int
 		}
 
 		log.Println(productOutput)
+
+		slog.Info("Created product output", "product", productOutput)
 
 		productOutputs = append(productOutputs, productOutput)
 	}

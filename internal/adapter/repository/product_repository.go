@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
+	"strings"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
 )
 
 type productRepository struct {
@@ -20,14 +23,111 @@ func NewProductRepository(db *pgxpool.Pool) domain.ProductRepository {
 }
 
 func (r *productRepository) Update(ctx context.Context, product entity.Product) (entity.Product, error) {
-	_, err := r.db.Exec(ctx, "UPDATE products SET name = $1, description = $2, price = $3, category_id = $4 WHERE id = $5", product.Name, product.Description, product.Price, product.Category.ID, product.ID)
+	slog.Info("Updating product", "product", shared.ToJSON(product))
+
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return entity.Product{}, err
 	}
+
+	// In case of a panic or error, ensure the transaction is rolled back
+	defer func() {
+		if p := recover(); p != nil {
+			slog.Error("Rolling back transaction", "error", p)
+			tx.Rollback(ctx)
+			panic(p)
+		} else if err != nil {
+			slog.Error("Rolling back transaction", "error", err)
+			tx.Rollback(ctx)
+		} else {
+			slog.Info("Committing transaction")
+			err = tx.Commit(ctx)
+		}
+	}()
+
+	// build a dynamic query to update the product
+	var columns []string
+	var args []any
+	argIndex := 1
+
+	if product.Category.Handle != "" {
+		// search for category by handle and add id to product
+		query := `SELECT id FROM categories WHERE handle = $1`
+		err = tx.QueryRow(ctx, query, product.Category.Handle).Scan(&product.Category.ID)
+		if err != nil {
+			slog.Error("Error searching for category", "error", err)
+			return entity.Product{}, domain.ErrNotFound("category")
+		}
+
+		// if category not found, throw error
+		if product.Category.ID == 0 {
+			slog.Error("Category not found", "category", product.Category)
+			return entity.Product{}, domain.ErrNotFound("category")
+		}
+
+		columns = append(columns, fmt.Sprintf("category_id = $%d", argIndex))
+		args = append(args, product.Category.ID)
+		argIndex++
+	}
+
+	if product.Name != "" {
+		columns = append(columns, fmt.Sprintf("name = $%d", argIndex))
+		args = append(args, product.Name)
+		argIndex++
+	}
+
+	if product.Description != "" {
+		columns = append(columns, fmt.Sprintf("description = $%d", argIndex))
+		args = append(args, product.Description)
+		argIndex++
+	}
+
+	if product.Price != 0 {
+		columns = append(columns, fmt.Sprintf("price = $%d", argIndex))
+		args = append(args, product.Price)
+		argIndex++
+	}
+
+	if len(columns) > 0 {
+		query := fmt.Sprintf("UPDATE products SET %s WHERE id = $%d", strings.Join(columns, ", "), argIndex)
+		slog.Info("Updating product", "query", query)
+		args = append(args, product.ID)
+		slog.Info("Updating product", "args", args)
+		_, err = tx.Exec(ctx, query, args...)
+		if err != nil {
+			slog.Error("Error updating product", "error", err)
+			return entity.Product{}, err
+		}
+	}
+
+	if len(product.Images) > 0 {
+		_, err = tx.Exec(ctx, "UPDATE products_images SET deleted_at = NOW() WHERE product_id = $1", product.ID)
+		if err != nil {
+			slog.Error("Error deleting product images", "error", err)
+			return entity.Product{}, err
+		}
+
+		for _, image := range product.Images {
+			_, err = tx.Exec(ctx, "INSERT INTO products_images (product_id, image) VALUES ($1, $2)", product.ID, image.ImageURL)
+			if err != nil {
+				slog.Error("Error inserting product image", "error", err)
+				return entity.Product{}, err
+			}
+		}
+	}
+
+	product, err = getOneProductWithExecutor(ctx, tx, product.ID)
+	if err != nil {
+		return entity.Product{}, err
+	}
+
+	slog.Info("Updated product", "product", shared.ToJSON(product))
+
 	return product, nil
 }
 
 func (r *productRepository) Delete(ctx context.Context, id int) error {
+	slog.Info("Deleting product", "id", id)
 	_, err := r.db.Exec(ctx, "UPDATE products SET deleted_at = NOW() WHERE id = $1", id)
 	if err != nil {
 		return err
@@ -36,6 +136,8 @@ func (r *productRepository) Delete(ctx context.Context, id int) error {
 }
 
 func (r *productRepository) Create(ctx context.Context, product entity.Product) (entity.Product, error) {
+	slog.Info("Creating product", "product", shared.ToJSON(product))
+
 	// Begin a new transaction
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
@@ -61,12 +163,12 @@ func (r *productRepository) Create(ctx context.Context, product entity.Product) 
 	query := `SELECT id FROM categories WHERE handle = $1`
 	err = tx.QueryRow(ctx, query, product.Category.Handle).Scan(&product.Category.ID)
 	if err != nil {
-		return entity.Product{}, err
+		return entity.Product{}, domain.ErrNotFound("category")
 	}
 
 	// if category not found, throw error
 	if product.Category.ID == 0 {
-		return entity.Product{}, domain.ErrNotFound
+		return entity.Product{}, domain.ErrNotFound("category")
 	}
 
 	query = `INSERT INTO products (name, description, price, category_id) VALUES ($1, $2, $3, $4) RETURNING id`
@@ -230,6 +332,7 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 			p.updated_at,
             c.id AS category_id, 
             c.name AS category_name,
+			c.handle AS category_handle,
 			c.created_at AS category_created_at,
 			c.updated_at AS category_updated_at,
             pi.id AS image_id, 
@@ -237,8 +340,8 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 			pi.created_at AS image_created_at,
 			pi.updated_at AS image_updated_at
 		FROM products p
-		LEFT JOIN categories c ON p.category_id = c.id
-		LEFT JOIN products_images pi ON p.id = pi.product_id
+		LEFT JOIN categories c ON p.category_id = c.id AND c.deleted_at IS NULL
+		LEFT JOIN products_images pi ON p.id = pi.product_id AND pi.deleted_at IS NULL
 		WHERE p.id = $1 AND p.deleted_at IS NULL
 	`
 	var rows pgx.Rows
@@ -276,6 +379,7 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 			&product.UpdatedAt,
 			&product.Category.ID,
 			&product.Category.Name,
+			&product.Category.Handle,
 			&product.Category.CreatedAt,
 			&product.Category.UpdatedAt,
 			&imageID,

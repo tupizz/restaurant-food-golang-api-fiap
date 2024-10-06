@@ -2,10 +2,11 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,7 +67,7 @@ func (h *clientHandler) GetByCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
 	client, err := h.clientService.GetClientByCpf(c.Request.Context(), cpf)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, domain.ErrNotFound("client")) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

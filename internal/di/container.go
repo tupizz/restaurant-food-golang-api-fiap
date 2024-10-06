@@ -33,11 +33,13 @@ func BuildContainer() *dig.Container {
 	container.Provide(service.NewUserService)
 	container.Provide(service.NewClientService)
 	container.Provide(service.NewProductService)
+	container.Provide(service.NewProductServiceAdmin)
 
 	// Handlers
 	container.Provide(handler.NewUserHandler)
 	container.Provide(handler.NewClientHandler)
 	container.Provide(handler.NewProductHandler)
+	container.Provide(handler.NewAdminProductHandler)
 
 	return container
 }

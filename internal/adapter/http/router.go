@@ -16,6 +16,7 @@ func NewRouter(
 	userHandler handler.UserHandler,
 	clientHandler handler.ClientHandler,
 	productHandler handler.ProductHandler,
+	adminProductHandler handler.AdminProductHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -40,6 +41,16 @@ func NewRouter(
 		products := v1.Group("/products")
 		{
 			products.GET("/", productHandler.GetProducts)
+		}
+
+		admin := v1.Group("/admin")
+		{
+			adminProducts := admin.Group("/products")
+			{
+				adminProducts.POST("/", adminProductHandler.Create)
+				adminProducts.PUT("/:id", adminProductHandler.Update)
+				adminProducts.DELETE("/:id", adminProductHandler.Delete)
+			}
 		}
 	}
 

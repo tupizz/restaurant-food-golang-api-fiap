@@ -32,7 +32,7 @@ func (r *clientRepository) GetByCpf(ctx context.Context, cpf string) (entity.Cli
 	err := r.db.QueryRow(ctx, query, cpf).Scan(&client.ID, &client.Name, &client.CPF, &client.CreatedAt, &client.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return entity.Client{}, domain.ErrNotFound
+			return entity.Client{}, domain.ErrNotFound("client")
 		}
 		return entity.Client{}, err
 	}
