@@ -15,10 +15,31 @@ definitions:
     properties:
       cpf:
         type: string
+      created_at:
+        type: string
       id:
         type: integer
       name:
         type: string
+      updated_at:
+        type: string
+    type: object
+  dto.ProductOutput:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      images:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
     type: object
   handler.ErrorResponse:
     properties:
@@ -105,4 +126,36 @@ paths:
       summary: Obtém um cliente pelo CPF
       tags:
       - clients
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get Products
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get Products
+      tags:
+      - products
 swagger: "2.0"
