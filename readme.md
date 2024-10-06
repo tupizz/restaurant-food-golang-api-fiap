@@ -1,3 +1,83 @@
+# Event Storming (DDD)
+
+Event Storming é uma técnica colaborativa que ajuda a descobrir, compreender e mapear processos de negócios complexos através da identificação de eventos, comandos, agregados, políticas, participantes, entre outros elementos. É especialmente útil em projetos de DDD, pois facilita a comunicação entre equipes técnicas e de negócio.
+
+## Linguagem Ubíqua
+
+- Pedido
+- Cliente
+- Pagamento
+- Preparação
+- Entrega
+- Status do Pedido
+- Notificação  
+
+
+## Realização do pedido e pagamento
+```mermaid
+sequenceDiagram
+    participant Cliente
+    participant SistemaAutoatendimento as Sistema de Autoatendimento
+    participant SistemaPagamento as Sistema de Pagamento
+    participant Cozinha
+    participant PainelCliente as Painel do Cliente
+
+    Cliente->>SistemaAutoatendimento: Iniciar Pedido
+    SistemaAutoatendimento->>Cliente: Exibir Menu de Produtos
+
+    loop Seleção de Itens
+        Cliente->>SistemaAutoatendimento: Adicionar Item ao Pedido
+        SistemaAutoatendimento->>Cliente: Confirmar Adição
+    end
+
+    Cliente->>SistemaAutoatendimento: Confirmar Pedido
+    SistemaAutoatendimento->>SistemaPagamento: Processar Pagamento via QRCode
+    SistemaPagamento-->>Cliente: Exibir QRCode do Mercado Pago
+    Cliente->>SistemaPagamento: Realizar Pagamento
+    SistemaPagamento-->>SistemaAutoatendimento: Pagamento Confirmado
+
+    SistemaAutoatendimento->>Cozinha: Enviar Pedido
+    SistemaAutoatendimento->>PainelCliente: Atualizar Status para "Recebido"
+```
+## Preparação e Entrega do pedido
+
+```mermaid
+sequenceDiagram
+    participant Cozinha
+    participant PainelCliente as Painel do Cliente
+    participant Cliente
+
+    Cozinha->>Cozinha: Iniciar Preparação
+    Cozinha->>PainelCliente: Atualizar Status para "Em Preparação"
+
+    Cozinha->>Cozinha: Finalizar Preparação
+    Cozinha->>PainelCliente: Atualizar Status para "Pronto"
+    PainelCliente-->>Cliente: Notificar Pedido Pronto
+
+    Cliente->>Cozinha: Retirar Pedido
+    Cozinha->>PainelCliente: Atualizar Status para "Finalizado"
+```
+
+## Fluxo detalhado com diagrama de atividades
+
+```mermaid
+flowchart TD
+    A[Iniciar Pedido] --> B{Cliente Identificado?}
+    B -- Sim --> C[Registrar Cliente]
+    B -- Não --> D[Prosseguir sem Identificação]
+    C --> D
+    D --> E[Selecionar Itens]
+    E --> F[Confirmar Pedido]
+    F --> G[Processar Pagamento]
+    G --> H{Pagamento Aprovado?}
+    H -- Sim --> I[Registrar Pedido]
+    H -- Não --> J[Notificar Falha no Pagamento]
+    I --> K["Atualizar Status para status Recebido"]
+    K --> L[Enviar Pedido para Cozinha]
+
+```
+
+
 # Guia de Instalação e Execução do Projeto
 
 Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** em sua máquina, seja utilizando Docker ou rodando a aplicação diretamente. Siga as instruções abaixo para preparar o ambiente de desenvolvimento e executar a aplicação.
