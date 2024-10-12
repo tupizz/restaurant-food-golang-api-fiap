@@ -29,6 +29,7 @@ func NewProductHandler(productService service.ProductService) ProductHandler {
 // @Produce      json
 // @Param        page     query     int  false  "Page number"
 // @Param        pageSize query     int  false  "Page size"
+// @Param        category query     string  false  "Category"
 // @Success      200      {object}  dto.ProductOutput
 // @Failure      400      {object}  handler.ErrorResponse
 // @Failure      500      {object}  handler.ErrorResponse

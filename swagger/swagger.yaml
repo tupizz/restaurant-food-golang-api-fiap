@@ -281,6 +281,10 @@ paths:
         in: query
         name: pageSize
         type: integer
+      - description: Category
+        in: query
+        name: category
+        type: string
       produces:
       - application/json
       responses:
