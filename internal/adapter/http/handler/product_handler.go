@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 )
 
 type ProductHandler interface {
@@ -44,7 +45,14 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size"})
 	}
 
-	products, total, err := h.productService.GetProducts(c.Request.Context(), page, pageSize)
+	category := c.DefaultQuery("category", "")
+
+	products, total, err := h.productService.GetProducts(c.Request.Context(), &domain.ProductFilter{
+		Category: category,
+		Page:     page,
+		PageSize: pageSize,
+	})
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

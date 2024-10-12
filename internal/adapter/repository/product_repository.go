@@ -202,20 +202,27 @@ func (r *productRepository) GetById(ctx context.Context, id int) (entity.Product
 	return product, nil
 }
 
-func (r *productRepository) GetAll(ctx context.Context, page int, pageSize int) ([]entity.Product, int, error) {
+func (r *productRepository) GetAll(ctx context.Context, filter *domain.ProductFilter) ([]entity.Product, int, error) {
 	// Set default values
-	if page <= 0 {
-		page = 1
+	if filter.Page <= 0 {
+		filter.Page = 1
 	}
-	if pageSize <= 0 {
-		pageSize = 10 // Default page size
+
+	// Set default page size
+	if filter.PageSize <= 0 {
+		filter.PageSize = 10 // Default page size
 	}
 
 	// Calculate offset
-	offset := (page - 1) * pageSize
+	offset := (filter.Page - 1) * filter.PageSize
+
+	categoryFilter := ""
+	if filter.Category != "" {
+		categoryFilter = fmt.Sprintf("AND LOWER(c.handle) = LOWER('%s')", filter.Category)
+	}
 
 	// Query to get paginated results
-	query := `
+	query := fmt.Sprintf(`
         WITH paginated_products AS (
             SELECT DISTINCT ON (p.id) p.id
             FROM products p
@@ -242,9 +249,12 @@ func (r *productRepository) GetAll(ctx context.Context, page int, pageSize int) 
         JOIN products p ON pp.id = p.id
         LEFT JOIN categories c ON p.category_id = c.id
         LEFT JOIN products_images pi ON p.id = pi.product_id
+        WHERE p.deleted_at IS NULL
+		%s
         ORDER BY p.id
-    `
-	rows, err := r.db.Query(ctx, query, pageSize, offset)
+    `, categoryFilter)
+
+	rows, err := r.db.Query(ctx, query, filter.PageSize, offset)
 	if err != nil {
 		return nil, 0, err
 	}

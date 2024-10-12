@@ -10,7 +10,7 @@ import (
 )
 
 type ProductService interface {
-	GetProducts(ctx context.Context, page int, pageSize int) ([]dto.ProductOutput, int, error)
+	GetProducts(ctx context.Context, filter *domain.ProductFilter) ([]dto.ProductOutput, int, error)
 }
 
 type productService struct {
@@ -21,8 +21,8 @@ func NewProductService(productRepo domain.ProductRepository) ProductService {
 	return &productService{productRepository: productRepo}
 }
 
-func (s *productService) GetProducts(ctx context.Context, page int, pageSize int) ([]dto.ProductOutput, int, error) {
-	products, total, err := s.productRepository.GetAll(ctx, page, pageSize)
+func (s *productService) GetProducts(ctx context.Context, filter *domain.ProductFilter) ([]dto.ProductOutput, int, error) {
+	products, total, err := s.productRepository.GetAll(ctx, filter)
 	if err != nil {
 		return nil, 0, err
 	}

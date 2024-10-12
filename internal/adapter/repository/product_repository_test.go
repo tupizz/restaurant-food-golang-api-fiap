@@ -137,7 +137,10 @@ func TestProductRepository_GetAll(t *testing.T) {
 		page := 1
 		pageSize := 10
 
-		products, totalCount, err := productRepository.GetAll(context.Background(), page, pageSize)
+		products, totalCount, err := productRepository.GetAll(context.Background(), &domain.ProductFilter{
+			Page:     page,
+			PageSize: pageSize,
+		})
 		assert.NoError(t, err, "Error getting all products")
 
 		// Assert pagination results
