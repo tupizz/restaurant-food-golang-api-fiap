@@ -38,9 +38,21 @@ type OrderItem struct {
 	DeletedAt *time.Time
 }
 
+// CalculateTotalAmount calculates the total amount for the order, including product prices and applicable taxes.
+// It takes two parameters:
+// - existingMappedProducts: a map of product IDs to Product entities
+// - existingPaymentTaxes: a slice of PaymentTaxSettings entities
+//
+// The function performs the following steps:
+// 1. Calculates the base total amount from the order items and their quantities
+// 2. Applies any applicable taxes based on the payment method and tax settings
+// 3. Sets the final amount to the Payment.Amount field of the Order
+//
+// Returns an error if any product in the order is not found in the existingMappedProducts map.
 func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, existingPaymentTaxes []PaymentTaxSettings) error {
 	totalAmount := 0.0
 
+	// Calculate base total amount from order items
 	for idx, item := range o.Items {
 		if product, ok := existingMappedProducts[item.ProductID]; ok {
 			item.Price = product.Price
@@ -51,11 +63,14 @@ func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, exi
 		o.Items[idx] = item
 	}
 
+	// Apply taxes
 	for _, tax := range existingPaymentTaxes {
+		// Skip credit card taxes if payment method is not credit card
 		if o.Payment.Method != "credit_card" && tax.ApplicableTo == ApplicableToCreditCard {
 			continue
 		}
 
+		// Apply percentage or fixed amount taxes
 		if tax.AmountType == AmountTypePercentage {
 			totalAmount = totalAmount * (1 + tax.AmountValue/100)
 		} else if tax.AmountType == AmountTypeFixed {
@@ -63,6 +78,7 @@ func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, exi
 		}
 	}
 
+	// Set the final amount to the Payment.Amount field
 	o.Payment.Amount = totalAmount
 	return nil
 }
