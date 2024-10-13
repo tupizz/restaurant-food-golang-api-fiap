@@ -27,4 +27,16 @@ type ProductRepository interface {
 	GetAll(ctx context.Context, filter *ProductFilter) ([]entity.Product, int, error)
 	Delete(ctx context.Context, id int) error
 	Update(ctx context.Context, product entity.Product) (entity.Product, error)
+	GetByIds(ctx context.Context, ids []int) ([]entity.Product, int, error)
+}
+
+type OrderRepository interface {
+	Create(ctx context.Context, order entity.Order) (entity.Order, error)
+	Update(ctx context.Context, order entity.Order) error
+	GetByID(ctx context.Context, id int) (entity.Order, error)
+	Delete(ctx context.Context, id int) error
+}
+
+type PaymentTaxSettingsRepository interface {
+	GetAll(ctx context.Context) ([]entity.PaymentTaxSettings, error)
 }

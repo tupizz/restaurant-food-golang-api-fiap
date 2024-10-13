@@ -244,6 +244,26 @@ A aplicação estará disponível em `http://localhost:8080`. Utilize os mesmos 
 
 ---
 
+## Solução de problemas com migrations
+
+Para mais detalhes, consulte o arquivo [MIGRATION_GUIDE.md](./docs/migrations.md).
+
+Sample error:
+```
+error: Dirty database version 7. Fix and force version.
+```
+
+Solution:
+- Force the past version
+- Update again
+
+```bash
+migrate -path ./migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" force 6
+migrate -path ./migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
+```
+
+---
+
 ## Estrutura do Projeto
 
 - **`cmd/main.go`**: Ponto de entrada da aplicação.

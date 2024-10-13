@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
@@ -20,6 +21,102 @@ type productRepository struct {
 
 func NewProductRepository(db *pgxpool.Pool) domain.ProductRepository {
 	return &productRepository{db: db}
+}
+
+func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]entity.Product, int, error) {
+	if len(ids) == 0 {
+		return nil, 0, nil
+	}
+
+	query := `
+        SELECT 
+            p.id, 
+            p.name, 
+            p.description, 
+            p.price, 
+			p.created_at,
+			p.updated_at,
+            c.id AS category_id, 
+            c.name AS category_name,
+			c.created_at AS category_created_at,
+			c.updated_at AS category_updated_at,
+            pi.id AS image_id, 
+            pi.image,
+			pi.created_at AS image_created_at,
+			pi.updated_at AS image_updated_at
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN products_images pi ON p.id = pi.product_id
+        WHERE p.deleted_at IS NULL AND p.id = ANY($1)
+    `
+
+	rows, err := r.db.Query(ctx, query, ids)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	productMap := make(map[int]*entity.Product)
+	var products []entity.Product
+
+	for rows.Next() {
+		var product entity.Product
+		var imageID sql.NullInt64
+		var imageURL sql.NullString
+		var imageCreatedAt sql.NullTime
+		var imageUpdatedAt sql.NullTime
+
+		err = rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+			&product.Category.ID,
+			&product.Category.Name,
+			&product.Category.CreatedAt,
+			&product.Category.UpdatedAt,
+			&imageID,
+			&imageURL,
+			&imageCreatedAt,
+			&imageUpdatedAt,
+		)
+
+		if err != nil {
+			return nil, 0, err
+		}
+
+		if existingProduct, ok := productMap[product.ID]; ok {
+			// Product already exists, just add the image
+			if imageID.Valid && imageURL.Valid {
+				existingProduct.Images = append(existingProduct.Images, entity.ProductImage{
+					ID:        int(imageID.Int64),
+					ImageURL:  imageURL.String,
+					CreatedAt: imageCreatedAt.Time,
+					UpdatedAt: imageUpdatedAt.Time,
+				})
+			}
+		} else {
+			// New product, add it to the map and slice
+			if imageID.Valid && imageURL.Valid {
+				product.Images = []entity.ProductImage{{
+					ID:        int(imageID.Int64),
+					ImageURL:  imageURL.String,
+					CreatedAt: imageCreatedAt.Time,
+					UpdatedAt: imageUpdatedAt.Time,
+				}}
+			}
+			productMap[product.ID] = &product
+			products = append(products, product)
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	return products, len(products), nil
 }
 
 func (r *productRepository) Update(ctx context.Context, product entity.Product) (entity.Product, error) {
