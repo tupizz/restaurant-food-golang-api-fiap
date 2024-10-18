@@ -10,17 +10,25 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 
+	fiapRestaurantDb "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
 )
 
 type productRepository struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	sqlcDb *fiapRestaurantDb.Queries
 }
 
-func NewProductRepository(db *pgxpool.Pool) domain.ProductRepository {
-	return &productRepository{db: db}
+func NewProductRepository(
+	db *pgxpool.Pool,
+	sqlcDb *fiapRestaurantDb.Queries,
+) domain.ProductRepository {
+	return &productRepository{
+		db:     db,
+		sqlcDb: sqlcDb,
+	}
 }
 
 func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]entity.Product, int, error) {

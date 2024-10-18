@@ -258,8 +258,8 @@ Solution:
 - Update again
 
 ```bash
-migrate -path ./migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" force 6
-migrate -path ./migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
+migrate -path ./database/migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" force 6
+migrate -path ./database/migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
 ```
 
 ---
@@ -273,7 +273,10 @@ migrate -path ./migrations -database "postgres://postgres:postgres@localhost:543
     - **`domain/`**: Entidades de negócio e interfaces de repositórios.
     - **`config/`**: Carregamento e gerenciamento de configurações.
     - **`di/`**: Configuração de injeção de dependências com o Uber Dig.
-- **`migrations/`**: Arquivos de migração do banco de dados.
+- **`database/`**: Configuração do banco de dados com o SQLC.
+    - **`migrations/`**: Arquivos de migração do banco de dados.
+    - **`queries/`**: Arquivos de queries do banco de dados.
+    - **`sqlc`**: Arquivos gerados pelo SQLC.
 - **`Dockerfile`**: Arquivo Docker para construir a imagem da aplicação.
 - **`docker-compose.yml`**: Configuração do Docker Compose.
 - **`go.mod` e `go.sum`**: Arquivos de módulos do Go.

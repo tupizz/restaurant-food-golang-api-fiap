@@ -90,10 +90,10 @@ DROP TABLE IF EXISTS users;
 To apply your migrations, use the following command:
 
 ```sh
-migrate -path ./migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
+migrate -path ./database/migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
 ```
 
-- `-path ./migrations` specifies the directory where your migration files are located.
+- `-path ./database/migrations` specifies the directory where your migration files are located.
 - `-database` specifies the database connection string.
 
 ### Rolling Back Migrations
@@ -101,7 +101,7 @@ migrate -path ./migrations -database "postgres://postgres:postgres@localhost:543
 To roll back the most recent migration:
 
 ```sh
-migrate -path ./migrations -database  "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" down 1
+migrate -path ./database/migrations -database  "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" down 1
 ```
 
 ## Step 5: Using `golang-migrate` in Code (Optional)
@@ -129,7 +129,7 @@ If you need to run migrations programmatically from within your Go application:
 
    func main() {
        m, err := migrate.New(
-           "file://migrations",
+           "file://database/migrations",
            "postgres://user:password@localhost:5432/dbname?sslmode=disable",
        )
        if err != nil {
@@ -155,12 +155,12 @@ If you need to run migrations programmatically from within your Go application:
 
 - **Create a new migration**:
   ```sh
-  migrate create -ext sql -dir migrations -seq migration_name
+  migrate create -ext sql -dir database/migrations -seq migration_name
   ```
 
 - **Apply all migrations**:
   ```sh
-  migrate -path ./migrations -database "DB_CONNECTION_STRING" up
+  migrate -path ./database/migrations -database "DB_CONNECTION_STRING" up
   ```
 
 - **Roll back last migration**:

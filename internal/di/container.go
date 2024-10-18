@@ -1,8 +1,6 @@
 package di
 
 import (
-	"fmt"
-
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/repository"
@@ -19,7 +17,7 @@ func BuildContainer() *dig.Container {
 
 	// Database Connection
 	container.Provide(NewDatabaseConnection)
-	fmt.Println("Building container")
+	container.Provide(NewSQLCDB)
 
 	// Router
 	container.Provide(http.NewRouter)

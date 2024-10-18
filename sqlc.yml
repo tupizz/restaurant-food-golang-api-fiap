@@ -1,0 +1,12 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema:
+      - "./database/migrations/*.sql"
+    queries:
+      - "./database/queries/"
+    gen:
+      go:
+        package: "fiapRestaurantDb"
+        out: "./database/sqlc"
+        sql_package: "pgx/v5"
