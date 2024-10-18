@@ -26,7 +26,17 @@ func NewOrderHandler(orderService service.OrderService) OrderHandler {
 	return &orderHandler{orderService: orderService}
 }
 
-// CreateOrder handles POST /pedidos
+// Create godoc
+// @Summary      Cria um novo pedido
+// @Description  Cria um novo pedido com os dados fornecidos
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Param        order  body      dto.CreateOrderRequest  true  "Dados do Pedido"
+// @Success      201     {object}  dto.OrderResponse
+// @Failure      400     {object}  handler.ErrorResponse
+// @Failure      500     {object}  handler.ErrorResponse
+// @Router       /orders [post]
 func (h *orderHandler) Create(c *gin.Context) {
 	var createOrderReq dto.CreateOrderRequest
 
@@ -57,7 +67,17 @@ func (h *orderHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, orderResponse)
 }
 
-// GetOrderById handles GET /pedidos/{id}
+// GetById godoc
+// @Summary      Obtém um pedido por ID
+// @Description  Obtém um pedido com o ID fornecido
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Param        id  path      int  true  "ID do Pedido"
+// @Success      200     {object}  dto.OrderResponse
+// @Failure      400     {object}  handler.ErrorResponse
+// @Failure      500     {object}  handler.ErrorResponse
+// @Router       /orders/{id} [get]
 func (h *orderHandler) GetById(c *gin.Context) {
 	// Get the order ID from the URL path
 	orderID, err := strconv.Atoi(c.Param("id"))

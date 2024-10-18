@@ -255,6 +255,96 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders": {
+            "post": {
+                "description": "Cria um novo pedido com os dados fornecidos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Cria um novo pedido",
+                "parameters": [
+                    {
+                        "description": "Dados do Pedido",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OrderResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "description": "Obtém um pedido com o ID fornecido",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Obtém um pedido por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Pedido",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OrderResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
                 "description": "Get Products",
@@ -309,6 +399,85 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users": {
+            "get": {
+                "description": "Obtém todos os usuários cadastrados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Obtém todos os usuários",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/entity.User"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo usuário com os dados fornecidos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Cria um novo usuário",
+                "parameters": [
+                    {
+                        "description": "Dados do Usuário",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -341,6 +510,131 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateOrderItemRequest": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "dto.CreateOrderRequest": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CreateOrderItemRequest"
+                    }
+                },
+                "payment": {
+                    "$ref": "#/definitions/dto.CreatePaymentRequest"
+                }
+            }
+        },
+        "dto.CreatePaymentRequest": {
+            "type": "object",
+            "required": [
+                "method"
+            ],
+            "properties": {
+                "method": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.OrderItemResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.OrderResponse": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OrderItemResponse"
+                    }
+                },
+                "payment": {
+                    "$ref": "#/definitions/dto.PaymentResponse"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -438,6 +732,52 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
+                }
+            }
+        },
+        "dto.UserInput": {
+            "type": "object",
+            "required": [
+                "age",
+                "email",
+                "name"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer",
+                    "maximum": 130,
+                    "minimum": 0
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

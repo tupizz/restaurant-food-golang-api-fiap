@@ -24,6 +24,88 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.CreateOrderItemRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
+  dto.CreateOrderRequest:
+    properties:
+      client_id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/dto.CreateOrderItemRequest'
+        type: array
+      payment:
+        $ref: '#/definitions/dto.CreatePaymentRequest'
+    type: object
+  dto.CreatePaymentRequest:
+    properties:
+      method:
+        type: string
+    required:
+    - method
+    type: object
+  dto.OrderItemResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      order_id:
+        type: integer
+      price:
+        type: number
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.OrderResponse:
+    properties:
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/dto.OrderItemResponse'
+        type: array
+      payment:
+        $ref: '#/definitions/dto.PaymentResponse'
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.PaymentResponse:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: integer
+      method:
+        type: string
+      order_id:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.ProductInputCreate:
     properties:
       category:
@@ -88,6 +170,38 @@ definitions:
         type: string
       price:
         type: number
+    type: object
+  dto.UserInput:
+    properties:
+      age:
+        maximum: 130
+        minimum: 0
+        type: integer
+      email:
+        maxLength: 100
+        type: string
+      name:
+        maxLength: 100
+        type: string
+    required:
+    - age
+    - email
+    - name
+    type: object
+  entity.User:
+    properties:
+      age:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
     type: object
   handler.ErrorResponse:
     properties:
@@ -267,6 +381,65 @@ paths:
       summary: Obtém um cliente pelo CPF
       tags:
       - clients
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo pedido com os dados fornecidos
+      parameters:
+      - description: Dados do Pedido
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Cria um novo pedido
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtém um pedido com o ID fornecido
+      parameters:
+      - description: ID do Pedido
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Obtém um pedido por ID
+      tags:
+      - orders
   /products:
     get:
       consumes:
@@ -303,4 +476,56 @@ paths:
       summary: Get Products
       tags:
       - products
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Obtém todos os usuários cadastrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/entity.User'
+              type: array
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Obtém todos os usuários
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo usuário com os dados fornecidos
+      parameters:
+      - description: Dados do Usuário
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Cria um novo usuário
+      tags:
+      - users
 swagger: "2.0"
