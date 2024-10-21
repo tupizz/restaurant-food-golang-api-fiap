@@ -4,7 +4,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
 )
@@ -71,5 +70,5 @@ func NewRouter(
 }
 
 func (r Router) Start(address string) {
-	endless.ListenAndServe(address, r.engine)
+	r.engine.Run(address)
 }

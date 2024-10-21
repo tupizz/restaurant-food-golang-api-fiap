@@ -19,12 +19,10 @@ func NewDatabaseConnection(cfg *config.Config) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	// Optionally, ping the database to ensure connection is established
-	err = dbpool.Ping(ctx)
-	if err != nil {
-		slog.Error("Unable to ping the database", "error", err)
-		return nil, err
-	}
+	// Set connection pool parameters if necessary
+	dbpool.Config().MaxConns = 50                     // Adjust the number of maximum connections
+	dbpool.Config().MaxConnIdleTime = 5 * time.Minute // Set idle timeout for connections
+	dbpool.Config().MaxConnLifetime = time.Hour       // Set maximum lifetime of a connection
 
 	return dbpool, nil
 }

@@ -10,3 +10,4 @@ sql:
         package: "fiapRestaurantDb"
         out: "./database/sqlc"
         sql_package: "pgx/v5"
+        

@@ -19,6 +19,11 @@ require (
 )
 
 require (
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+)
+
+require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/bytedance/sonic v1.12.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
@@ -26,7 +31,6 @@ require (
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -38,12 +42,12 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.14.3 // indirect
+	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgtype v1.14.0 // indirect
+	github.com/jackc/pgtype v1.14.0
 	github.com/jackc/puddle v1.3.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
