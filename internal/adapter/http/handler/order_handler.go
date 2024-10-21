@@ -27,6 +27,18 @@ func NewOrderHandler(orderService service.OrderService) OrderHandler {
 	return &orderHandler{orderService: orderService}
 }
 
+// GetAllOrders godoc
+// @Summary     Retrieve all orders
+// @Description Get a list of all orders with pagination
+// @Tags        orders
+// @Accept      json
+// @Produce     json
+// @Param       page     query     int    false  "Page number"        default(1)
+// @Param       pageSize query     int    false  "Number of items per page" default(10)
+// @Success     200      {object}  order_list.PaginatedOrdersDTO
+// @Failure     400      {object}  ErrorResponse
+// @Failure     500      {object}  ErrorResponse
+// @Router      /admin/orders [get]
 func (h *orderHandler) GetAll(c *gin.Context) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {

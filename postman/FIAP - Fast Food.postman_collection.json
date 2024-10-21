@@ -131,7 +131,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/api/v1/products?page=3&pageSize=50",
+									"raw": "http://localhost:8080/api/v1/products?category=Lanche&page=3",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -144,17 +144,116 @@
 									],
 									"query": [
 										{
-											"key": "page",
-											"value": "3"
+											"key": "category",
+											"value": "Lanche"
 										},
 										{
-											"key": "pageSize",
-											"value": "50"
+											"key": "page",
+											"value": "3"
 										}
 									]
 								}
 							},
-							"response": []
+							"response": [
+								{
+									"name": "Get All Products",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:8080/api/v1/products?category=Lanche&page=3",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"v1",
+												"products"
+											],
+											"query": [
+												{
+													"key": "category",
+													"value": "Lanche"
+												},
+												{
+													"key": "page",
+													"value": "3"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 18 Oct 2024 15:19:15 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1574"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"products\": [\n        {\n            \"id\": 25,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 26,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 27,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 29,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 30,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 31,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 32,\n            \"name\": \"Produto novo\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 33,\n            \"name\": \"Test Product 1\",\n            \"price\": 10,\n            \"description\": \"Test Description 1\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test1.jpg\"\n            ]\n        },\n        {\n            \"id\": 34,\n            \"name\": \"Test Product 2\",\n            \"price\": 11,\n            \"description\": \"Test Description 2\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test2.jpg\"\n            ]\n        },\n        {\n            \"id\": 35,\n            \"name\": \"Test Product 3\",\n            \"price\": 12,\n            \"description\": \"Test Description 3\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test3.jpg\"\n            ]\n        }\n    ],\n    \"total\": 146\n}"
+								},
+								{
+									"name": "Get All Products",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:8080/api/v1/products?category=Lanche&page=3",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"v1",
+												"products"
+											],
+											"query": [
+												{
+													"key": "category",
+													"value": "Lanche"
+												},
+												{
+													"key": "page",
+													"value": "3"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 21 Oct 2024 17:36:48 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1574"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"products\": [\n        {\n            \"id\": 25,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 26,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 27,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 29,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 30,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 31,\n            \"name\": \"Produto novo (tadeu)\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 32,\n            \"name\": \"Produto novo\",\n            \"price\": 10,\n            \"description\": \"Descrição do produto novo\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://placehold.co/600x400/png\"\n            ]\n        },\n        {\n            \"id\": 33,\n            \"name\": \"Test Product 1\",\n            \"price\": 10,\n            \"description\": \"Test Description 1\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test1.jpg\"\n            ]\n        },\n        {\n            \"id\": 34,\n            \"name\": \"Test Product 2\",\n            \"price\": 11,\n            \"description\": \"Test Description 2\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test2.jpg\"\n            ]\n        },\n        {\n            \"id\": 35,\n            \"name\": \"Test Product 3\",\n            \"price\": 12,\n            \"description\": \"Test Description 3\",\n            \"category\": \"Lanche\",\n            \"images\": [\n                \"https://example.com/test3.jpg\"\n            ]\n        }\n    ],\n    \"total\": 147\n}"
+								}
+							]
 						}
 					]
 				},
@@ -171,7 +270,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"name\": \"new product name from postman\",\n    \"price\": 12,\n    \"description\": \"some description for the product\",\n    \"category\": \"lanche\",\n    \"images\": [\"https://placehold.co/400\"]\n}",
+											"raw": "{\n    \"name\": \"new product name from postman\",\n    \"price\": 12,\n    \"description\": \"some description for the product\",\n    \"category\": \"lanche\",\n    \"images\": [\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -193,7 +292,57 @@
 											]
 										}
 									},
-									"response": []
+									"response": [
+										{
+											"name": "Create Product",
+											"originalRequest": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"new product name from postman\",\n    \"price\": 12,\n    \"description\": \"some description for the product\",\n    \"category\": \"lanche\",\n    \"images\": [\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\"\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8080/api/v1/admin/products",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"products"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Date",
+													"value": "Fri, 18 Oct 2024 15:19:49 GMT"
+												},
+												{
+													"key": "Content-Length",
+													"value": "221"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"id\": 152,\n    \"name\": \"new product name from postman\",\n    \"price\": 12,\n    \"description\": \"some description for the product\",\n    \"category\": \"lanche\",\n    \"images\": [\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\"\n    ]\n}"
+										}
+									]
 								},
 								{
 									"name": "Update Product",
@@ -225,7 +374,58 @@
 											]
 										}
 									},
-									"response": []
+									"response": [
+										{
+											"name": "Update Product",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": 151, \n    \"name\": \"attt\",\n    \"price\": 13.312,\n    \"description\": \"updated value\",\n    \"category\": \"sobremesa\",\n    \"images\": [\"https://placehold.co/400\"]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "http://localhost:8080/api/v1/admin/products/151",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"products",
+														"151"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Date",
+													"value": "Thu, 17 Oct 2024 22:26:21 GMT"
+												},
+												{
+													"key": "Content-Length",
+													"value": "129"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"id\": 151,\n    \"name\": \"attt\",\n    \"price\": 13.31,\n    \"description\": \"updated value\",\n    \"category\": \"sobremesa\",\n    \"images\": [\n        \"https://placehold.co/400\"\n    ]\n}"
+										}
+									]
 								},
 								{
 									"name": "Update Product Copy",
@@ -233,7 +433,7 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "http://localhost:8080/api/v1/admin/products/150",
+											"raw": "http://localhost:8080/api/v1/admin/products/151",
 											"protocol": "http",
 											"host": [
 												"localhost"
@@ -244,11 +444,133 @@
 												"v1",
 												"admin",
 												"products",
-												"150"
+												"151"
 											]
 										}
 									},
-									"response": []
+									"response": [
+										{
+											"name": "Update Product Copy",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "http://localhost:8080/api/v1/admin/products/151",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"products",
+														"151"
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "plain",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Thu, 17 Oct 2024 22:26:25 GMT"
+												}
+											],
+											"cookie": [],
+											"body": null
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Oders",
+							"item": [
+								{
+									"name": "List Orders",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:8080/api/v1/admin/orders?pageSize=5&page=2",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"orders"
+											],
+											"query": [
+												{
+													"key": "pageSize",
+													"value": "5"
+												},
+												{
+													"key": "page",
+													"value": "2"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "List Orders",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "http://localhost:8080/api/v1/admin/orders?pageSize=5&page=2",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"orders"
+													],
+													"query": [
+														{
+															"key": "pageSize",
+															"value": "5"
+														},
+														{
+															"key": "page",
+															"value": "2"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json; charset=utf-8"
+												},
+												{
+													"key": "Date",
+													"value": "Mon, 21 Oct 2024 17:29:54 GMT"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"orders\": [\n        {\n            \"id\": 8,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 8,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 8,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 8,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 8,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                }\n            ],\n            \"payment\": {\n                \"id\": 8,\n                \"order_id\": 8,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 7,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 7,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 7,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 7,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 7,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                }\n            ],\n            \"payment\": {\n                \"id\": 7,\n                \"order_id\": 7,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 6,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 6,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 6,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 6,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 6,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                }\n            ],\n            \"payment\": {\n                \"id\": 6,\n                \"order_id\": 6,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 9,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 9,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 9,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 9,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 9,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                }\n            ],\n            \"payment\": {\n                \"id\": 9,\n                \"order_id\": 9,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        }\n    ],\n    \"total\": 4\n}"
+										}
+									]
 								}
 							]
 						}
@@ -264,7 +586,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"client_id\": 1,\n  \"status\": \"pending\",\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
+									"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -285,7 +607,56 @@
 									]
 								}
 							},
-							"response": []
+							"response": [
+								{
+									"name": "Create Order",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:8080/api/v1/orders",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"v1",
+												"orders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 18 Oct 2024 12:54:07 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "767"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 9,\n    \"client_id\": 1,\n    \"status\": \"pending\",\n    \"items\": [\n        {\n            \"id\": 20,\n            \"order_id\": 9,\n            \"product_id\": 4,\n            \"quantity\": 2,\n            \"price\": 3,\n            \"created_at\": \"2024-10-18T09:54:07.150766Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.150766Z\"\n        },\n        {\n            \"id\": 21,\n            \"order_id\": 9,\n            \"product_id\": 1,\n            \"quantity\": 3,\n            \"price\": 10,\n            \"created_at\": \"2024-10-18T09:54:07.152109Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152109Z\"\n        },\n        {\n            \"id\": 22,\n            \"order_id\": 9,\n            \"product_id\": 2,\n            \"quantity\": 3,\n            \"price\": 5,\n            \"created_at\": \"2024-10-18T09:54:07.152571Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152571Z\"\n        }\n    ],\n    \"payment\": {\n        \"id\": 9,\n        \"order_id\": 9,\n        \"status\": \"pending\",\n        \"method\": \"credit_card\",\n        \"amount\": 58.059124999999995,\n        \"created_at\": \"2024-10-18T09:54:07.153033Z\",\n        \"updated_at\": \"2024-10-18T09:54:07.153033Z\"\n    },\n    \"created_at\": \"2024-10-18T09:54:07.148189Z\",\n    \"updated_at\": \"2024-10-18T09:54:07.148189Z\"\n}"
+								}
+							]
 						},
 						{
 							"name": "Get Order",
@@ -307,7 +678,48 @@
 									]
 								}
 							},
-							"response": []
+							"response": [
+								{
+									"name": "Get Order",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:8080/api/v1/orders/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"api",
+												"v1",
+												"orders",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 14 Oct 2024 16:26:11 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "608"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 1,\n    \"client_id\": 1,\n    \"status\": \"pending\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"order_id\": 1,\n            \"product_id\": 123,\n            \"quantity\": 2,\n            \"price\": 20,\n            \"created_at\": \"2024-10-13T12:28:53.241739Z\",\n            \"updated_at\": \"2024-10-13T12:28:53.241739Z\"\n        },\n        {\n            \"id\": 2,\n            \"order_id\": 1,\n            \"product_id\": 1,\n            \"quantity\": 2,\n            \"price\": 10,\n            \"created_at\": \"2024-10-13T12:28:53.243182Z\",\n            \"updated_at\": \"2024-10-13T12:28:53.243182Z\"\n        }\n    ],\n    \"payment\": {\n        \"id\": 1,\n        \"order_id\": 1,\n        \"status\": \"pending\",\n        \"method\": \"credit_card\",\n        \"amount\": 67.42,\n        \"created_at\": \"2024-10-13T12:28:53.243654Z\",\n        \"updated_at\": \"2024-10-13T12:28:53.243654Z\"\n    },\n    \"created_at\": \"2024-10-13T12:28:53.236956Z\",\n    \"updated_at\": \"2024-10-13T12:28:53.236956Z\"\n}"
+								}
+							]
 						}
 					]
 				}
