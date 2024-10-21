@@ -20,6 +20,10 @@ func NewSQLCDB(cfg *config.Config) (*fiapRestaurantDb.Queries, error) {
 		return nil, err
 	}
 
+	dbpool.Config().MaxConns = 50
+	dbpool.Config().MaxConnIdleTime = 5 * time.Minute
+	dbpool.Config().MaxConnLifetime = time.Hour
+
 	db := fiapRestaurantDb.New(dbpool)
 
 	return db, nil
