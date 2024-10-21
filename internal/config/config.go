@@ -1,8 +1,7 @@
 package config
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
 
 	"github.com/spf13/viper"
 )
@@ -12,17 +11,17 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	fmt.Println("Loading config")
+	slog.Info("Loading config")
 	viper.AutomaticEnv()
 
-	fmt.Println(viper.GetString("DATABASE_URL"))
+	slog.Info("DATABASE_URL", "value", viper.GetString("DATABASE_URL"))
 
 	config := &Config{
 		DatabaseURL: viper.GetString("DATABASE_URL"),
 	}
 
 	if config.DatabaseURL == "" {
-		log.Fatal("DATABASE_URL is not set")
+		slog.Error("DATABASE_URL is not set")
 	}
 
 	return config

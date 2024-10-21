@@ -2,8 +2,7 @@ package di
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -12,20 +11,18 @@ import (
 )
 
 func NewSQLCDB(cfg *config.Config) (*fiapRestaurantDb.Queries, error) {
-	fmt.Println("NewSQLCDB")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	dbpool, err := pgx.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
-		log.Printf("Unable to connect to database: %v\n", err)
+		slog.Error("Unable to connect to database", "error", err)
 		return nil, err
 	}
 
 	err = dbpool.Ping(ctx)
 	if err != nil {
-		log.Printf("Unable to ping the database: %v\n", err)
+		slog.Error("Unable to ping the database", "error", err)
 		return nil, err
 	}
 

@@ -2,7 +2,7 @@ package di
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -15,14 +15,14 @@ func NewDatabaseConnection(cfg *config.Config) (*pgxpool.Pool, error) {
 
 	dbpool, err := pgxpool.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
-		log.Printf("Unable to connect to database: %v\n", err)
+		slog.Error("Unable to connect to database", "error", err)
 		return nil, err
 	}
 
 	// Optionally, ping the database to ensure connection is established
 	err = dbpool.Ping(ctx)
 	if err != nil {
-		log.Printf("Unable to ping the database: %v\n", err)
+		slog.Error("Unable to ping the database", "error", err)
 		return nil, err
 	}
 

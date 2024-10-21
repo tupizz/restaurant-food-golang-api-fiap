@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"log/slog"
 
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
@@ -53,10 +52,6 @@ func (s *productService) GetProducts(ctx context.Context, filter *domain.Product
 			Category:    product.Category.Name,
 			Images:      images,
 		}
-
-		log.Println(productOutput)
-
-		slog.Info("Created product output", "product", productOutput)
 
 		productOutputs = append(productOutputs, productOutput)
 	}
