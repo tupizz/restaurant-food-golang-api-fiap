@@ -7,21 +7,42 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	fiapRestaurantDb "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 )
 
 type orderRepository struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	sqlcDb *fiapRestaurantDb.Queries
 }
 
-func NewOrderRepository(db *pgxpool.Pool) domain.OrderRepository {
-	return &orderRepository{db: db}
+func NewOrderRepository(
+	db *pgxpool.Pool,
+	sqlcDb *fiapRestaurantDb.Queries,
+) domain.OrderRepository {
+	return &orderRepository{
+		db:     db,
+		sqlcDb: sqlcDb,
+	}
 }
 
 var (
 	ErrOrderNotFound = errors.New("order not found")
 )
+
+func (r *orderRepository) GetAll(ctx context.Context, filter *domain.OrderFilter) ([]fiapRestaurantDb.GetAllOrdersRow, error) {
+	orders, err := r.sqlcDb.GetAllOrders(ctx, fiapRestaurantDb.GetAllOrdersParams{
+		Limit:  int32(filter.PageSize),
+		Offset: int32((filter.Page - 1) * filter.PageSize),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
 
 func (r *orderRepository) Create(ctx context.Context, order entity.Order) (entity.Order, error) {
 	tx, err := r.db.Begin(ctx)

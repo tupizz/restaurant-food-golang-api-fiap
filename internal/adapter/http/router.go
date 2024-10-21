@@ -52,6 +52,11 @@ func NewRouter(
 
 		admin := v1.Group("/admin")
 		{
+			adminOrders := admin.Group("/orders")
+			{
+				adminOrders.GET("/", orderHandler.GetAll)
+			}
+
 			adminProducts := admin.Group("/products")
 			{
 				adminProducts.POST("/", adminProductHandler.Create)

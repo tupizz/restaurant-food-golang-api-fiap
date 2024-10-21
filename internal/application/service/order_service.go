@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto/order_list"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 )
@@ -10,6 +12,7 @@ import (
 type OrderService interface {
 	CreateOrder(ctx context.Context, order entity.Order) (entity.Order, error)
 	GetOrderById(ctx context.Context, id int) (entity.Order, error)
+	GetAllOrders(ctx context.Context, filter *domain.OrderFilter) ([]order_list.OrderDTO, error)
 }
 
 type orderService struct {
@@ -28,6 +31,82 @@ func NewOrderService(
 		productRepo:            productRepo,
 		paymentTaxSettingsRepo: paymentTaxSettingsRepo,
 	}
+}
+
+func (s *orderService) GetAllOrders(ctx context.Context, filter *domain.OrderFilter) ([]order_list.OrderDTO, error) {
+	if filter.PageSize == 0 {
+		filter.PageSize = 10
+	}
+
+	if filter.Page == 0 {
+		filter.Page = 1
+	}
+
+	orders, err := s.orderRepo.GetAll(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var mapOrderIdToItems = make(map[int][]order_list.OrderDTO)
+	for _, order := range orders {
+		productPrice, _ := order.ProductPrice.Float64Value()
+
+		if !productPrice.Valid {
+			slog.Error("product price is not valid")
+		}
+
+		paymentAmount, _ := order.PaymentAmount.Float64Value()
+		if !paymentAmount.Valid {
+			slog.Error("payment amount is not valid")
+		}
+
+		mapOrderIdToItems[int(order.OrderID)] = append(mapOrderIdToItems[int(order.OrderID)], order_list.OrderDTO{
+			ID:       int(order.OrderID),
+			ClientID: int(order.ClientID),
+			Client: order_list.ClientDTO{
+				ID:   int(order.ClientID),
+				Name: order.ClientName,
+				CPF:  order.ClientCpf,
+			},
+			Status: string(order.OrderStatus.String),
+			Items: []order_list.OrderItemDTO{
+				{
+					ID:        int(order.ProductID),
+					OrderID:   int(order.OrderID),
+					ProductID: int(order.ProductID),
+					Quantity:  int(order.ProductQuantity),
+					Price:     productPrice.Float64,
+					Product: order_list.ProductDTO{
+						ID:             int(order.ProductID),
+						Name:           order.ProductName,
+						CategoryHandle: order.CategoryHandle.String,
+						Description:    order.ProductDescription,
+						Price:          productPrice.Float64,
+					},
+				},
+			},
+			Payment: order_list.PaymentDTO{
+				ID:      int(order.PaymentID),
+				OrderID: int(order.OrderID),
+				Status:  string(order.PaymentStatus.String),
+				Amount:  paymentAmount.Float64,
+				Method:  string(order.PaymentMethod),
+			},
+		})
+	}
+
+	var ordersEntity []order_list.OrderDTO
+	for _, orders := range mapOrderIdToItems {
+		order := orders[0]
+
+		for _, item := range orders {
+			order.Items = append(order.Items, item.Items...)
+		}
+
+		ordersEntity = append(ordersEntity, order)
+	}
+
+	return ordersEntity, nil
 }
 
 func (s *orderService) CreateOrder(ctx context.Context, order entity.Order) (entity.Order, error) {

@@ -16,6 +16,7 @@ import (
 type OrderHandler interface {
 	Create(c *gin.Context)
 	GetById(c *gin.Context)
+	GetAll(c *gin.Context)
 }
 
 type orderHandler struct {
@@ -24,6 +25,34 @@ type orderHandler struct {
 
 func NewOrderHandler(orderService service.OrderService) OrderHandler {
 	return &orderHandler{orderService: orderService}
+}
+
+func (h *orderHandler) GetAll(c *gin.Context) {
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		return
+	}
+
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size"})
+	}
+
+	orders, err := h.orderService.GetAllOrders(c.Request.Context(), &domain.OrderFilter{
+		Page:     page,
+		PageSize: pageSize,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"orders": orders,
+		"total":  len(orders),
+	})
 }
 
 // Create godoc
