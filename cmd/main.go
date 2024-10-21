@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
+	"os"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
@@ -13,11 +13,11 @@ import (
 // @title           FastFood Golang API
 // @version         1.0
 // @description     API do projeto FastFood Golang.
-// @termsOfService  http://seu-site.com/terms/
+// @termsOfService  https://tadeutupinamba.com.br
 
 // @contact.name   Suporte
-// @contact.url    http://seu-site.com/support
-// @contact.email  suporte@seu-site.com
+// @contact.url    https://tadeutupinamba.com.br
+// @contact.email  tadeu.tupiz@gmail.com
 
 // @license.name  MIT
 // @license.url   https://opensource.org/licenses/MIT
@@ -27,13 +27,17 @@ import (
 func main() {
 	container := di.BuildContainer()
 
-	fmt.Println("Starting server")
+	slog.Info("Starting server")
 
 	err := container.Invoke(func(router http.Router) {
+		slog.Info("Server started at port 8080")
+		slog.Info("Swagger UI at http://localhost:8080/swagger/index.html")
+		slog.Info("API Documentation at http://localhost:8080/swagger/doc.json")
 		router.Start(":8080")
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Error starting server", "error", err)
+		os.Exit(1)
 	}
 }
