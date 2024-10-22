@@ -35,7 +35,7 @@ func NewOrderHandler(orderService service.OrderService) OrderHandler {
 // @Produce     json
 // @Param       page     query     int    false  "Page number"        default(1)
 // @Param       pageSize query     int    false  "Number of items per page" default(10)
-// @Success     200      {object}  order_list.PaginatedOrdersDTO
+// @Success     200      {object}  order_list_dto.PaginatedOrdersDTO
 // @Failure     400      {object}  ErrorResponse
 // @Failure     500      {object}  ErrorResponse
 // @Router      /admin/orders [get]

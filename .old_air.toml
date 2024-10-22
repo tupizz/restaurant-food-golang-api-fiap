@@ -1,22 +1,19 @@
-root = "."
+oot = "."
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 # Config file for Air
 [build]
-  cmd = "make build-debug"
-  bin = "./bin/fastfood-golang-debug"
-  full_bin = "dlv exec ./bin/fastfood-golang-debug --listen=127.0.0.1:2345 --headless=true --api-version=2 --accept-multiclient --continue --log -- "
+  cmd = "go build -o ./tmp/main ./cmd/main.go"
+  bin = "./tmp/main"
   include_ext = ["go", "tpl", "tmpl", "html"]
-  exclude_dir = [".vscode", ".github", "bin", "tmp"]
+  exclude_dir = ["vendor", "tmp", "scripts", "dist"]
   exclude_file = ["README.md"]
-  exclude_regex = ["_test.go"]
   delay = 1000 # ms
   kill_delay = 500 # ms
   log = "air_errors.log"
   thread = true
   stop_on_error = true
-  args_bin = ["server"]
 
 [log]
   color = true

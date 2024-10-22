@@ -1,4 +1,4 @@
-package order_list
+package order_list_dto
 
 import "time"
 

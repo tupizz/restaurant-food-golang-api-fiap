@@ -10,14 +10,14 @@ import (
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/config"
 )
 
-func NewSQLCDB(cfg *config.Config) (*fiapRestaurantDb.Queries, error) {
+func NewSQLCDB(cfg *config.Config) (*fiapRestaurantDb.Queries, *pgxpool.Pool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	dbpool, err := pgxpool.New(ctx, cfg.DatabaseURL)
 	if err != nil {
 		slog.Error("Unable to connect to database", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
 
 	dbpool.Config().MaxConns = 50
@@ -26,5 +26,5 @@ func NewSQLCDB(cfg *config.Config) (*fiapRestaurantDb.Queries, error) {
 
 	db := fiapRestaurantDb.New(dbpool)
 
-	return db, nil
+	return db, dbpool, nil
 }

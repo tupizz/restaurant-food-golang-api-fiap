@@ -8,6 +8,7 @@ GOPATH := $(shell go env GOPATH)
 SWAG := $(GOPATH)/bin/swag
 AIR := $(GOPATH)/bin/air
 MIGRATE := $(GOPATH)/bin/migrate
+BINARY_NAME := $(APP_NAME)
 
 # Database URL - update if necessary or override when running make
 DATABASE_URL ?= postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable
@@ -44,6 +45,9 @@ build:
 run:
 	@echo "Running application..."
 	$(GO) run ./cmd/main.go
+
+build-debug: clean
+	CGO_ENABLED=0 go build -gcflags=all="-N -l" -o bin/$(BINARY_NAME)-debug ./cmd/main.go
 
 run-air:
 	@echo "Running application with Air..."

@@ -44,6 +44,10 @@ type OrderRepository interface {
 	GetAll(ctx context.Context, filter *OrderFilter) ([]fiapRestaurantDb.GetAllOrdersRow, error)
 }
 
+type PaymentRepository interface {
+	UpdateOrderPaymentStatus(ctx context.Context, orderId int, status entity.PaymentStatus) error
+}
+
 type PaymentTaxSettingsRepository interface {
 	GetAll(ctx context.Context) ([]entity.PaymentTaxSettings, error)
 }

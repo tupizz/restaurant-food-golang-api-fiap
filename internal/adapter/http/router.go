@@ -18,6 +18,7 @@ func NewRouter(
 	productHandler handler.ProductHandler,
 	adminProductHandler handler.AdminProductHandler,
 	orderHandler handler.OrderHandler,
+	fakeCheckoutHandler handler.FakeCheckoutHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -52,6 +53,8 @@ func NewRouter(
 
 		admin := v1.Group("/admin")
 		{
+			admin.POST("/fake-checkout", fakeCheckoutHandler.ProcessPayment)
+
 			adminOrders := admin.Group("/orders")
 			{
 				adminOrders.GET("/", orderHandler.GetAll)

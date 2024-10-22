@@ -1,5 +1,7 @@
 .idea
 tmp
 playground
-.vscode
 main
+/bin/*
+!.vscode/launch.json
+.vscode/*
