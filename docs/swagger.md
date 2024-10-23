@@ -13,5 +13,3 @@ Observação: Certifique-se de que o diretório $GOPATH/bin está no seu PATH pa
 go get -u github.com/swaggo/gin-swagger
 go get -u github.com/swaggo/files
 ```
-
-

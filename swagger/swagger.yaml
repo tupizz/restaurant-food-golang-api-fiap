@@ -188,19 +188,13 @@ definitions:
     - email
     - name
     type: object
-  entity.User:
+  dto.UserOutput:
     properties:
       age:
         type: integer
-      created_at:
-        type: string
       email:
         type: string
-      id:
-        type: integer
       name:
-        type: string
-      updated_at:
         type: string
     type: object
   handler.ErrorResponse:
@@ -215,7 +209,7 @@ definitions:
         example: Invalid request
         type: string
     type: object
-  order_list.ClientDTO:
+  order_list_dto.ClientDTO:
     properties:
       cpf:
         type: string
@@ -224,24 +218,24 @@ definitions:
       name:
         type: string
     type: object
-  order_list.OrderDTO:
+  order_list_dto.OrderDTO:
     properties:
       client:
-        $ref: '#/definitions/order_list.ClientDTO'
+        $ref: '#/definitions/order_list_dto.ClientDTO'
       client_id:
         type: integer
       id:
         type: integer
       items:
         items:
-          $ref: '#/definitions/order_list.OrderItemDTO'
+          $ref: '#/definitions/order_list_dto.OrderItemDTO'
         type: array
       payment:
-        $ref: '#/definitions/order_list.PaymentDTO'
+        $ref: '#/definitions/order_list_dto.PaymentDTO'
       status:
         type: string
     type: object
-  order_list.OrderItemDTO:
+  order_list_dto.OrderItemDTO:
     properties:
       id:
         type: integer
@@ -250,22 +244,22 @@ definitions:
       price:
         type: number
       product:
-        $ref: '#/definitions/order_list.ProductDTO'
+        $ref: '#/definitions/order_list_dto.ProductDTO'
       product_id:
         type: integer
       quantity:
         type: integer
     type: object
-  order_list.PaginatedOrdersDTO:
+  order_list_dto.PaginatedOrdersDTO:
     properties:
       orders:
         items:
-          $ref: '#/definitions/order_list.OrderDTO'
+          $ref: '#/definitions/order_list_dto.OrderDTO'
         type: array
       total:
         type: integer
     type: object
-  order_list.PaymentDTO:
+  order_list_dto.PaymentDTO:
     properties:
       amount:
         type: number
@@ -278,7 +272,7 @@ definitions:
       status:
         type: string
     type: object
-  order_list.ProductDTO:
+  order_list_dto.ProductDTO:
     properties:
       category_handle:
         type: string
@@ -296,14 +290,14 @@ definitions:
 host: localhost:8080
 info:
   contact:
-    email: suporte@seu-site.com
+    email: tadeu.tupiz@gmail.com
     name: Suporte
-    url: http://seu-site.com/support
+    url: https://tadeutupinamba.com.br
   description: API do projeto FastFood Golang.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  termsOfService: http://seu-site.com/terms/
+  termsOfService: https://tadeutupinamba.com.br
   title: FastFood Golang API
   version: "1.0"
 paths:
@@ -329,7 +323,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/order_list.PaginatedOrdersDTO'
+            $ref: '#/definitions/order_list_dto.PaginatedOrdersDTO'
         "400":
           description: Bad Request
           schema:
@@ -601,7 +595,7 @@ paths:
           schema:
             items:
               items:
-                $ref: '#/definitions/entity.User'
+                $ref: '#/definitions/dto.UserOutput'
               type: array
             type: array
         "500":
@@ -628,7 +622,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/entity.User'
+            $ref: '#/definitions/dto.UserOutput'
         "400":
           description: Bad Request
           schema:

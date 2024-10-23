@@ -1,3 +1,5 @@
+include .env
+
 # Makefile
 
 SHELL := /bin/bash
@@ -9,9 +11,6 @@ SWAG := $(GOPATH)/bin/swag
 AIR := $(GOPATH)/bin/air
 MIGRATE := $(GOPATH)/bin/migrate
 BINARY_NAME := $(APP_NAME)
-
-# Database URL - update if necessary or override when running make
-DATABASE_URL ?= postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable
 
 # Ensure GOPATH/bin is in PATH
 export PATH := $(GOPATH)/bin:$(PATH)
@@ -55,11 +54,11 @@ run-air:
 
 migrate-up:
 	@echo "Applying database migrations..."
-	$(MIGRATE) -database $(DATABASE_URL) -path ./migrations up
+	$(MIGRATE) -database $(DATABASE_URL) -path ./database/migrations up
 
 migrate-down:
 	@echo "Reverting database migrations..."
-	$(MIGRATE) -database $(DATABASE_URL) -path ./migrations down 1
+	$(MIGRATE) -database $(DATABASE_URL) -path ./database/migrations down 1
 
 swag-init:
 	@echo "Generating Swagger documentation..."
@@ -84,7 +83,7 @@ clean:
 install-tools:
 	@echo "Installing tools..."
 	$(GO) install github.com/swaggo/swag/cmd/swag@latest
-	$(GO) install github.com/cosmtrek/air@latest
+	$(GO) install github.com/air-verse/air@latest
 	$(GO) install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 setup: install-tools swag-init migrate-up

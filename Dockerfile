@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.20-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./cmd/main.go
 
 # Run stage
-FROM alpine:latest
+FROM scratch
 
 # Set the working directory
 WORKDIR /app
@@ -30,4 +30,3 @@ EXPOSE 8080
 
 # Command to run the executable
 CMD ["./main"]
-

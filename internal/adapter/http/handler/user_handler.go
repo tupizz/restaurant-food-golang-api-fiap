@@ -9,6 +9,7 @@ import (
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/mappers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +33,7 @@ func NewUserHandler(userService service.UserService) UserHandler {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Success      200     {array}  []entity.User
+// @Success      200     {array}  []dto.UserOutput
 // @Failure      500     {object}  handler.ErrorResponse
 // @Router       /users [get]
 func (h *userHandler) GetAll(c *gin.Context) {
@@ -41,6 +42,7 @@ func (h *userHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, users)
 }
 
@@ -51,7 +53,7 @@ func (h *userHandler) GetAll(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        user  body      dto.UserInput  true  "Dados do Usuário"
-// @Success      201     {object}  entity.User
+// @Success      201     {object}  dto.UserOutput
 // @Failure      400     {object}  handler.ErrorResponse
 // @Failure      500     {object}  handler.ErrorResponse
 // @Router       /users [post]
@@ -84,5 +86,8 @@ func (h *userHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createdUser)
+	// Map domain entity to response DTO
+	userResponse := mappers.MapUserEntityToResponse(createdUser)
+
+	c.JSON(http.StatusCreated, userResponse)
 }
