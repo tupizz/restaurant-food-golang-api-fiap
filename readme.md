@@ -101,7 +101,7 @@ Abra o terminal e clone o repositório para a sua máquina local:
 
 ```bash
 git clone https://github.com/tupizz/restaurant-food-golang-api-fiap
-cd fastfood-golang
+cd restaurant-food-golang-api-fiap
 ```
 
 ### 2. Instalar Dependências Go
@@ -121,7 +121,7 @@ Air é uma ferramenta que recompila e reinicia automaticamente a aplicação qua
 Ou, se preferir, instale via Go (confirme que o diretório `$GOPATH/bin` está no seu `PATH`):
 
 ```bash
-go install github.com/cosmtrek/air@latest
+go install github.com/air-verse/air@latest
 ```
 
 ### 4. Instalar o Golang-Migrate para Migrações de Banco de Dados
@@ -135,6 +135,24 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@lat
 ```
 
 Certifique-se de que o diretório `$GOPATH/bin` está no seu `PATH` para acessar o comando `migrate`.
+
+---
+
+#### Observações (Passo 3 e 4):
+
+1. Caso você use alguma ferramenta para gerenciar diferentes versões do Go, como o [ASDF](https://github.com/asdf-vm/asdf), você precisrá regerar os _shims_ para que os binários instalados diretamente com o `go install` estejam disponíveis.
+
+```bash
+# Para o cenário do ASDF, pode ser:
+asdf reshim golang
+```
+
+2. Os seguintes comandos a seguir podem verificar a correta isntalação das ferramentas acima:
+
+```bash
+air -v
+migrate -version
+```
 
 ---
 
@@ -178,29 +196,53 @@ A aplicação estará disponível em `http://localhost:8080`.
 - **Criar Usuário:**
 
   ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"name":"João Silva", "email":"joao.silva@example.com", "age":30}' http://localhost:8080/api/v1/users
+  curl -X POST -H "Content-Type: application/json" -d '{"name":"João Silva", "email":"joao.silva@example.com", "age":30}' http://localhost:8080/api/v1/users/
   ```
 
 ---
 
 ## Executando o Projeto sem Docker
 
-### 1. Configurar o Banco de Dados PostgreSQL
+### 1. Configurar o Banco de Dados PostgreSQL (2 formas):
 
-Instale o PostgreSQL em sua máquina e crie um banco de dados chamado `yourdb`.
+#### 1.1 Rodando o Banco de Dados localmente
+
+Instale o PostgreSQL em sua máquina e crie um banco de dados chamado `fiap_fast_food`.
 
 Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu banco de dados local:
 
 ```env
-DATABASE_URL=postgres://postgres:suasenha@localhost:5432/yourdb?sslmode=disable
+DATABASE_URL=postgres://postgres:suasenha@localhost:5432/fiap_fast_food?sslmode=disable
+```
+
+#### 1.2 Rodando o Banco de Dados em um container Docker
+
+Também é possível utilizar o container para o postgres disponível no `docker-compose.yml`. Neste caso basta subir apenas este container e rodar somente o _app_ localmente:
+
+**Caso prefira rodar o banco em sua máquina, isto é, sem uso de containers, desconsidere este passo**.
+
+```bash
+docker-compose up db --build
+```
+
+Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu banco de dados do container (as credenciais podem ser vistas como variáveis de ambiente no `docker-compose.yml`):
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable
 ```
 
 ### 2. Executar Migrações do Banco de Dados
 
-Execute as migrações para criar as tabelas necessárias:
+Execute as migrações para criar as tabelas necessárias (subtituindo a DATABASE_URL abaixo):
 
 ```bash
-migrate -database ${DATABASE_URL} -path ./migrations up
+migrate -database "${DATABASE_URL}" -path ./database/migrations up
+```
+
+Ou, se preferir, rode através do [make](https://www.gnu.org/software/make/).
+
+```bash
+make migrate-up
 ```
 
 ### 3. Iniciar a Aplicação com Air
@@ -209,6 +251,12 @@ Inicie a aplicação usando o Air para habilitar o live reloading:
 
 ```bash
 air
+```
+
+Ou, se preferir, rode através do [make](https://www.gnu.org/software/make/).
+
+```bash
+make run-air
 ```
 
 **Observação:** Certifique-se de que o comando `air` está disponível no seu `PATH`. Se instalou o Air via Go, o binário estará em `$GOPATH/bin`.
@@ -319,7 +367,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 
 **Detalhes e Decisões:**
 
-- **Uso do Gin Framework:** Escolhemos o Gin devido à sua eficiência e facilidade de uso para criar APIs RESTful.
+- **Uso do Gin Framework:** Escolhemos o Gin devido à sua eficiência e facilidade de uso para criar APIs RESTful (foram cogitados outros frameworks, como o echo).
 - **Responsabilidade Limitada dos Handlers:** Os manipuladores focam em processar solicitações e respostas, delegando a lógica de negócios para a camada de aplicação.
 
 ---
@@ -341,9 +389,9 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 **Arquivos Relevantes:**
 
 - **Serviços de Aplicação:**
-    - `internal/application/service/user_service.go`: Implementa a lógica de negócios relacionada a usuários, como criação, leitura, atualização e exclusão.
+    - `internal/application/service/user_service.go` (exemplo): Implementa a lógica de negócios relacionada a usuários, como criação, leitura, atualização e exclusão.
 - **Data Transfer Objects (DTOs):**
-    - `internal/application/dto/user_dto.go`: Define estruturas para transferência de dados entre camadas, evitando expor diretamente as entidades do domínio.
+    - `internal/application/dto/product_input.go` e `internal/application/dto/product_output.go` (exemplo): Define estruturas para transferência de dados entre camadas, evitando expor diretamente as entidades do domínio.
 
 **Detalhes e Decisões:**
 
@@ -400,7 +448,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - **Injeção de Dependências:**
     - `internal/di/container.go`: Configura o container de injeção de dependências usando o Uber Dig, registrando todos os provedores necessários.
 - **Conexão com o Banco de Dados:**
-    - `internal/di/database.go`: Estabelece a conexão com o PostgreSQL utilizando `pgxpool`.
+    - `internal/di/database.go`: Estabelece a conexão com o PostgreSQL utilizando `pgxpool`, fazendo uso de uma _connection pool_ para evitar gargalos entre as _gorountines_ que competirão por acesso ao Banco de Dados.
 
 **Detalhes e Decisões:**
 

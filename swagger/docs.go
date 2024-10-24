@@ -9,11 +9,11 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://seu-site.com/terms/",
+        "termsOfService": "https://tadeutupinamba.com.br",
         "contact": {
             "name": "Suporte",
-            "url": "http://seu-site.com/support",
-            "email": "suporte@seu-site.com"
+            "url": "https://tadeutupinamba.com.br",
+            "email": "tadeu.tupiz@gmail.com"
         },
         "license": {
             "name": "MIT",
@@ -57,7 +57,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/order_list.PaginatedOrdersDTO"
+                            "$ref": "#/definitions/order_list_dto.PaginatedOrdersDTO"
                         }
                     },
                     "400": {
@@ -472,7 +472,7 @@ const docTemplate = `{
                             "items": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/entity.User"
+                                    "$ref": "#/definitions/dto.UserOutput"
                                 }
                             }
                         }
@@ -512,7 +512,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
+                            "$ref": "#/definitions/dto.UserOutput"
                         }
                     },
                     "400": {
@@ -809,25 +809,16 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.User": {
+        "dto.UserOutput": {
             "type": "object",
             "properties": {
                 "age": {
                     "type": "integer"
                 },
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "name": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }
@@ -849,7 +840,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_list.ClientDTO": {
+        "order_list_dto.ClientDTO": {
             "type": "object",
             "properties": {
                 "cpf": {
@@ -863,11 +854,11 @@ const docTemplate = `{
                 }
             }
         },
-        "order_list.OrderDTO": {
+        "order_list_dto.OrderDTO": {
             "type": "object",
             "properties": {
                 "client": {
-                    "$ref": "#/definitions/order_list.ClientDTO"
+                    "$ref": "#/definitions/order_list_dto.ClientDTO"
                 },
                 "client_id": {
                     "type": "integer"
@@ -878,18 +869,18 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_list.OrderItemDTO"
+                        "$ref": "#/definitions/order_list_dto.OrderItemDTO"
                     }
                 },
                 "payment": {
-                    "$ref": "#/definitions/order_list.PaymentDTO"
+                    "$ref": "#/definitions/order_list_dto.PaymentDTO"
                 },
                 "status": {
                     "type": "string"
                 }
             }
         },
-        "order_list.OrderItemDTO": {
+        "order_list_dto.OrderItemDTO": {
             "type": "object",
             "properties": {
                 "id": {
@@ -902,7 +893,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "product": {
-                    "$ref": "#/definitions/order_list.ProductDTO"
+                    "$ref": "#/definitions/order_list_dto.ProductDTO"
                 },
                 "product_id": {
                     "type": "integer"
@@ -912,13 +903,13 @@ const docTemplate = `{
                 }
             }
         },
-        "order_list.PaginatedOrdersDTO": {
+        "order_list_dto.PaginatedOrdersDTO": {
             "type": "object",
             "properties": {
                 "orders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_list.OrderDTO"
+                        "$ref": "#/definitions/order_list_dto.OrderDTO"
                     }
                 },
                 "total": {
@@ -926,7 +917,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_list.PaymentDTO": {
+        "order_list_dto.PaymentDTO": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -946,7 +937,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_list.ProductDTO": {
+        "order_list_dto.ProductDTO": {
             "type": "object",
             "properties": {
                 "category_handle": {

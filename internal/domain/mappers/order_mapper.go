@@ -63,3 +63,12 @@ func MapOrderEntityToResponse(order entity.Order) dto.OrderResponse {
 		UpdatedAt: order.UpdatedAt,
 	}
 }
+
+// MapUserEntityToResponse maps the User entity to the OrderResponse DTO
+func MapUserEntityToResponse(user entity.User) dto.UserOutput {
+	return dto.UserOutput{
+		Name:  user.Name,
+		Email: user.Email,
+		Age:   user.Age,
+	}
+}
