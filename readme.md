@@ -2,6 +2,10 @@
 
 Event Storming é uma técnica colaborativa que ajuda a descobrir, compreender e mapear processos de negócios complexos através da identificação de eventos, comandos, agregados, políticas, participantes, entre outros elementos. É especialmente útil em projetos de DDD, pois facilita a comunicação entre equipes técnicas e de negócio.
 
+## Fluxo DDD Miro
+
+[Board DDD](https://miro.com/app/board/uXjVLeiK8DM=/)
+
 ## Linguagem Ubíqua
 
 - Pedido
@@ -10,7 +14,7 @@ Event Storming é uma técnica colaborativa que ajuda a descobrir, compreender e
 - Preparação
 - Entrega
 - Status do Pedido
-- Notificação  
+- Notificação
 
 
 ## Realização do pedido e pagamento
