@@ -141,3 +141,9 @@ flowchart TB
     Outbound --> Database
 
 ```
+
+### Clean Architexture Diagrama
+
+```
+TO-DO
+```
