@@ -82,7 +82,7 @@ flowchart TD
 ```
 
 
-# Guia de Instalação e Execução do Projeto
+# Guia de instalação e execução do projeto
 
 Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** em sua máquina, seja utilizando Docker ou rodando a aplicação diretamente. Siga as instruções abaixo para preparar o ambiente de desenvolvimento e executar a aplicação.
 
@@ -97,9 +97,9 @@ Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** e
 
 ---
 
-## Configuração do Ambiente
+## Configuração do ambiente
 
-### 1. Clonar o Repositório
+### 1. Clonar o repositório
 
 Abra o terminal e clone o repositório para a sua máquina local:
 
@@ -108,7 +108,7 @@ git clone https://github.com/tupizz/restaurant-food-golang-api-fiap
 cd restaurant-food-golang-api-fiap
 ```
 
-### 2. Instalar Dependências Go
+### 2. Instalar dependências Go
 
 Certifique-se de ter o Go instalado e configurado em sua máquina. Baixe as dependências do projeto:
 
@@ -118,7 +118,7 @@ go mod download
 
 ### 3. Instalar o Air para Live Reloading
 
-Air é uma ferramenta que recompila e reinicia automaticamente a aplicação quando mudanças no código são detectadas.
+Air é uma ferramenta que recompila e reinicia automaticamente a aplicação quando mudanças no código são detectadas nos arquivos mapeados.
 
 #### Instalação
 
@@ -128,7 +128,7 @@ Ou, se preferir, instale via Go (confirme que o diretório `$GOPATH/bin` está n
 go install github.com/air-verse/air@latest
 ```
 
-### 4. Instalar o Golang-Migrate para Migrações de Banco de Dados
+### 4. Instalar o Golang-Migrate para migrações de banco de dados
 
 Golang-Migrate é usado para gerenciar migrações do banco de dados.
 
@@ -142,7 +142,7 @@ Certifique-se de que o diretório `$GOPATH/bin` está no seu `PATH` para acessar
 
 ---
 
-#### Observações (Passo 3 e 4):
+#### Observações (passo 3 e 4):
 
 1. Caso você use alguma ferramenta para gerenciar diferentes versões do Go, como o [ASDF](https://github.com/asdf-vm/asdf), você precisrá regerar os _shims_ para que os binários instalados diretamente com o `go install` estejam disponíveis.
 
@@ -160,9 +160,9 @@ migrate -version
 
 ---
 
-## Executando o Projeto com Docker
+## Executando o projeto com Docker
 
-### 1. Configurar Variáveis de Ambiente
+### 1. Configurar variáveis de ambiente
 
 Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
 
@@ -170,7 +170,7 @@ Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
 DATABASE_URL=postgres://postgres:postgres@db:5432/yourdb?sslmode=disable
 ```
 
-### 2. Construir e Iniciar os Serviços com Docker Compose
+### 2. Construir e iniciar os serviços com Docker Compose
 
 Execute o seguinte comando para construir as imagens e iniciar os contêineres:
 
@@ -185,19 +185,19 @@ Isso irá:
 - Executar as migrações do banco de dados.
 - Iniciar o contêiner da aplicação Go com o Air para live reloading.
 
-### 3. Acessar a Aplicação
+### 3. Acessar a aplicação
 
 A aplicação estará disponível em `http://localhost:8080`.
 
-#### Testar Endpoints
+#### Testar endpoints
 
-- **Listar Usuários:**
+- **Listar usuários:**
 
   ```bash
   curl http://localhost:8080/api/v1/users
   ```
 
-- **Criar Usuário:**
+- **Criar usuário:**
 
   ```bash
   curl -X POST -H "Content-Type: application/json" -d '{"name":"João Silva", "email":"joao.silva@example.com", "age":30}' http://localhost:8080/api/v1/users/
@@ -205,11 +205,11 @@ A aplicação estará disponível em `http://localhost:8080`.
 
 ---
 
-## Executando o Projeto sem Docker
+## Executando o projeto sem Docker
 
-### 1. Configurar o Banco de Dados PostgreSQL (2 formas):
+### 1. Configurar o banco de dados PostgreSQL (2 formas):
 
-#### 1.1 Rodando o Banco de Dados localmente
+#### 1.1 Rodando o banco de dados localmente
 
 Instale o PostgreSQL em sua máquina e crie um banco de dados chamado `fiap_fast_food`.
 
@@ -219,7 +219,7 @@ Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu ba
 DATABASE_URL=postgres://postgres:suasenha@localhost:5432/fiap_fast_food?sslmode=disable
 ```
 
-#### 1.2 Rodando o Banco de Dados em um container Docker
+#### 1.2 Rodando o banco de dados em um container Docker
 
 Também é possível utilizar o container para o postgres disponível no `docker-compose.yml`. Neste caso basta subir apenas este container e rodar somente o _app_ localmente:
 
@@ -235,7 +235,7 @@ Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu ba
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable
 ```
 
-### 2. Executar Migrações do Banco de Dados
+### 2. Executar migrações do banco de dados
 
 Execute as migrações para criar as tabelas necessárias (subtituindo a DATABASE_URL abaixo):
 
@@ -249,7 +249,7 @@ Ou, se preferir, rode através do [make](https://www.gnu.org/software/make/).
 make migrate-up
 ```
 
-### 3. Iniciar a Aplicação com Air
+### 3. Iniciar a aplicação com Air
 
 Inicie a aplicação usando o Air para habilitar o live reloading:
 
@@ -265,7 +265,7 @@ make run-air
 
 **Observação:** Certifique-se de que o comando `air` está disponível no seu `PATH`. Se instalou o Air via Go, o binário estará em `$GOPATH/bin`.
 
-### 4. Acessar a Aplicação
+### 4. Acessar a aplicação
 
 A aplicação estará disponível em `http://localhost:8080`. Utilize os mesmos comandos mencionados anteriormente para testar os endpoints.
 
@@ -281,13 +281,13 @@ A aplicação estará disponível em `http://localhost:8080`. Utilize os mesmos 
   chmod -R 755 ./fastfood-golang
   ```
 
-- **Logs da Aplicação:** Monitore os logs para identificar possíveis erros:
+- **Logs da aplicação:** Monitore os logs para identificar possíveis erros:
 
   ```bash
   docker-compose logs -f
   ```
 
-- **Reinstalar Dependências:** Se encontrar erros relacionados a dependências, execute:
+- **Reinstalar dependências:** Se encontrar erros relacionados a dependências, execute:
 
   ```bash
   go mod tidy
@@ -316,7 +316,7 @@ migrate -path ./database/migrations -database "postgres://postgres:postgres@loca
 
 ---
 
-## Estrutura do Projeto
+## Estrutura do projeto
 
 - **`cmd/main.go`**: Ponto de entrada da aplicação.
 - **`internal/`**: Código interno da aplicação.
@@ -335,20 +335,20 @@ migrate -path ./database/migrations -database "postgres://postgres:postgres@loca
 
 ---
 
-# Explicação Detalhada das Camadas e Interações no Projeto
+# Explicação detalhada das camadas e interações no projeto
 
 O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arquitetura Limpa** e **Arquitetura Hexagonal**, com o objetivo de criar um sistema modular, escalável e de fácil manutenção. Abaixo, detalhamos cada camada, suas responsabilidades, como elas interagem entre si e referências aos arquivos relevantes.
 
-## Camadas da Arquitetura
+## Camadas da arquitetura
 
-1. [Camada de Apresentação (Presentation Layer)](#1-camada-de-apresentação-presentation-layer)
-2. [Camada de Aplicação (Application Layer)](#2-camada-de-aplicação-application-layer)
-3. [Camada de Domínio (Domain Layer)](#3-camada-de-domínio-domain-layer)
-4. [Camada de Infraestrutura (Infrastructure Layer)](#4-camada-de-infraestrutura-infrastructure-layer)
+1. [Camada de apresentação (presentation layer)](#1-camada-de-apresentação-presentation-layer)
+2. [Camada de aplicação (application layer)](#2-camada-de-aplicação-application-layer)
+3. [Camada de domínio (domain layer)](#3-camada-de-domínio-domain-layer)
+4. [Camada de infraestrutura (infrastructure layer)](#4-camada-de-infraestrutura-infrastructure-layer)
 
 ---
 
-### 1. Camada de Apresentação (Presentation Layer)
+### 1. Camada de apresentação (presentation layer)
 
 **Responsabilidade:**
 
@@ -362,21 +362,21 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - Invoca serviços da camada de aplicação para processar a lógica de negócios.
 - Retorna respostas HTTP apropriadas aos clientes.
 
-**Arquivos Relevantes:**
+**Arquivos relevantes:**
 
 - **Manipuladores HTTP (Handlers):**
     - `internal/adapter/http/handler/user_handler.go`: Contém a implementação do `UserHandler`, que processa as solicitações relacionadas a usuários.
 - **Roteador HTTP:**
     - `internal/adapter/http/router.go`: Configura as rotas da API e registra os manipuladores correspondentes.
 
-**Detalhes e Decisões:**
+**Detalhes e decisões:**
 
 - **Uso do Gin Framework:** Escolhemos o Gin devido à sua eficiência e facilidade de uso para criar APIs RESTful (foram cogitados outros frameworks, como o echo).
 - **Responsabilidade Limitada dos Handlers:** Os manipuladores focam em processar solicitações e respostas, delegando a lógica de negócios para a camada de aplicação.
 
 ---
 
-### 2. Camada de Aplicação (Application Layer)
+### 2. Camada de aplicação (application layer)
 
 **Responsabilidade:**
 
@@ -390,21 +390,21 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - Utiliza entidades e interfaces da camada de domínio para processar dados.
 - Chama repositórios através das interfaces definidas na camada de domínio.
 
-**Arquivos Relevantes:**
+**Arquivos relevantes:**
 
 - **Serviços de Aplicação:**
     - `internal/application/service/user_service.go` (exemplo): Implementa a lógica de negócios relacionada a usuários, como criação, leitura, atualização e exclusão.
 - **Data Transfer Objects (DTOs):**
     - `internal/application/dto/product_input.go` e `internal/application/dto/product_output.go` (exemplo): Define estruturas para transferência de dados entre camadas, evitando expor diretamente as entidades do domínio.
 
-**Detalhes e Decisões:**
+**Detalhes e decisões:**
 
 - **Isolamento da Lógica de Negócios:** Centralizamos a lógica aqui para facilitar testes e manutenções futuras.
 - **Uso de DTOs:** Facilita a validação e transformação de dados entre as camadas, promovendo a segurança e integridade dos dados.
 
 ---
 
-### 3. Camada de Domínio (Domain Layer)
+### 3. Camada de domínio (domain layer)
 
 **Responsabilidade:**
 
@@ -417,21 +417,21 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - As entidades e interfaces são usadas pela camada de aplicação para processar dados.
 - As interfaces de repositório definidas aqui são implementadas pela camada de infraestrutura.
 
-**Arquivos Relevantes:**
+**Arquivos relevantes:**
 
 - **Entidades de Domínio:**
     - `internal/domain/entity/user.go`: Define a estrutura da entidade `User`, representando um usuário no sistema.
 - **Interfaces de Repositório:**
     - `internal/domain/repository.go`: Declara a interface `UserRepository`, especificando os métodos que devem ser implementados para manipulação de usuários.
 
-**Detalhes e Decisões:**
+**Detalhes e decisões:**
 
 - **Independência Tecnológica:** Ao não depender de frameworks ou pacotes externos, a camada de domínio permanece flexível e adaptável a mudanças.
 - **Definição de Interfaces:** As interfaces permitem que diferentes implementações sejam usadas sem alterar a lógica de negócios, facilitando testes e trocas de tecnologia.
 
 ---
 
-### 4. Camada de Infraestrutura (Infrastructure Layer)
+### 4. Camada de infraestrutura (infrastructure layer)
 
 **Responsabilidade:**
 
@@ -443,7 +443,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - Implementa as interfaces de repositório, interagindo diretamente com o banco de dados.
 - É chamada pela camada de aplicação através das interfaces do domínio.
 
-**Arquivos Relevantes:**
+**Arquivos relevantes:**
 
 - **Implementação dos Repositórios:**
     - `internal/adapter/repository/user_repository.go`: Implementa `UserRepository`, realizando operações de banco de dados para a entidade `User`.
@@ -454,7 +454,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - **Conexão com o Banco de Dados:**
     - `internal/di/database.go`: Estabelece a conexão com o PostgreSQL utilizando `pgxpool`, fazendo uso de uma _connection pool_ para evitar gargalos entre as _gorountines_ que competirão por acesso ao Banco de Dados.
 
-**Detalhes e Decisões:**
+**Detalhes e decisões:**
 
 - **Uso do `pgxpool`:** Optamos pelo driver `pgx` para melhor performance e recursos avançados na interação com o PostgreSQL.
 - **Injeção de Dependências com Uber Dig:** Facilita o gerenciamento de dependências complexas e aumenta a testabilidade da aplicação.
@@ -462,32 +462,32 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 
 ---
 
-## Como as Camadas Interagem
+## Como as camadas interagem
 
-### Fluxo de uma Operação: "Get All Users"
+### Fluxo de uma operação: "Get All Users"
 
 1. **Solicitação HTTP:**
     - O cliente envia uma requisição HTTP GET para `/api/v1/users`.
 
-2. **Camada de Apresentação:**
+2. **Camada de apresentação:**
     - **Router (`router.go`):** Direciona a requisição para o `UserHandler`.
     - **Handler (`user_handler.go`):**
         - Recebe a requisição.
         - Realiza validações iniciais, se necessário.
         - Chama o método `GetAllUsers()` do `UserService`.
 
-3. **Camada de Aplicação:**
+3. **Camada de aplicação:**
     - **Service (`user_service.go`):**
         - Aplica regras de negócio (por exemplo, filtragem, ordenação).
         - Chama o método `GetAll(ctx)` do repositório de usuários através da interface `UserRepository`.
 
-4. **Camada de Domínio:**
+4. **Camada de domínio:**
     - **Interface (`repository.go`):**
         - Define o contrato para `GetAll(ctx)` que deve ser implementado.
     - **Entidade (`user.go`):**
         - Estrutura de dados que representa um usuário.
 
-5. **Camada de Infraestrutura:**
+5. **Camada de infraestrutura:**
     - **Repositório (`user_repository.go`):**
         - Implementa `GetAll(ctx)`, executando uma consulta SQL no banco de dados.
         - Utiliza o pool de conexões `pgxpool` para interação com o PostgreSQL.
@@ -499,7 +499,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
     - **Serviço:** Pode aplicar transformações adicionais nos dados.
     - **Handler:** Formata a resposta (JSON) e envia de volta ao cliente com o status HTTP adequado.
 
-### Interações Chave:
+### Interações chave:
 
 - **Handlers ↔ Services:**
     - Os handlers invocam métodos dos serviços para processar a lógica de negócios.
@@ -523,17 +523,17 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 - **Testabilidade Aumentada:** Facilita a injeção de mocks ou stubs durante testes unitários.
 - **Redução de Acoplamento:** Evita dependências rígidas entre componentes, promovendo um design mais flexível.
 
-### Uso de Interfaces e Abstrações
+### Uso de interfaces e abstrações
 
 - **Flexibilidade:** Permite trocar implementações (por exemplo, substituir o banco de dados) sem alterar as camadas superiores.
 - **Isolamento da Lógica de Negócios:** A lógica de negócios não depende de detalhes de infraestrutura, seguindo o princípio da inversão de dependência.
 
-### Gerenciamento Centralizado de Configurações
+### Gerenciamento centralizado de configurações
 
 - **Segurança:** Variáveis sensíveis são gerenciadas em um único lugar, facilitando a proteção de dados.
 - **Facilidade de Configuração:** Alterações nos ambientes (desenvolvimento, teste, produção) são simplificadas.
 
-### Escolha de Tecnologias
+### Escolha de tecnologias
 
 - **Golang:** Escolhido pela performance, simplicidade e forte suporte à concorrência.
 - **PostgreSQL com `pgxpool`:** Proporciona uma conexão eficiente e recursos avançados para interagir com o banco de dados.
@@ -541,7 +541,7 @@ O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arqui
 
 ---
 
-## Referências aos Arquivos por Camada
+## Referências aos arquivos por camada
 
 - **Camada de Apresentação:**
     - `internal/adapter/http/handler/`
