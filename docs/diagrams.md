@@ -142,7 +142,7 @@ flowchart TB
 
 ```
 
-### Clean Architexture Diagrama
+### Clean Architecture Diagram
 
 ```
 TO-DO
