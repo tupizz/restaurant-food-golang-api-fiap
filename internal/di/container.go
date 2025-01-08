@@ -39,6 +39,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(service.NewPaymentService)
 
 	// Handlers
+	container.Provide(handler.NewHealthcheckHandler)
 	container.Provide(handler.NewUserHandler)
 	container.Provide(handler.NewClientHandler)
 	container.Provide(handler.NewProductHandler)

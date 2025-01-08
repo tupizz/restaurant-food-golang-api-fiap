@@ -13,6 +13,7 @@ type Router struct {
 }
 
 func NewRouter(
+	healthcheckHandler handler.HealthcheckHandler,
 	userHandler handler.UserHandler,
 	clientHandler handler.ClientHandler,
 	productHandler handler.ProductHandler,
@@ -24,6 +25,9 @@ func NewRouter(
 
 	// Rota do Swagger
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Healthcheck
+	engine.GET("/healthcheck", healthcheckHandler.Ping)
 
 	// Set up routes
 	v1 := engine.Group("/api/v1")

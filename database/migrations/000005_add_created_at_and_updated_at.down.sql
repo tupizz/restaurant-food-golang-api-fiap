@@ -1,4 +1,3 @@
-
 -- Remove triggers and columns from all tables
 DO $$
 DECLARE
@@ -21,5 +20,4 @@ BEGIN
     END LOOP;
 END $$;
 
--- Drop the function
 DROP FUNCTION IF EXISTS update_modified_column();
