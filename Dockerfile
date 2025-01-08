@@ -26,6 +26,7 @@ WORKDIR /app
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/main .
+COPY --from=builder /app/database/migrations /app/database/migrations
 
 # Expose port (replace with your application's port if different)
 EXPOSE 8080
