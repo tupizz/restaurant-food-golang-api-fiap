@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-db
+  labels:
+    app: restaurant-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restaurant-db
+  template:
+    metadata:
+      labels:
+        app: restaurant-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13-alpine
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "fiap_fast_food"
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+              - "pg_isready"
+              - "-U"
+              - "postgres"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+              - "pg_isready"
+              - "-U"
+              - "postgres"
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc

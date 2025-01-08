@@ -25,7 +25,6 @@ LEFT JOIN categories c ON p.category_id = c.id
 LEFT JOIN products_images pi ON p.id = pi.product_id
 WHERE p.deleted_at IS NULL AND p.id = ANY(@ids::int[]);
 
-
 -- name: GetProductById :many
 SELECT 
     p.id, 

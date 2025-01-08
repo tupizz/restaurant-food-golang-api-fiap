@@ -3,7 +3,6 @@ UPDATE orders
 SET status = $2
 WHERE id = $1;
 
-
 -- name: UpdateOrderPaymentStatus :exec
 UPDATE payments
 SET status = $2

@@ -1,4 +1,3 @@
--- Function to update modified column
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -28,4 +27,3 @@ BEGIN
                         FOR EACH ROW EXECUTE FUNCTION update_modified_column()', t, t);
     END LOOP;
 END $$;
-
