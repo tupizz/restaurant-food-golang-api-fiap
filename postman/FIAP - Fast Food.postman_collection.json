@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "9815372a-92c2-4c0a-abca-9fc63aee7915",
+		"_postman_id": "416ef53b-971d-4514-95f6-f001d60eac40",
 		"name": "FIAP - Fast Food",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24777268"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "10219511"
 	},
 	"item": [
 		{
@@ -26,19 +26,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/api/v1/clients",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"clients"
-									]
-								}
+								"url": "http://localhost:8080/api/v1/clients"
 							},
 							"response": []
 						},
@@ -47,20 +35,7 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v1/clients/12345678909",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"clients",
-										"12345678909"
-									]
-								}
+								"url": "http://localhost:8080/api/v1/clients/12345678909"
 							},
 							"response": []
 						}
@@ -76,26 +51,14 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"tadeu\",\n    \"email\": \"tadeu.tupiz@email.com\",\n    \"age\": 12\n}",
+									"raw": "{\n    \"name\": \"tadeu\",\n    \"email\": \"tadeu.tupiz@email.com\",\n    \"age\": 18\n}",
 									"options": {
 										"raw": {
 											"language": "json"
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/api/v1/users",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"users"
-									]
-								}
+								"url": "http://localhost:8080/api/v1/users"
 							},
 							"response": []
 						},
@@ -104,19 +67,7 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v1/users",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"users"
-									]
-								}
+								"url": "http://localhost:8080/api/v1/users"
 							},
 							"response": []
 						}
@@ -258,7 +209,7 @@
 					]
 				},
 				{
-					"name": "ADMIN",
+					"name": "Admin",
 					"item": [
 						{
 							"name": "Products",
@@ -277,20 +228,7 @@
 												}
 											}
 										},
-										"url": {
-											"raw": "http://localhost:8080/api/v1/admin/products",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"api",
-												"v1",
-												"admin",
-												"products"
-											]
-										}
+										"url": "http://localhost:8080/api/v1/admin/products"
 									},
 									"response": [
 										{
@@ -307,20 +245,7 @@
 														}
 													}
 												},
-												"url": {
-													"raw": "http://localhost:8080/api/v1/admin/products",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8080",
-													"path": [
-														"api",
-														"v1",
-														"admin",
-														"products"
-													]
-												}
+												"url": "http://localhost:8080/api/v1/admin/products"
 											},
 											"status": "Created",
 											"code": 201,
@@ -358,21 +283,7 @@
 												}
 											}
 										},
-										"url": {
-											"raw": "http://localhost:8080/api/v1/admin/products/149",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"api",
-												"v1",
-												"admin",
-												"products",
-												"149"
-											]
-										}
+										"url": "http://localhost:8080/api/v1/admin/products/149"
 									},
 									"response": [
 										{
@@ -389,21 +300,7 @@
 														}
 													}
 												},
-												"url": {
-													"raw": "http://localhost:8080/api/v1/admin/products/151",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8080",
-													"path": [
-														"api",
-														"v1",
-														"admin",
-														"products",
-														"151"
-													]
-												}
+												"url": "http://localhost:8080/api/v1/admin/products/151"
 											},
 											"status": "OK",
 											"code": 200,
@@ -432,21 +329,7 @@
 									"request": {
 										"method": "DELETE",
 										"header": [],
-										"url": {
-											"raw": "http://localhost:8080/api/v1/admin/products/151",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"api",
-												"v1",
-												"admin",
-												"products",
-												"151"
-											]
-										}
+										"url": "http://localhost:8080/api/v1/admin/products/151"
 									},
 									"response": [
 										{
@@ -454,21 +337,7 @@
 											"originalRequest": {
 												"method": "DELETE",
 												"header": [],
-												"url": {
-													"raw": "http://localhost:8080/api/v1/admin/products/151",
-													"protocol": "http",
-													"host": [
-														"localhost"
-													],
-													"port": "8080",
-													"path": [
-														"api",
-														"v1",
-														"admin",
-														"products",
-														"151"
-													]
-												}
+												"url": "http://localhost:8080/api/v1/admin/products/151"
 											},
 											"status": "No Content",
 											"code": 204,
@@ -480,7 +349,7 @@
 												}
 											],
 											"cookie": [],
-											"body": null
+											"body": ""
 										}
 									]
 								}
@@ -580,103 +449,11 @@
 					"name": "Orders",
 					"item": [
 						{
-							"name": "Create Order",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8080/api/v1/orders",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"orders"
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Create Order",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "http://localhost:8080/api/v1/orders",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"api",
-												"v1",
-												"orders"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Date",
-											"value": "Fri, 18 Oct 2024 12:54:07 GMT"
-										},
-										{
-											"key": "Content-Length",
-											"value": "767"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"id\": 9,\n    \"client_id\": 1,\n    \"status\": \"pending\",\n    \"items\": [\n        {\n            \"id\": 20,\n            \"order_id\": 9,\n            \"product_id\": 4,\n            \"quantity\": 2,\n            \"price\": 3,\n            \"created_at\": \"2024-10-18T09:54:07.150766Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.150766Z\"\n        },\n        {\n            \"id\": 21,\n            \"order_id\": 9,\n            \"product_id\": 1,\n            \"quantity\": 3,\n            \"price\": 10,\n            \"created_at\": \"2024-10-18T09:54:07.152109Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152109Z\"\n        },\n        {\n            \"id\": 22,\n            \"order_id\": 9,\n            \"product_id\": 2,\n            \"quantity\": 3,\n            \"price\": 5,\n            \"created_at\": \"2024-10-18T09:54:07.152571Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152571Z\"\n        }\n    ],\n    \"payment\": {\n        \"id\": 9,\n        \"order_id\": 9,\n        \"status\": \"pending\",\n        \"method\": \"credit_card\",\n        \"amount\": 58.059124999999995,\n        \"created_at\": \"2024-10-18T09:54:07.153033Z\",\n        \"updated_at\": \"2024-10-18T09:54:07.153033Z\"\n    },\n    \"created_at\": \"2024-10-18T09:54:07.148189Z\",\n    \"updated_at\": \"2024-10-18T09:54:07.148189Z\"\n}"
-								}
-							]
-						},
-						{
 							"name": "Get Order",
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v1/orders/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v1",
-										"orders",
-										"1"
-									]
-								}
+								"url": "http://localhost:8080/api/v1/orders/1"
 							},
 							"response": [
 								{
@@ -684,20 +461,7 @@
 									"originalRequest": {
 										"method": "GET",
 										"header": [],
-										"url": {
-											"raw": "http://localhost:8080/api/v1/orders/1",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"api",
-												"v1",
-												"orders",
-												"1"
-											]
-										}
+										"url": "http://localhost:8080/api/v1/orders/1"
 									},
 									"status": "OK",
 									"code": 200,
@@ -720,6 +484,79 @@
 									"body": "{\n    \"id\": 1,\n    \"client_id\": 1,\n    \"status\": \"pending\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"order_id\": 1,\n            \"product_id\": 123,\n            \"quantity\": 2,\n            \"price\": 20,\n            \"created_at\": \"2024-10-13T12:28:53.241739Z\",\n            \"updated_at\": \"2024-10-13T12:28:53.241739Z\"\n        },\n        {\n            \"id\": 2,\n            \"order_id\": 1,\n            \"product_id\": 1,\n            \"quantity\": 2,\n            \"price\": 10,\n            \"created_at\": \"2024-10-13T12:28:53.243182Z\",\n            \"updated_at\": \"2024-10-13T12:28:53.243182Z\"\n        }\n    ],\n    \"payment\": {\n        \"id\": 1,\n        \"order_id\": 1,\n        \"status\": \"pending\",\n        \"method\": \"credit_card\",\n        \"amount\": 67.42,\n        \"created_at\": \"2024-10-13T12:28:53.243654Z\",\n        \"updated_at\": \"2024-10-13T12:28:53.243654Z\"\n    },\n    \"created_at\": \"2024-10-13T12:28:53.236956Z\",\n    \"updated_at\": \"2024-10-13T12:28:53.236956Z\"\n}"
 								}
 							]
+						}
+					]
+				},
+				{
+					"name": "Checkout",
+					"item": [
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"qr_code\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:8080/api/v1/checkout"
+							},
+							"response": [
+								{
+									"name": "Create Order",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"client_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 4,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 1,\n      \"quantity\": 3\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 3\n    }\n  ],\n  \"payment\": {\n    \"method\": \"credit_card\"\n  }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "http://localhost:8080/api/v1/orders"
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 18 Oct 2024 12:54:07 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "767"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 9,\n    \"client_id\": 1,\n    \"status\": \"pending\",\n    \"items\": [\n        {\n            \"id\": 20,\n            \"order_id\": 9,\n            \"product_id\": 4,\n            \"quantity\": 2,\n            \"price\": 3,\n            \"created_at\": \"2024-10-18T09:54:07.150766Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.150766Z\"\n        },\n        {\n            \"id\": 21,\n            \"order_id\": 9,\n            \"product_id\": 1,\n            \"quantity\": 3,\n            \"price\": 10,\n            \"created_at\": \"2024-10-18T09:54:07.152109Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152109Z\"\n        },\n        {\n            \"id\": 22,\n            \"order_id\": 9,\n            \"product_id\": 2,\n            \"quantity\": 3,\n            \"price\": 5,\n            \"created_at\": \"2024-10-18T09:54:07.152571Z\",\n            \"updated_at\": \"2024-10-18T09:54:07.152571Z\"\n        }\n    ],\n    \"payment\": {\n        \"id\": 9,\n        \"order_id\": 9,\n        \"status\": \"pending\",\n        \"method\": \"credit_card\",\n        \"amount\": 58.059124999999995,\n        \"created_at\": \"2024-10-18T09:54:07.153033Z\",\n        \"updated_at\": \"2024-10-18T09:54:07.153033Z\"\n    },\n    \"created_at\": \"2024-10-18T09:54:07.148189Z\",\n    \"updated_at\": \"2024-10-18T09:54:07.148189Z\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Webhooks",
+					"item": [
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
 						}
 					]
 				}
