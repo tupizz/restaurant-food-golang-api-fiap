@@ -6,7 +6,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Add timestamps to all tables
 DO $$
 DECLARE
     t text;

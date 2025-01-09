@@ -10,19 +10,19 @@ import (
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/validation"
 )
 
-type FakeCheckoutHandler interface {
+type WebhookHandler interface {
 	ProcessPayment(c *gin.Context)
 }
 
-type fakeCheckoutHandler struct {
+type webhookHandler struct {
 	paymentService service.PaymentService
 }
 
-func NewFakeCheckoutHandler(paymentService service.PaymentService) FakeCheckoutHandler {
-	return &fakeCheckoutHandler{paymentService: paymentService}
+func NewWebhookHandler(paymentService service.PaymentService) WebhookHandler {
+	return &webhookHandler{paymentService: paymentService}
 }
 
-func (h fakeCheckoutHandler) ProcessPayment(c *gin.Context) {
+func (h webhookHandler) ProcessPayment(c *gin.Context) {
 	var paymentInput payment_dto.PaymentInputDto
 
 	if err := c.ShouldBindJSON(&paymentInput); err != nil {
@@ -30,14 +30,13 @@ func (h fakeCheckoutHandler) ProcessPayment(c *gin.Context) {
 		return
 	}
 
-	// validate paymentInput
 	if err := validator.New().Struct(paymentInput); err != nil {
 		errors := validation.HandleValidationError(err)
 		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
 
-	err := h.paymentService.ProcessPayment(c.Request.Context(), paymentInput.OrderId, paymentInput.Status)
+	err := h.paymentService.ProcessPayment(c.Request.Context(), paymentInput.ExternalReference, paymentInput.PaymentMethod, paymentInput.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

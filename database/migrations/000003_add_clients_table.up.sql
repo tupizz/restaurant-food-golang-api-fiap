@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS clients (
      deleted_at TIMESTAMP WITH TIME ZONE
 );
 
--- Add index to cpf only if it doesn't already exist
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'idx_cpf' AND relkind = 'i') THEN

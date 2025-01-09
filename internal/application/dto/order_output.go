@@ -27,6 +27,7 @@ type PaymentResponse struct {
 	OrderID   int       `json:"order_id"`
 	Status    string    `json:"status"`
 	Method    string    `json:"method"`
+	QRData    string    `json:"qr_data,omitempty"`
 	Amount    float64   `json:"amount"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

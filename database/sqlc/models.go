@@ -47,14 +47,16 @@ type OrderItem struct {
 }
 
 type Payment struct {
-	ID        int32
-	OrderID   int32
-	Status    pgtype.Text
-	Method    string
-	Amount    pgtype.Numeric
-	CreatedAt pgtype.Timestamp
-	UpdatedAt pgtype.Timestamp
-	DeletedAt pgtype.Timestamp
+	ID                int32
+	OrderID           int32
+	Status            pgtype.Text
+	Method            string
+	Amount            pgtype.Numeric
+	ExternalReference pgtype.Text
+	QrData            pgtype.Text
+	CreatedAt         pgtype.Timestamp
+	UpdatedAt         pgtype.Timestamp
+	DeletedAt         pgtype.Timestamp
 }
 
 type PaymentTaxSetting struct {

@@ -263,11 +263,11 @@ func (r *orderRepository) getOrderItemsByOrderID(ctx context.Context, orderID in
 
 func (r *orderRepository) createPayment(ctx context.Context, tx pgx.Tx, payment *entity.Payment) (*entity.Payment, error) {
 	query := `
-		INSERT INTO payments (order_id, status, method, amount, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO payments (order_id, status, method, amount, external_reference, qr_data ,created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, created_at, updated_at
 	`
-	err := tx.QueryRow(ctx, query, payment.OrderID, payment.Status, payment.Method, payment.Amount, time.Now(), time.Now()).
+	err := tx.QueryRow(ctx, query, payment.OrderID, payment.Status, payment.Method, payment.Amount, payment.ExternalReference, payment.QRData, time.Now(), time.Now()).
 		Scan(&payment.ID, &payment.CreatedAt, &payment.UpdatedAt)
 	if err != nil {
 		return nil, err

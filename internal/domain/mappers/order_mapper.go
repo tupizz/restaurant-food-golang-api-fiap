@@ -48,6 +48,7 @@ func MapOrderEntityToResponse(order entity.Order) dto.OrderResponse {
 		OrderID:   order.Payment.OrderID,
 		Status:    string(order.Payment.Status),
 		Method:    string(order.Payment.Method),
+		QRData:    order.Payment.QRData,
 		Amount:    order.Payment.Amount,
 		CreatedAt: order.Payment.CreatedAt,
 		UpdatedAt: order.Payment.UpdatedAt,
@@ -67,6 +68,7 @@ func MapOrderEntityToResponse(order entity.Order) dto.OrderResponse {
 // MapUserEntityToResponse maps the User entity to the OrderResponse DTO
 func MapUserEntityToResponse(user entity.User) dto.UserOutput {
 	return dto.UserOutput{
+		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
 		Age:   user.Age,

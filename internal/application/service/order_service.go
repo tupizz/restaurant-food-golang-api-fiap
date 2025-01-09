@@ -136,6 +136,11 @@ func (s *orderService) CreateOrder(ctx context.Context, order entity.Order) (ent
 		return entity.Order{}, domain.NewEntityNotProcessableError("order", err.Error())
 	}
 
+	err = order.Payment.Authorize()
+	if err != nil {
+		return entity.Order{}, domain.NewEntityNotProcessableError("payment", err.Error())
+	}
+
 	// Business logic to create an order
 	createdOrder, err := s.orderRepo.Create(ctx, order)
 	if err != nil {
