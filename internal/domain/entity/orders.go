@@ -63,6 +63,11 @@ func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, exi
 		o.Items[idx] = item
 	}
 
+	if o.Payment.Method == "qr_code" {
+		o.Payment.Amount = totalAmount
+		return nil
+	}
+
 	// Apply taxes
 	for _, tax := range existingPaymentTaxes {
 		// Skip credit card taxes if payment method is not credit card

@@ -8,7 +8,7 @@ import (
 )
 
 type PaymentService interface {
-	ProcessPayment(ctx context.Context, orderId int, status entity.PaymentStatus) error
+	ProcessPayment(ctx context.Context, ExternalReference string, paymentMethod string, status entity.PaymentStatus) error
 }
 
 type paymentServiceImpl struct {
@@ -19,6 +19,6 @@ func NewPaymentService(paymentRepository domain.PaymentRepository) PaymentServic
 	return &paymentServiceImpl{paymentRepository: paymentRepository}
 }
 
-func (s *paymentServiceImpl) ProcessPayment(ctx context.Context, orderId int, status entity.PaymentStatus) error {
-	return s.paymentRepository.UpdateOrderPaymentStatus(ctx, orderId, status)
+func (s *paymentServiceImpl) ProcessPayment(ctx context.Context, ExternalReference string, paymentMethod string, status entity.PaymentStatus) error {
+	return s.paymentRepository.UpdateOrderPaymentStatus(ctx, ExternalReference, paymentMethod, status)
 }

@@ -27,7 +27,7 @@ func NewPaymentRepository(
 	}
 }
 
-func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, orderId int, status entity.PaymentStatus) error {
+func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status entity.PaymentStatus) error {
 	tx, err := r.dbPool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		slog.Error("Error starting transaction", "error", err)
@@ -39,7 +39,7 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, orderI
 			tx.Rollback(ctx)
 			panic(p)
 		} else if err != nil {
-			slog.Error("Order update failed", "order_id", orderId, "status", status)
+			slog.Error("Order update failed", "externalRefrence", externalReference, "paymentMethod", paymentMethod, "status", status)
 			slog.Error("Transaction", "tx", tx)
 			slog.Error("Context", "ctx", ctx)
 			slog.Error("Error", "error", err)
@@ -52,13 +52,16 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, orderI
 	qtx := r.sqlcDb.WithTx(tx)
 
 	err = qtx.UpdateOrderPaymentStatus(ctx, fiapRestaurantDb.UpdateOrderPaymentStatusParams{
-		OrderID: int32(orderId),
+		ExternalReference: pgtype.Text{
+			String: externalReference,
+			Valid:  true,
+		},
+		Method: paymentMethod,
 		Status: pgtype.Text{
 			String: string(status),
 			Valid:  true,
 		},
 	})
-
 	if err != nil {
 		return err
 	}
@@ -68,6 +71,17 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, orderI
 		orderStatusToUpdate = entity.OrderStatusPreparing
 	} else {
 		orderStatusToUpdate = entity.OrderStatusCanceled
+	}
+
+	orderId, err := qtx.GetOrderIdByExternalReferenceAndMethod(ctx, fiapRestaurantDb.GetOrderIdByExternalReferenceAndMethodParams{
+		ExternalReference: pgtype.Text{
+			String: externalReference,
+			Valid:  true,
+		},
+		Method: paymentMethod,
+	})
+	if err != nil {
+		return err
 	}
 
 	err = qtx.UpdateOrderStatus(ctx, fiapRestaurantDb.UpdateOrderStatusParams{

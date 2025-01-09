@@ -19,7 +19,7 @@ func NewRouter(
 	productHandler handler.ProductHandler,
 	adminProductHandler handler.AdminProductHandler,
 	orderHandler handler.OrderHandler,
-	fakeCheckoutHandler handler.FakeCheckoutHandler,
+	webhookHandler handler.WebhookHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -51,14 +51,21 @@ func NewRouter(
 
 		orders := v1.Group("/orders")
 		{
-			orders.POST("/", orderHandler.Create)
 			orders.GET("/:id", orderHandler.GetById)
+		}
+
+		checkout := v1.Group("/checkout")
+		{
+			checkout.POST("/", orderHandler.Create)
+		}
+
+		webhooks := v1.Group("/webhooks")
+		{
+			webhooks.POST("/notifications", webhookHandler.ProcessPayment)
 		}
 
 		admin := v1.Group("/admin")
 		{
-			admin.POST("/fake-checkout", fakeCheckoutHandler.ProcessPayment)
-
 			adminOrders := admin.Group("/orders")
 			{
 				adminOrders.GET("/", orderHandler.GetAll)

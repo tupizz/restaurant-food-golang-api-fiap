@@ -11,19 +11,38 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getOrderIdByExternalReferenceAndMethod = `-- name: GetOrderIdByExternalReferenceAndMethod :one
+SELECT order_id
+FROM payments
+WHERE external_reference = $1 AND method = $2
+`
+
+type GetOrderIdByExternalReferenceAndMethodParams struct {
+	ExternalReference pgtype.Text
+	Method            string
+}
+
+func (q *Queries) GetOrderIdByExternalReferenceAndMethod(ctx context.Context, arg GetOrderIdByExternalReferenceAndMethodParams) (int32, error) {
+	row := q.db.QueryRow(ctx, getOrderIdByExternalReferenceAndMethod, arg.ExternalReference, arg.Method)
+	var order_id int32
+	err := row.Scan(&order_id)
+	return order_id, err
+}
+
 const updateOrderPaymentStatus = `-- name: UpdateOrderPaymentStatus :exec
 UPDATE payments
-SET status = $2
-WHERE order_id = $1
+SET status = $3
+WHERE external_reference = $1 AND method = $2
 `
 
 type UpdateOrderPaymentStatusParams struct {
-	OrderID int32
-	Status  pgtype.Text
+	ExternalReference pgtype.Text
+	Method            string
+	Status            pgtype.Text
 }
 
 func (q *Queries) UpdateOrderPaymentStatus(ctx context.Context, arg UpdateOrderPaymentStatusParams) error {
-	_, err := q.db.Exec(ctx, updateOrderPaymentStatus, arg.OrderID, arg.Status)
+	_, err := q.db.Exec(ctx, updateOrderPaymentStatus, arg.ExternalReference, arg.Method, arg.Status)
 	return err
 }
 

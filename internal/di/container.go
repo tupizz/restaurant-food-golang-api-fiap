@@ -45,7 +45,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(handler.NewProductHandler)
 	container.Provide(handler.NewAdminProductHandler)
 	container.Provide(handler.NewOrderHandler)
-	container.Provide(handler.NewFakeCheckoutHandler)
+	container.Provide(handler.NewWebhookHandler)
 
 	return container
 }

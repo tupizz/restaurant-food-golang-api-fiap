@@ -85,5 +85,6 @@ install-tools:
 	$(GO) install github.com/swaggo/swag/cmd/swag@latest
 	$(GO) install github.com/air-verse/air@latest
 	$(GO) install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+	$(GO) install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
 setup: install-tools swag-init migrate-up

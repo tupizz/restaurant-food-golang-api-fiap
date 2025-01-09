@@ -45,7 +45,7 @@ type OrderRepository interface {
 }
 
 type PaymentRepository interface {
-	UpdateOrderPaymentStatus(ctx context.Context, orderId int, status entity.PaymentStatus) error
+	UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status entity.PaymentStatus) error
 }
 
 type PaymentTaxSettingsRepository interface {

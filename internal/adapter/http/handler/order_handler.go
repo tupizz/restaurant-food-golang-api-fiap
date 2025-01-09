@@ -77,7 +77,7 @@ func (h *orderHandler) GetAll(c *gin.Context) {
 // @Success      201     {object}  dto.OrderResponse
 // @Failure      400     {object}  handler.ErrorResponse
 // @Failure      500     {object}  handler.ErrorResponse
-// @Router       /orders [post]
+// @Router       /checkout [post]
 func (h *orderHandler) Create(c *gin.Context) {
 	var createOrderReq dto.CreateOrderRequest
 
