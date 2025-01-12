@@ -6,26 +6,27 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/validation"
+	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/validator"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
+
+	"github.com/gin-gonic/gin"
 )
 
-type AdminProductHandler interface {
+type ProductAdminHandler interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
 
-type adminProductHandler struct {
-	productService service.ProductServiceAdmin
+type productAdminHandler struct {
+	productUseCase usecase.ProductUseCase
 }
 
-func NewAdminProductHandler(productService service.ProductServiceAdmin) AdminProductHandler {
-	return &adminProductHandler{productService: productService}
+func NewProductAdminHandler(productUseCase usecase.ProductUseCase) ProductAdminHandler {
+	return &productAdminHandler{productUseCase: productUseCase}
 }
 
 // Create godoc
@@ -39,7 +40,7 @@ func NewAdminProductHandler(productService service.ProductServiceAdmin) AdminPro
 // @Failure      400  {object}  handler.ErrorResponse
 // @Failure      500  {object}  handler.ErrorResponse
 // @Router       /admin/products [post]
-func (h *adminProductHandler) Create(c *gin.Context) {
+func (h *productAdminHandler) Create(c *gin.Context) {
 	var input dto.ProductInputCreate
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -47,16 +48,16 @@ func (h *adminProductHandler) Create(c *gin.Context) {
 	}
 
 	if err := dto.ValidateProductCreate(input); err != nil {
-		errors := validation.HandleValidationError(err)
+		errors := validator.HandleValidationError(err)
 		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
 
 	slog.Info("Creating product", "input", shared.ToJSON(input))
 
-	product, err := h.productService.CreateProduct(c.Request.Context(), input)
+	product, err := h.productUseCase.CreateProduct(c.Request.Context(), input)
 	if err != nil {
-		if errors.Is(err, &domain.NotFoundError{}) {
+		if errors.Is(err, &domainError.NotFoundError{}) {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
@@ -80,7 +81,7 @@ func (h *adminProductHandler) Create(c *gin.Context) {
 // @Failure      400  {object}  handler.ErrorResponse
 // @Failure      500  {object}  handler.ErrorResponse
 // @Router       /admin/products/{id} [put]
-func (h *adminProductHandler) Update(c *gin.Context) {
+func (h *productAdminHandler) Update(c *gin.Context) {
 	var input dto.ProductInputUpdate
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -88,16 +89,16 @@ func (h *adminProductHandler) Update(c *gin.Context) {
 	}
 
 	if err := dto.ValidateProductUpdate(input); err != nil {
-		errors := validation.HandleValidationError(err)
+		errors := validator.HandleValidationError(err)
 		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
 
 	slog.Info("Updating product", "input", shared.ToJSON(input))
 
-	product, err := h.productService.UpdateProduct(c.Request.Context(), input.ID, input)
+	product, err := h.productUseCase.UpdateProduct(c.Request.Context(), input.ID, input)
 	if err != nil {
-		if errors.Is(err, &domain.NotFoundError{}) {
+		if errors.Is(err, &domainError.NotFoundError{}) {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
@@ -120,7 +121,7 @@ func (h *adminProductHandler) Update(c *gin.Context) {
 // @Failure      400  {object}  handler.ErrorResponse
 // @Failure      500  {object}  handler.ErrorResponse
 // @Router       /admin/products/{id} [delete]
-func (h *adminProductHandler) Delete(c *gin.Context) {
+func (h *productAdminHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -130,7 +131,7 @@ func (h *adminProductHandler) Delete(c *gin.Context) {
 
 	slog.Info("Deleting product", "id", id)
 
-	err = h.productService.DeleteProduct(c.Request.Context(), id)
+	err = h.productUseCase.DeleteProduct(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

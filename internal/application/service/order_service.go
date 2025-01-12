@@ -5,6 +5,9 @@ import (
 	"log/slog"
 
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto/order_list_dto"
+	domainClean "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
+
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 )
@@ -17,13 +20,13 @@ type OrderService interface {
 
 type orderService struct {
 	orderRepo              domain.OrderRepository
-	productRepo            domain.ProductRepository
+	productRepo            ports.ProductRepository
 	paymentTaxSettingsRepo domain.PaymentTaxSettingsRepository
 }
 
 func NewOrderService(
 	orderRepo domain.OrderRepository,
-	productRepo domain.ProductRepository,
+	productRepo ports.ProductRepository,
 	paymentTaxSettingsRepo domain.PaymentTaxSettingsRepository,
 ) OrderService {
 	return &orderService{
@@ -121,7 +124,7 @@ func (s *orderService) CreateOrder(ctx context.Context, order entity.Order) (ent
 		return entity.Order{}, err
 	}
 
-	mappedProducts := make(map[int]entity.Product)
+	mappedProducts := make(map[int]domainClean.Product)
 	for _, product := range existingProductsFromDB {
 		mappedProducts[product.ID] = product
 	}

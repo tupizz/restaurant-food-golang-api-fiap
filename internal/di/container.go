@@ -27,7 +27,6 @@ func BuildContainer() *dig.Container {
 
 	// Repositories
 	container.Provide(repository.NewUserRepository)
-	container.Provide(repository.NewProductRepository)
 	container.Provide(repository.NewOrderRepository)
 	container.Provide(repository.NewPaymentTaxSettingsRepository)
 	container.Provide(repository.NewPaymentRepository)
@@ -39,7 +38,6 @@ func BuildContainer() *dig.Container {
 
 	// Services
 	container.Provide(service.NewUserService)
-	container.Provide(service.NewProductServiceAdmin)
 	container.Provide(service.NewOrderService)
 	container.Provide(service.NewPaymentService)
 
@@ -50,7 +48,6 @@ func BuildContainer() *dig.Container {
 
 	// Handlers
 	container.Provide(handler.NewUserHandler)
-	container.Provide(handler.NewAdminProductHandler)
 	container.Provide(handler.NewOrderHandler)
 	container.Provide(handler.NewWebhookHandler)
 
@@ -58,6 +55,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(cleanHandler.NewClientHandler)
 	container.Provide(cleanHandler.NewHealthcheckHandler)
 	container.Provide(cleanHandler.NewProductHandler)
+	container.Provide(cleanHandler.NewProductAdminHandler)
 
 	return container
 }

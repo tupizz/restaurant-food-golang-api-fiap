@@ -3,6 +3,8 @@ package entity
 import (
 	"fmt"
 	"time"
+
+	domainClean "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
 )
 
 type OrderStatus string
@@ -49,7 +51,7 @@ type OrderItem struct {
 // 3. Sets the final amount to the Payment.Amount field of the Order
 //
 // Returns an error if any product in the order is not found in the existingMappedProducts map.
-func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, existingPaymentTaxes []PaymentTaxSettings) error {
+func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]domainClean.Product, existingPaymentTaxes []PaymentTaxSettings) error {
 	totalAmount := 0.0
 
 	// Calculate base total amount from order items

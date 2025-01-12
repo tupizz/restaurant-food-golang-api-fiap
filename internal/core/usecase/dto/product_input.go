@@ -22,16 +22,13 @@ type ProductInputCreate struct {
 var validate *validator.Validate
 
 func init() {
-	// Initialize the validator
 	validate = validator.New()
 }
 
-// ValidateProductUpdate validates the ProductInputUpdate struct
 func ValidateProductUpdate(input ProductInputUpdate) error {
 	return validate.Struct(input)
 }
 
-// ValidateProductCreate validates the ProductInputCreate struct
 func ValidateProductCreate(input ProductInputCreate) error {
 	return validate.Struct(input)
 }

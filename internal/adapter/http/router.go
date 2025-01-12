@@ -18,7 +18,7 @@ func NewRouter(
 	userHandler handler.UserHandler,
 	clientHandler cleanHandler.ClientHandler,
 	productHandler cleanHandler.ProductHandler,
-	adminProductHandler handler.AdminProductHandler,
+	adminProductHandler cleanHandler.ProductAdminHandler,
 	orderHandler handler.OrderHandler,
 	webhookHandler handler.WebhookHandler,
 ) Router {
