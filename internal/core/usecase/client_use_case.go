@@ -1,41 +1,39 @@
-package service
+package usecase
 
 import (
 	"context"
 	"errors"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/validation"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/validator"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
-type ClientService interface {
+type ClientUseCase interface {
 	CreateClient(ctx context.Context, input dto.ClientInput) (dto.ClientOutput, error)
 	GetClientByCpf(ctx context.Context, cpf string) (dto.ClientOutput, error)
 }
 
-type clientService struct {
-	clientRepository domain.ClientRepository
+type clientUseCase struct {
+	clientRepository ports.ClientRepository
 }
 
-func NewClientService(clientRepo domain.ClientRepository) ClientService {
-	return &clientService{clientRepository: clientRepo}
+func NewClientUseCase(clientRepository ports.ClientRepository) ClientUseCase {
+	return &clientUseCase{clientRepository: clientRepository}
 }
 
-func (s *clientService) CreateClient(ctx context.Context, input dto.ClientInput) (dto.ClientOutput, error) {
-	// Validação do CPF
-	if !validation.IsValidCPF(input.CPF) {
+func (s *clientUseCase) CreateClient(ctx context.Context, input dto.ClientInput) (dto.ClientOutput, error) {
+	if err := validator.IsValidCPF(input.CPF); err != nil {
 		return dto.ClientOutput{}, errors.New("CPF inválido")
 	}
 
-	// Verificar se o CPF já está cadastrado
 	_, err := s.clientRepository.GetByCpf(ctx, input.CPF)
 	if err == nil {
 		return dto.ClientOutput{}, errors.New("CPF já cadastrado")
 	}
 
-	client := entity.Client{
+	client := domain.Client{
 		Name: input.Name,
 		CPF:  input.CPF,
 	}
@@ -56,7 +54,7 @@ func (s *clientService) CreateClient(ctx context.Context, input dto.ClientInput)
 	return output, nil
 }
 
-func (s *clientService) GetClientByCpf(ctx context.Context, cpf string) (dto.ClientOutput, error) {
+func (s *clientUseCase) GetClientByCpf(ctx context.Context, cpf string) (dto.ClientOutput, error) {
 	client, err := s.clientRepository.GetByCpf(ctx, cpf)
 	if err != nil {
 		return dto.ClientOutput{}, err

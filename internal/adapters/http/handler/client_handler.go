@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
+	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,11 +17,11 @@ type ClientHandler interface {
 }
 
 type clientHandler struct {
-	clientService service.ClientService
+	clientUseCase usecase.ClientUseCase
 }
 
-func NewClientHandler(clientService service.ClientService) ClientHandler {
-	return &clientHandler{clientService: clientService}
+func NewClientHandler(clientUseCase usecase.ClientUseCase) ClientHandler {
+	return &clientHandler{clientUseCase: clientUseCase}
 }
 
 // Create CreateClient godoc
@@ -42,7 +42,7 @@ func (h *clientHandler) Create(c *gin.Context) {
 		return
 	}
 
-	client, err := h.clientService.CreateClient(c.Request.Context(), input)
+	client, err := h.clientUseCase.CreateClient(c.Request.Context(), input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -65,9 +65,9 @@ func (h *clientHandler) Create(c *gin.Context) {
 // @Router       /clients/{cpf} [get]
 func (h *clientHandler) GetByCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
-	client, err := h.clientService.GetClientByCpf(c.Request.Context(), cpf)
+	client, err := h.clientUseCase.GetClientByCpf(c.Request.Context(), cpf)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound("client")) {
+		if errors.Is(err, domainError.ErrNotFound("client")) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

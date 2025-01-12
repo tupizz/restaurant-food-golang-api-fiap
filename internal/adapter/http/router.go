@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
+	cleanHandler "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
 )
 
 type Router struct {
@@ -15,7 +16,7 @@ type Router struct {
 func NewRouter(
 	healthcheckHandler handler.HealthcheckHandler,
 	userHandler handler.UserHandler,
-	clientHandler handler.ClientHandler,
+	clientHandler cleanHandler.ClientHandler,
 	productHandler handler.ProductHandler,
 	adminProductHandler handler.AdminProductHandler,
 	orderHandler handler.OrderHandler,

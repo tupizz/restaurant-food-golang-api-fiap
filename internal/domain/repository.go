@@ -12,10 +12,6 @@ type UserRepository interface {
 	Create(ctx context.Context, user entity.User) (entity.User, error)
 }
 
-type ClientRepository interface {
-	Create(ctx context.Context, client entity.Client) (entity.Client, error)
-	GetByCpf(ctx context.Context, cpf string) (entity.Client, error)
-}
 type ProductFilter struct {
 	Category string
 	Page     int
