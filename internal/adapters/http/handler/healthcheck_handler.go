@@ -28,7 +28,7 @@ func NewHealthcheckHandler(healthCheckUseCase usecase.HealthCheckUseCase) Health
 // @Accept      json
 // @Produce     json
 // @Success     200     {object}  []dto.HealthCheckOutput
-// @Failure     500     ErrorResponse
+// @Failure     500     {object}  handler.ErrorResponse
 // @Router      /healthcheck [get]
 func (h *healthcheckHandler) Ping(c *gin.Context) {
 	err := h.healthCheckUseCase.Ping(c.Request.Context())

@@ -53,6 +53,11 @@ definitions:
     required:
     - method
     type: object
+  dto.HealthCheckOutput:
+    properties:
+      status:
+        type: string
+    type: object
   dto.OrderItemResponse:
     properties:
       created_at:
@@ -101,6 +106,8 @@ definitions:
         type: string
       order_id:
         type: integer
+      qr_data:
+        type: string
       status:
         type: string
       updated_at:
@@ -194,10 +201,24 @@ definitions:
         type: integer
       email:
         type: string
+      id:
+        type: integer
       name:
         type: string
     type: object
-  handler.ErrorResponse:
+  internal_adapter_http_handler.ErrorResponse:
+    properties:
+      code:
+        example: 400
+        type: integer
+      details:
+        example: Additional information
+        type: string
+      error:
+        example: Invalid request
+        type: string
+    type: object
+  internal_adapters_http_handler.ErrorResponse:
     properties:
       code:
         example: 400
@@ -327,11 +348,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Retrieve all orders
       tags:
       - orders
@@ -357,11 +378,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Create Product
       tags:
       - products
@@ -386,11 +407,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Delete Product
       tags:
       - products
@@ -420,14 +441,44 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Update Product
       tags:
       - products
+  /checkout:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo pedido com os dados fornecidos
+      parameters:
+      - description: Dados do Pedido
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+      summary: Cria um novo pedido
+      tags:
+      - orders
   /clients:
     post:
       consumes:
@@ -450,11 +501,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
       summary: Cria um novo cliente
       tags:
       - clients
@@ -479,44 +530,36 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
       summary: Obtém um cliente pelo CPF
       tags:
       - clients
-  /orders:
-    post:
+  /healthcheck:
+    get:
       consumes:
       - application/json
-      description: Cria um novo pedido com os dados fornecidos
-      parameters:
-      - description: Dados do Pedido
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateOrderRequest'
+      description: Verifica se a aplicação está respondendo para o liveness e readiness
+        probe do K8s
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/dto.OrderResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            items:
+              $ref: '#/definitions/dto.HealthCheckOutput'
+            type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Cria um novo pedido
+            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+      summary: Verifica se a aplicação está respondendo
       tags:
-      - orders
+      - healthcheck
   /orders/{id}:
     get:
       consumes:
@@ -538,11 +581,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Obtém um pedido por ID
       tags:
       - orders
@@ -574,11 +617,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Get Products
       tags:
       - products
@@ -601,7 +644,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Obtém todos os usuários
       tags:
       - users
@@ -626,11 +669,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
       summary: Cria um novo usuário
       tags:
       - users
