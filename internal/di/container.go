@@ -35,10 +35,10 @@ func BuildContainer() *dig.Container {
 	// Repositories 2.0
 	container.Provide(cleanRepository.NewClientRepository)
 	container.Provide(cleanRepository.NewHealthCheckRepository)
+	container.Provide(cleanRepository.NewProductRepository)
 
 	// Services
 	container.Provide(service.NewUserService)
-	container.Provide(service.NewProductService)
 	container.Provide(service.NewProductServiceAdmin)
 	container.Provide(service.NewOrderService)
 	container.Provide(service.NewPaymentService)
@@ -46,10 +46,10 @@ func BuildContainer() *dig.Container {
 	// UseCases
 	container.Provide(cleanUseCase.NewClientUseCase)
 	container.Provide(cleanUseCase.NewHealthCheckUseCase)
+	container.Provide(cleanUseCase.NewProductUseCase)
 
 	// Handlers
 	container.Provide(handler.NewUserHandler)
-	container.Provide(handler.NewProductHandler)
 	container.Provide(handler.NewAdminProductHandler)
 	container.Provide(handler.NewOrderHandler)
 	container.Provide(handler.NewWebhookHandler)
@@ -57,6 +57,7 @@ func BuildContainer() *dig.Container {
 	// Handlers 2.0
 	container.Provide(cleanHandler.NewClientHandler)
 	container.Provide(cleanHandler.NewHealthcheckHandler)
+	container.Provide(cleanHandler.NewProductHandler)
 
 	return container
 }

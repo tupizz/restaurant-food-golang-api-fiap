@@ -17,7 +17,7 @@ func NewRouter(
 	healthcheckHandler cleanHandler.HealthcheckHandler,
 	userHandler handler.UserHandler,
 	clientHandler cleanHandler.ClientHandler,
-	productHandler handler.ProductHandler,
+	productHandler cleanHandler.ProductHandler,
 	adminProductHandler handler.AdminProductHandler,
 	orderHandler handler.OrderHandler,
 	webhookHandler handler.WebhookHandler,

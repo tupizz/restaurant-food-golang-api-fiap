@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
+
 	"github.com/gin-gonic/gin"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
 )
 
 type ProductHandler interface {
@@ -14,11 +15,11 @@ type ProductHandler interface {
 }
 
 type productHandler struct {
-	productService service.ProductService
+	productUseCase usecase.ProductUseCase
 }
 
-func NewProductHandler(productService service.ProductService) ProductHandler {
-	return &productHandler{productService: productService}
+func NewProductHandler(productUseCase usecase.ProductUseCase) ProductHandler {
+	return &productHandler{productUseCase: productUseCase}
 }
 
 // GetProducts godoc
@@ -30,7 +31,7 @@ func NewProductHandler(productService service.ProductService) ProductHandler {
 // @Param        page     query     int  false  "Page number"
 // @Param        pageSize query     int  false  "Page size"
 // @Param        category query     string  false  "Category"
-// @Success      200      {object}  dto.ProductOutput
+// @Success      200      {array}  dto.ProductOutput
 // @Failure      400      {object}  handler.ErrorResponse
 // @Failure      500      {object}  handler.ErrorResponse
 // @Router       /products [get]
@@ -48,7 +49,7 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 
 	category := c.DefaultQuery("category", "")
 
-	products, total, err := h.productService.GetProducts(c.Request.Context(), &domain.ProductFilter{
+	products, total, err := h.productUseCase.GetProducts(c.Request.Context(), &ports.ProductFilter{
 		Category: category,
 		Page:     page,
 		PageSize: pageSize,

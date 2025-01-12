@@ -26,7 +26,6 @@ type OrderFilter struct {
 type ProductRepository interface {
 	Create(ctx context.Context, product entity.Product) (entity.Product, error)
 	GetById(ctx context.Context, id int) (entity.Product, error)
-	GetAll(ctx context.Context, filter *ProductFilter) ([]entity.Product, int, error)
 	Delete(ctx context.Context, id int) error
 	Update(ctx context.Context, product entity.Product) (entity.Product, error)
 	GetByIds(ctx context.Context, ids []int) ([]entity.Product, int, error)
