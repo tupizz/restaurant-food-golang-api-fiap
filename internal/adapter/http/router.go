@@ -14,7 +14,7 @@ type Router struct {
 }
 
 func NewRouter(
-	healthcheckHandler handler.HealthcheckHandler,
+	healthcheckHandler cleanHandler.HealthcheckHandler,
 	userHandler handler.UserHandler,
 	clientHandler cleanHandler.ClientHandler,
 	productHandler handler.ProductHandler,
