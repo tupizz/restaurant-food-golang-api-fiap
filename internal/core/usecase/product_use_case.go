@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
@@ -65,19 +65,19 @@ func (c *productUseCase) DeleteProduct(ctx context.Context, id int) error {
 }
 
 func (c *productUseCase) UpdateProduct(ctx context.Context, id int, input dto.ProductInputUpdate) (dto.ProductOutput, error) {
-	images := make([]domain.ProductImage, 0, len(input.Images))
+	images := make([]entities.ProductImage, 0, len(input.Images))
 	for _, image := range input.Images {
-		images = append(images, domain.ProductImage{
+		images = append(images, entities.ProductImage{
 			ImageURL: image,
 		})
 	}
 
-	product := domain.Product{
+	product := entities.Product{
 		ID:          id,
 		Name:        input.Name,
 		Description: input.Description,
 		Price:       input.Price,
-		Category: domain.ProductCategory{
+		Category: entities.ProductCategory{
 			Handle: input.Category,
 		},
 		Images: images,
@@ -107,18 +107,18 @@ func (c *productUseCase) UpdateProduct(ctx context.Context, id int, input dto.Pr
 }
 
 func (c *productUseCase) CreateProduct(ctx context.Context, input dto.ProductInputCreate) (dto.ProductOutput, error) {
-	images := make([]domain.ProductImage, 0, len(input.Images))
+	images := make([]entities.ProductImage, 0, len(input.Images))
 	for _, image := range input.Images {
-		images = append(images, domain.ProductImage{
+		images = append(images, entities.ProductImage{
 			ImageURL: image,
 		})
 	}
 
-	product := domain.Product{
+	product := entities.Product{
 		Name:        input.Name,
 		Description: input.Description,
 		Price:       input.Price,
-		Category: domain.ProductCategory{
+		Category: entities.ProductCategory{
 			Handle: input.Category,
 		},
 		Images: images,

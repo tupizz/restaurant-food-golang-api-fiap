@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	sqlcDB "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
@@ -26,7 +26,7 @@ func NewProductRepository(db *pgxpool.Pool, sqlcDb *sqlcDB.Queries) ports.Produc
 	return &productRepository{db: db, sqlcDb: sqlcDb}
 }
 
-func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]domain.Product, int, error) {
+func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]entities.Product, int, error) {
 	if len(ids) == 0 {
 		return nil, 0, nil
 	}
@@ -59,11 +59,11 @@ func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]domain.P
 	}
 	defer rows.Close()
 
-	productMap := make(map[int]*domain.Product)
-	var products []domain.Product
+	productMap := make(map[int]*entities.Product)
+	var products []entities.Product
 
 	for rows.Next() {
-		var product domain.Product
+		var product entities.Product
 		var imageID sql.NullInt64
 		var imageURL sql.NullString
 		var imageCreatedAt sql.NullTime
@@ -92,7 +92,7 @@ func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]domain.P
 
 		if existingProduct, ok := productMap[product.ID]; ok {
 			if imageID.Valid && imageURL.Valid {
-				existingProduct.Images = append(existingProduct.Images, domain.ProductImage{
+				existingProduct.Images = append(existingProduct.Images, entities.ProductImage{
 					ID:        int(imageID.Int64),
 					ImageURL:  imageURL.String,
 					CreatedAt: imageCreatedAt.Time,
@@ -101,7 +101,7 @@ func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]domain.P
 			}
 		} else {
 			if imageID.Valid && imageURL.Valid {
-				product.Images = []domain.ProductImage{{
+				product.Images = []entities.ProductImage{{
 					ID:        int(imageID.Int64),
 					ImageURL:  imageURL.String,
 					CreatedAt: imageCreatedAt.Time,
@@ -120,12 +120,12 @@ func (r *productRepository) GetByIds(ctx context.Context, ids []int) ([]domain.P
 	return products, len(products), nil
 }
 
-func (r *productRepository) Update(ctx context.Context, product domain.Product) (domain.Product, error) {
+func (r *productRepository) Update(ctx context.Context, product entities.Product) (entities.Product, error) {
 	slog.Info("Updating product", "product", shared.ToJSON(product))
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	defer func() {
@@ -151,12 +151,12 @@ func (r *productRepository) Update(ctx context.Context, product domain.Product) 
 		err = tx.QueryRow(ctx, query, product.Category.Handle).Scan(&product.Category.ID)
 		if err != nil {
 			slog.Error("Error searching for category", "error", err)
-			return domain.Product{}, domainError.ErrNotFound("category")
+			return entities.Product{}, domainError.ErrNotFound("category")
 		}
 
 		if product.Category.ID == 0 {
 			slog.Error("Category not found", "category", product.Category)
-			return domain.Product{}, domainError.ErrNotFound("category")
+			return entities.Product{}, domainError.ErrNotFound("category")
 		}
 
 		columns = append(columns, fmt.Sprintf("category_id = $%d", argIndex))
@@ -190,7 +190,7 @@ func (r *productRepository) Update(ctx context.Context, product domain.Product) 
 		_, err = tx.Exec(ctx, query, args...)
 		if err != nil {
 			slog.Error("Error updating product", "error", err)
-			return domain.Product{}, err
+			return entities.Product{}, err
 		}
 	}
 
@@ -198,21 +198,21 @@ func (r *productRepository) Update(ctx context.Context, product domain.Product) 
 		_, err = tx.Exec(ctx, "UPDATE products_images SET deleted_at = NOW() WHERE product_id = $1", product.ID)
 		if err != nil {
 			slog.Error("Error deleting product images", "error", err)
-			return domain.Product{}, err
+			return entities.Product{}, err
 		}
 
 		for _, image := range product.Images {
 			_, err = tx.Exec(ctx, "INSERT INTO products_images (product_id, image) VALUES ($1, $2)", product.ID, image.ImageURL)
 			if err != nil {
 				slog.Error("Error inserting product image", "error", err)
-				return domain.Product{}, err
+				return entities.Product{}, err
 			}
 		}
 	}
 
 	product, err = getOneProductWithExecutor(ctx, tx, product.ID)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	slog.Info("Updated product", "product", shared.ToJSON(product))
@@ -229,12 +229,12 @@ func (r *productRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (r *productRepository) Create(ctx context.Context, product domain.Product) (domain.Product, error) {
+func (r *productRepository) Create(ctx context.Context, product entities.Product) (entities.Product, error) {
 	slog.Info("Creating product", "product", shared.ToJSON(product))
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	defer func() {
@@ -253,45 +253,45 @@ func (r *productRepository) Create(ctx context.Context, product domain.Product) 
 	query := `SELECT id FROM categories WHERE handle = $1`
 	err = tx.QueryRow(ctx, query, product.Category.Handle).Scan(&product.Category.ID)
 	if err != nil {
-		return domain.Product{}, domainError.ErrNotFound("category")
+		return entities.Product{}, domainError.ErrNotFound("category")
 	}
 
 	if product.Category.ID == 0 {
-		return domain.Product{}, domainError.ErrNotFound("category")
+		return entities.Product{}, domainError.ErrNotFound("category")
 	}
 
 	query = `INSERT INTO products (name, description, price, category_id) VALUES ($1, $2, $3, $4) RETURNING id`
 	err = tx.QueryRow(ctx, query, product.Name, product.Description, product.Price, product.Category.ID).Scan(&product.ID)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	query = `INSERT INTO products_images (product_id, image) VALUES ($1, $2)`
 	for _, image := range product.Images {
 		_, err = tx.Exec(ctx, query, product.ID, image.ImageURL)
 		if err != nil {
-			return domain.Product{}, err
+			return entities.Product{}, err
 		}
 	}
 
 	product, err = getOneProductWithExecutor(ctx, tx, product.ID)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	return product, nil
 }
 
-func (r *productRepository) GetById(ctx context.Context, id int) (domain.Product, error) {
+func (r *productRepository) GetById(ctx context.Context, id int) (entities.Product, error) {
 	product, err := getOneProductWithExecutor(ctx, r.db, id)
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	return product, nil
 }
 
-func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int) (domain.Product, error) {
+func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int) (entities.Product, error) {
 	query := `
 		SELECT 
 			p.id, 
@@ -323,18 +323,18 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 	case *pgxpool.Pool:
 		rows, err = e.Query(ctx, query, id)
 	default:
-		return domain.Product{}, fmt.Errorf("unsupported executor type")
+		return entities.Product{}, fmt.Errorf("unsupported executor type")
 	}
 
 	if err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	defer rows.Close()
 
-	var result_product domain.Product
+	var result_product entities.Product
 	for rows.Next() {
-		var product domain.Product
+		var product entities.Product
 		var imageID sql.NullInt64
 		var imageURL sql.NullString
 		var imageCreatedAt sql.NullTime
@@ -358,7 +358,7 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 			&imageUpdatedAt,
 		)
 		if err != nil {
-			return domain.Product{}, err
+			return entities.Product{}, err
 		}
 
 		if result_product.ID == 0 {
@@ -366,7 +366,7 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 		}
 
 		if imageID.Valid && imageURL.Valid {
-			result_product.Images = append(result_product.Images, domain.ProductImage{
+			result_product.Images = append(result_product.Images, entities.ProductImage{
 				ID:        int(imageID.Int64),
 				ImageURL:  imageURL.String,
 				CreatedAt: imageCreatedAt.Time,
@@ -376,13 +376,13 @@ func getOneProductWithExecutor(ctx context.Context, executor interface{}, id int
 	}
 
 	if err = rows.Err(); err != nil {
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	return result_product, nil
 }
 
-func (r *productRepository) GetAll(ctx context.Context, filter *ports.ProductFilter) ([]domain.Product, int, error) {
+func (r *productRepository) GetAll(ctx context.Context, filter *ports.ProductFilter) ([]entities.Product, int, error) {
 	if filter.Page <= 0 {
 		filter.Page = 1
 	}
@@ -436,11 +436,11 @@ func (r *productRepository) GetAll(ctx context.Context, filter *ports.ProductFil
 	}
 	defer rows.Close()
 
-	productMap := make(map[int]*domain.Product)
-	var products []domain.Product
+	productMap := make(map[int]*entities.Product)
+	var products []entities.Product
 
 	for rows.Next() {
-		var product domain.Product
+		var product entities.Product
 		var imageID sql.NullInt64
 		var imageURL sql.NullString
 		var imageCreatedAt sql.NullTime
@@ -469,7 +469,7 @@ func (r *productRepository) GetAll(ctx context.Context, filter *ports.ProductFil
 
 		if existingProduct, ok := productMap[product.ID]; ok {
 			if imageID.Valid && imageURL.Valid {
-				existingProduct.Images = append(existingProduct.Images, domain.ProductImage{
+				existingProduct.Images = append(existingProduct.Images, entities.ProductImage{
 					ID:        int(imageID.Int64),
 					ImageURL:  imageURL.String,
 					CreatedAt: imageCreatedAt.Time,
@@ -478,7 +478,7 @@ func (r *productRepository) GetAll(ctx context.Context, filter *ports.ProductFil
 			}
 		} else {
 			if imageID.Valid && imageURL.Valid {
-				product.Images = []domain.ProductImage{{
+				product.Images = []entities.ProductImage{{
 					ID:        int(imageID.Int64),
 					ImageURL:  imageURL.String,
 					CreatedAt: imageCreatedAt.Time,

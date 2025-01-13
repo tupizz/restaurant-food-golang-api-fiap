@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sqlcDB "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 )
 
 type OrderFilter struct {
@@ -13,9 +13,9 @@ type OrderFilter struct {
 }
 
 type OrderRepository interface {
-	Create(ctx context.Context, order domain.Order) (domain.Order, error)
-	Update(ctx context.Context, order domain.Order) error
-	GetByID(ctx context.Context, id int) (domain.Order, error)
+	Create(ctx context.Context, order entities.Order) (entities.Order, error)
+	Update(ctx context.Context, order entities.Order) error
+	GetByID(ctx context.Context, id int) (entities.Order, error)
 	Delete(ctx context.Context, id int) error
 	GetAll(ctx context.Context, filter *OrderFilter) ([]sqlcDB.GetAllOrdersRow, error)
 }

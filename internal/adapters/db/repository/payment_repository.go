@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	sqlcDB "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
@@ -24,7 +24,7 @@ func NewPaymentRepository(sqlcDb *sqlcDB.Queries, dbPool *pgxpool.Pool) ports.Pa
 	}
 }
 
-func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status domain.PaymentStatus) error {
+func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status entities.PaymentStatus) error {
 	tx, err := r.dbPool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		slog.Error("Error starting transaction", "error", err)
@@ -63,11 +63,11 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, extern
 		return err
 	}
 
-	var orderStatusToUpdate domain.OrderStatus
-	if status == domain.PaymentStatusApproved {
-		orderStatusToUpdate = domain.OrderStatusPreparing
+	var orderStatusToUpdate entities.OrderStatus
+	if status == entities.PaymentStatusApproved {
+		orderStatusToUpdate = entities.OrderStatusPreparing
 	} else {
-		orderStatusToUpdate = domain.OrderStatusCanceled
+		orderStatusToUpdate = entities.OrderStatusCanceled
 	}
 
 	orderId, err := qtx.GetOrderIdByExternalReferenceAndMethod(ctx, sqlcDB.GetOrderIdByExternalReferenceAndMethodParams{

@@ -1,33 +1,33 @@
 package mappers
 
 import (
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 )
 
-func MapCreateOrderRequestToDomain(dto dto.CreateOrderRequest) domain.Order {
-	items := make([]domain.OrderItem, len(dto.Items))
+func MapCreateOrderRequestToEntity(dto dto.CreateOrderRequest) entities.Order {
+	items := make([]entities.OrderItem, len(dto.Items))
 	for i, itemDTO := range dto.Items {
-		items[i] = domain.OrderItem{
+		items[i] = entities.OrderItem{
 			ProductID: itemDTO.ProductID,
 			Quantity:  itemDTO.Quantity,
 		}
 	}
 
-	payment := domain.Payment{
-		Method: domain.PaymentMethod(dto.Payment.Method),
-		Status: domain.PaymentStatusPending,
+	payment := entities.Payment{
+		Method: entities.PaymentMethod(dto.Payment.Method),
+		Status: entities.PaymentStatusPending,
 	}
 
-	return domain.Order{
+	return entities.Order{
 		ClientID: dto.ClientID,
-		Status:   domain.OrderStatusPending,
+		Status:   entities.OrderStatusPending,
 		Items:    items,
 		Payment:  payment,
 	}
 }
 
-func MapOrderDomainToResponse(order domain.Order) dto.OrderResponse {
+func MapOrderEntityToResponse(order entities.Order) dto.OrderResponse {
 	items := make([]dto.OrderItemResponse, len(order.Items))
 	for i, item := range order.Items {
 		items[i] = dto.OrderItemResponse{

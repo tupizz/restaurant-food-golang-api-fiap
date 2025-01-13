@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
@@ -16,7 +16,7 @@ func NewPaymentTaxSettingsRepository(db *pgxpool.Pool) ports.PaymentTaxSettingsR
 	return &paymentTaxSettingsRepository{db: db}
 }
 
-func (r *paymentTaxSettingsRepository) GetAll(ctx context.Context) ([]domain.PaymentTaxSettings, error) {
+func (r *paymentTaxSettingsRepository) GetAll(ctx context.Context) ([]entities.PaymentTaxSettings, error) {
 	query := `
 	SELECT id, name, description, amount_type, amount_value, applicable_to, created_at, updated_at, deleted_at
 	FROM payment_tax_settings
@@ -29,9 +29,9 @@ func (r *paymentTaxSettingsRepository) GetAll(ctx context.Context) ([]domain.Pay
 	}
 	defer rows.Close()
 
-	var taxes []domain.PaymentTaxSettings
+	var taxes []entities.PaymentTaxSettings
 	for rows.Next() {
-		var tax domain.PaymentTaxSettings
+		var tax entities.PaymentTaxSettings
 		err := rows.Scan(&tax.ID, &tax.Name, &tax.Description, &tax.AmountType, &tax.AmountValue, &tax.ApplicableTo, &tax.CreatedAt, &tax.UpdatedAt, &tax.DeletedAt)
 		if err != nil {
 			return nil, err

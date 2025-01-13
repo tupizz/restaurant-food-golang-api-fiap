@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/validator"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
@@ -33,7 +33,7 @@ func (s *clientUseCase) CreateClient(ctx context.Context, input dto.ClientInput)
 		return dto.ClientOutput{}, errors.New("CPF já cadastrado")
 	}
 
-	client := domain.Client{
+	client := entities.Client{
 		Name: input.Name,
 		CPF:  input.CPF,
 	}

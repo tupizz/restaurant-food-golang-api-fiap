@@ -88,7 +88,7 @@ func (h *orderHandler) Create(c *gin.Context) {
 		return
 	}
 
-	orderEntity := mappers.MapCreateOrderRequestToDomain(createOrderReq)
+	orderEntity := mappers.MapCreateOrderRequestToEntity(createOrderReq)
 
 	createdOrder, err := h.orderUseCase.CreateOrder(c.Request.Context(), orderEntity)
 	if err != nil {
@@ -100,7 +100,7 @@ func (h *orderHandler) Create(c *gin.Context) {
 		return
 	}
 
-	orderResponse := mappers.MapOrderDomainToResponse(createdOrder)
+	orderResponse := mappers.MapOrderEntityToResponse(createdOrder)
 
 	c.JSON(http.StatusCreated, orderResponse)
 }
@@ -133,7 +133,7 @@ func (h *orderHandler) GetById(c *gin.Context) {
 		return
 	}
 
-	orderResponse := mappers.MapOrderDomainToResponse(orderEntity)
+	orderResponse := mappers.MapOrderEntityToResponse(orderEntity)
 
 	c.JSON(http.StatusOK, orderResponse)
 }

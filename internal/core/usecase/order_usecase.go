@@ -4,15 +4,15 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
 type OrderUseCase interface {
-	CreateOrder(ctx context.Context, order domain.Order) (domain.Order, error)
-	GetOrderById(ctx context.Context, id int) (domain.Order, error)
+	CreateOrder(ctx context.Context, order entities.Order) (entities.Order, error)
+	GetOrderById(ctx context.Context, id int) (entities.Order, error)
 	GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]dto.OrderDTO, error)
 }
 
@@ -110,7 +110,7 @@ func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilt
 	return ordersEntity, nil
 }
 
-func (s *orderUseCase) CreateOrder(ctx context.Context, order domain.Order) (domain.Order, error) {
+func (s *orderUseCase) CreateOrder(ctx context.Context, order entities.Order) (entities.Order, error) {
 	// Validate if the product exists
 	var productIds []int
 	for _, item := range order.Items {
@@ -119,41 +119,41 @@ func (s *orderUseCase) CreateOrder(ctx context.Context, order domain.Order) (dom
 
 	existingProductsFromDB, _, err := s.productRepo.GetByIds(ctx, productIds)
 	if err != nil {
-		return domain.Order{}, err
+		return entities.Order{}, err
 	}
 
-	mappedProducts := make(map[int]domain.Product)
+	mappedProducts := make(map[int]entities.Product)
 	for _, product := range existingProductsFromDB {
 		mappedProducts[product.ID] = product
 	}
 
 	systemPaymentTaxSettings, err := s.paymentTaxSettingsRepo.GetAll(ctx)
 	if err != nil {
-		return domain.Order{}, err
+		return entities.Order{}, err
 	}
 
 	err = order.CalculateTotalAmount(mappedProducts, systemPaymentTaxSettings)
 	if err != nil {
-		return domain.Order{}, domainError.NewEntityNotProcessableError("order", err.Error())
+		return entities.Order{}, domainError.NewEntityNotProcessableError("order", err.Error())
 	}
 
 	err = order.Payment.Authorize()
 	if err != nil {
-		return domain.Order{}, domainError.NewEntityNotProcessableError("payment", err.Error())
+		return entities.Order{}, domainError.NewEntityNotProcessableError("payment", err.Error())
 	}
 
 	createdOrder, err := s.orderRepo.Create(ctx, order)
 	if err != nil {
-		return domain.Order{}, err
+		return entities.Order{}, err
 	}
 
 	return createdOrder, nil
 }
 
-func (s *orderUseCase) GetOrderById(ctx context.Context, id int) (domain.Order, error) {
+func (s *orderUseCase) GetOrderById(ctx context.Context, id int) (entities.Order, error) {
 	order, err := s.orderRepo.GetByID(ctx, id)
 	if err != nil {
-		return domain.Order{}, err
+		return entities.Order{}, err
 	}
 
 	return order, nil
