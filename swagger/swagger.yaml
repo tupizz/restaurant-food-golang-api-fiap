@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  dto.ClientDTO:
+    properties:
+      cpf:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   dto.ClientInput:
     properties:
       cpf:
@@ -58,6 +67,38 @@ definitions:
       status:
         type: string
     type: object
+  dto.OrderDTO:
+    properties:
+      client:
+        $ref: '#/definitions/dto.ClientDTO'
+      client_id:
+        type: integer
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/dto.OrderItemDTO'
+        type: array
+      payment:
+        $ref: '#/definitions/dto.PaymentDTO'
+      status:
+        type: string
+    type: object
+  dto.OrderItemDTO:
+    properties:
+      id:
+        type: integer
+      order_id:
+        type: integer
+      price:
+        type: number
+      product:
+        $ref: '#/definitions/dto.ProductDTO'
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
   dto.OrderItemResponse:
     properties:
       created_at:
@@ -94,6 +135,28 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.PaginatedOrdersDTO:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/dto.OrderDTO'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.PaymentDTO:
+    properties:
+      amount:
+        type: number
+      id:
+        type: integer
+      method:
+        type: string
+      order_id:
+        type: integer
+      status:
+        type: string
+    type: object
   dto.PaymentResponse:
     properties:
       amount:
@@ -112,6 +175,20 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.ProductDTO:
+    properties:
+      category_handle:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      images: {}
+      name:
+        type: string
+      price:
+        type: number
     type: object
   dto.ProductInputCreate:
     properties:
@@ -178,35 +255,7 @@ definitions:
       price:
         type: number
     type: object
-  dto.UserInput:
-    properties:
-      age:
-        maximum: 130
-        minimum: 0
-        type: integer
-      email:
-        maxLength: 100
-        type: string
-      name:
-        maxLength: 100
-        type: string
-    required:
-    - age
-    - email
-    - name
-    type: object
-  dto.UserOutput:
-    properties:
-      age:
-        type: integer
-      email:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  internal_adapter_http_handler.ErrorResponse:
+  handler.ErrorResponse:
     properties:
       code:
         example: 400
@@ -217,96 +266,6 @@ definitions:
       error:
         example: Invalid request
         type: string
-    type: object
-  internal_adapters_http_handler.ErrorResponse:
-    properties:
-      code:
-        example: 400
-        type: integer
-      details:
-        example: Additional information
-        type: string
-      error:
-        example: Invalid request
-        type: string
-    type: object
-  order_list_dto.ClientDTO:
-    properties:
-      cpf:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  order_list_dto.OrderDTO:
-    properties:
-      client:
-        $ref: '#/definitions/order_list_dto.ClientDTO'
-      client_id:
-        type: integer
-      id:
-        type: integer
-      items:
-        items:
-          $ref: '#/definitions/order_list_dto.OrderItemDTO'
-        type: array
-      payment:
-        $ref: '#/definitions/order_list_dto.PaymentDTO'
-      status:
-        type: string
-    type: object
-  order_list_dto.OrderItemDTO:
-    properties:
-      id:
-        type: integer
-      order_id:
-        type: integer
-      price:
-        type: number
-      product:
-        $ref: '#/definitions/order_list_dto.ProductDTO'
-      product_id:
-        type: integer
-      quantity:
-        type: integer
-    type: object
-  order_list_dto.PaginatedOrdersDTO:
-    properties:
-      orders:
-        items:
-          $ref: '#/definitions/order_list_dto.OrderDTO'
-        type: array
-      total:
-        type: integer
-    type: object
-  order_list_dto.PaymentDTO:
-    properties:
-      amount:
-        type: number
-      id:
-        type: integer
-      method:
-        type: string
-      order_id:
-        type: integer
-      status:
-        type: string
-    type: object
-  order_list_dto.ProductDTO:
-    properties:
-      category_handle:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      images:
-        description: Change this according to your image structure
-      name:
-        type: string
-      price:
-        type: number
     type: object
 host: localhost:8080
 info:
@@ -344,15 +303,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/order_list_dto.PaginatedOrdersDTO'
+            $ref: '#/definitions/dto.PaginatedOrdersDTO'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Retrieve all orders
       tags:
       - orders
@@ -378,11 +337,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Create Product
       tags:
       - products
@@ -407,11 +366,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Delete Product
       tags:
       - products
@@ -441,11 +400,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Update Product
       tags:
       - products
@@ -471,11 +430,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Cria um novo pedido
       tags:
       - orders
@@ -501,11 +460,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Cria um novo cliente
       tags:
       - clients
@@ -530,11 +489,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Obtém um cliente pelo CPF
       tags:
       - clients
@@ -556,7 +515,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapters_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Verifica se a aplicação está respondendo
       tags:
       - healthcheck
@@ -581,11 +540,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Obtém um pedido por ID
       tags:
       - orders
@@ -613,68 +572,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductOutput'
+            items:
+              $ref: '#/definitions/dto.ProductOutput'
+            type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
+            $ref: '#/definitions/handler.ErrorResponse'
       summary: Get Products
       tags:
       - products
-  /users:
-    get:
-      consumes:
-      - application/json
-      description: Obtém todos os usuários cadastrados
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              items:
-                $ref: '#/definitions/dto.UserOutput'
-              type: array
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
-      summary: Obtém todos os usuários
-      tags:
-      - users
-    post:
-      consumes:
-      - application/json
-      description: Cria um novo usuário com os dados fornecidos
-      parameters:
-      - description: Dados do Usuário
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UserInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/dto.UserOutput'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal_adapter_http_handler.ErrorResponse'
-      summary: Cria um novo usuário
-      tags:
-      - users
 swagger: "2.0"
