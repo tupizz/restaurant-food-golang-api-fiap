@@ -553,8 +553,24 @@
 						{
 							"name": "New Request",
 							"request": {
-								"method": "GET",
-								"header": []
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"external_reference\": \"c2a60c35-f337-47a5-a4f6-e5360b28280b\",\r\n    \"payment_method\": \"qr_code\",\r\n    \"status\": \"failed\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:8080/api/v1/webhooks/notifications"
 							},
 							"response": []
 						}

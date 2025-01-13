@@ -1,11 +1,11 @@
 package di
 
 import (
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/repository"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/db/repository"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/config"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
 	"go.uber.org/dig"
 )
 
@@ -22,28 +22,26 @@ func BuildContainer() *dig.Container {
 	// Router
 	container.Provide(http.NewRouter)
 
-	// Repositories
-	container.Provide(repository.NewUserRepository)
+	// Repositories 2.0
 	container.Provide(repository.NewClientRepository)
+	container.Provide(repository.NewHealthCheckRepository)
 	container.Provide(repository.NewProductRepository)
 	container.Provide(repository.NewOrderRepository)
 	container.Provide(repository.NewPaymentTaxSettingsRepository)
 	container.Provide(repository.NewPaymentRepository)
 
-	// Services
-	container.Provide(service.NewUserService)
-	container.Provide(service.NewClientService)
-	container.Provide(service.NewProductService)
-	container.Provide(service.NewProductServiceAdmin)
-	container.Provide(service.NewOrderService)
-	container.Provide(service.NewPaymentService)
+	// UseCases
+	container.Provide(usecase.NewClientUseCase)
+	container.Provide(usecase.NewHealthCheckUseCase)
+	container.Provide(usecase.NewProductUseCase)
+	container.Provide(usecase.NewOrderUseCase)
+	container.Provide(usecase.NewPaymentUseCase)
 
-	// Handlers
-	container.Provide(handler.NewHealthcheckHandler)
-	container.Provide(handler.NewUserHandler)
+	// Handlers 2.0
 	container.Provide(handler.NewClientHandler)
+	container.Provide(handler.NewHealthcheckHandler)
 	container.Provide(handler.NewProductHandler)
-	container.Provide(handler.NewAdminProductHandler)
+	container.Provide(handler.NewProductAdminHandler)
 	container.Provide(handler.NewOrderHandler)
 	container.Provide(handler.NewWebhookHandler)
 

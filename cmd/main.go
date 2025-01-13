@@ -5,7 +5,7 @@ import (
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/di"
 	_ "github.com/tupizz/restaurant-food-golang-api-fiap/swagger"
 )
