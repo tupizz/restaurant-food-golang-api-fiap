@@ -81,7 +81,6 @@ flowchart TD
 
 ```
 
-
 # Guia de instalação e execução do projeto
 
 Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** em sua máquina, seja utilizando Docker ou rodando a aplicação diretamente. Siga as instruções abaixo para preparar o ambiente de desenvolvimento e executar a aplicação.
@@ -318,89 +317,7 @@ migrate -path ./database/migrations -database "postgres://postgres:postgres@loca
 
 ## Estrutura do projeto
 
-- **`cmd/main.go`**: Ponto de entrada da aplicação.
-- **`internal/`**: Código interno da aplicação.
-    - **`adapter/`**: Adaptadores para handlers HTTP e implementações de repositórios.
-    - **`application/`**: Lógica de negócio e serviços.
-    - **`domain/`**: Entidades de negócio e interfaces de repositórios.
-    - **`config/`**: Carregamento e gerenciamento de configurações.
-    - **`di/`**: Configuração de injeção de dependências com o Uber Dig.
-- **`database/`**: Configuração do banco de dados com o SQLC.
-    - **`migrations/`**: Arquivos de migração do banco de dados.
-    - **`queries/`**: Arquivos de queries do banco de dados.
-    - **`sqlc`**: Arquivos gerados pelo SQLC.
-- **`Dockerfile`**: Arquivo Docker para construir a imagem da aplicação.
-- **`docker-compose.yml`**: Configuração do Docker Compose.
-- **`go.mod` e `go.sum`**: Arquivos de módulos do Go.
-
----
-
-# Explicação detalhada das camadas e interações no projeto
-
-O projeto **FastFood Golang** foi estruturado seguindo os princípios da **Arquitetura Limpa** e **Arquitetura Hexagonal**, com o objetivo de criar um sistema modular, escalável e de fácil manutenção. Abaixo, detalhamos cada camada, suas responsabilidades, como elas interagem entre si e referências aos arquivos relevantes.
-
-## Camadas da arquitetura
-
-1. [Camada de apresentação (presentation layer)](#1-camada-de-apresentação-presentation-layer)
-2. [Camada de aplicação (application layer)](#2-camada-de-aplicação-application-layer)
-3. [Camada de domínio (domain layer)](#3-camada-de-domínio-domain-layer)
-4. [Camada de infraestrutura (infrastructure layer)](#4-camada-de-infraestrutura-infrastructure-layer)
-
----
-
-### 1. Camada de apresentação (presentation layer)
-
-**Responsabilidade:**
-
-- Gerenciar a comunicação com o mundo externo (clientes, navegadores, etc.).
-- Processar solicitações HTTP, validar entradas e formatar respostas.
-- Delegar a lógica de negócios para a camada de aplicação.
-
-**Interação:**
-
-- Recebe solicitações HTTP dos clientes.
-- Invoca serviços da camada de aplicação para processar a lógica de negócios.
-- Retorna respostas HTTP apropriadas aos clientes.
-
-**Arquivos relevantes:**
-
-- **Manipuladores HTTP (Handlers):**
-    - `internal/adapter/http/handler/user_handler.go`: Contém a implementação do `UserHandler`, que processa as solicitações relacionadas a usuários.
-- **Roteador HTTP:**
-    - `internal/adapter/http/router.go`: Configura as rotas da API e registra os manipuladores correspondentes.
-
-**Detalhes e decisões:**
-
-- **Uso do Gin Framework:** Escolhemos o Gin devido à sua eficiência e facilidade de uso para criar APIs RESTful (foram cogitados outros frameworks, como o echo).
-- **Responsabilidade Limitada dos Handlers:** Os manipuladores focam em processar solicitações e respostas, delegando a lógica de negócios para a camada de aplicação.
-
----
-
-### 2. Camada de aplicação (application layer)
-
-**Responsabilidade:**
-
-- Implementar a lógica de negócios da aplicação.
-- Orquestrar operações entre a camada de apresentação e a camada de domínio.
-- Garantir que as regras de negócios sejam aplicadas corretamente.
-
-**Interação:**
-
-- Recebe chamadas dos manipuladores (handlers) da camada de apresentação.
-- Utiliza entidades e interfaces da camada de domínio para processar dados.
-- Chama repositórios através das interfaces definidas na camada de domínio.
-
-**Arquivos relevantes:**
-
-- **Serviços de Aplicação:**
-    - `internal/application/service/user_service.go` (exemplo): Implementa a lógica de negócios relacionada a usuários, como criação, leitura, atualização e exclusão.
-- **Data Transfer Objects (DTOs):**
-    - `internal/application/dto/product_input.go` e `internal/application/dto/product_output.go` (exemplo): Define estruturas para transferência de dados entre camadas, evitando expor diretamente as entidades do domínio.
-
-**Detalhes e decisões:**
-
-- **Isolamento da Lógica de Negócios:** Centralizamos a lógica aqui para facilitar testes e manutenções futuras.
-- **Uso de DTOs:** Facilita a validação e transformação de dados entre as camadas, promovendo a segurança e integridade dos dados.
+Para mais detalhes, consulte o arquivo [INFRA.md](./docs/infra.md).
 
 ---
 

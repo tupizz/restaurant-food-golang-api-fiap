@@ -9,13 +9,19 @@ Este projeto segue os princípios da **Clean Architecture**, garantindo modulari
 ```plaintext
 /
 ├── cmd/
+├── database/
+│   ├── migrations/
+│   ├── queries/
+|   └── sqlc/
 ├── docs/
 ├── internal/
 │   ├── adapters/
 │   │   ├── db/
 │   │   │   └── repository/
 │   │   └── http/
-│   │       └── handler/
+│   │       |── handler/
+|   |       └── middleware/
+|   ├── config/
 │   ├── core/
 │   │   ├── domain/
 │   │   │   ├── entities/
@@ -23,12 +29,10 @@ Este projeto segue os princípios da **Clean Architecture**, garantindo modulari
 │   │   │   └── validator/
 │   │   ├── usecase/
 │   │   │   ├── dto/
+|   |   |   ├── mappers/
 │   │   │   └── ports/
 │   ├── di/
-│   └── config/
-├── database/
-│   ├── migrations/
-│   └── queries/
+|   └── shared/
 ```
 
 ---
@@ -40,11 +44,19 @@ Este projeto segue os princípios da **Clean Architecture**, garantindo modulari
 Contém o ponto de entrada da aplicação, como arquivos `main.go` para inicializar o projeto.
 - Configura dependências e inicializa servidores HTTP ou outros serviços.
 
-### 2. **docs/**
+### 2. **database/**
+
+Contém scripts SQL e outros arquivos relacionados ao banco de dados:
+
+- **migrations/**: Scripts para migrações do banco de dados (ex.: criar tabelas, adicionar colunas).
+- **queries/**: Arquivos SQL usados para consultas específicas no banco de dados.
+- **sqlc/**: Arquivos autogerados pelo pacote `sqlc` usados para consultas específicas no banco de dados.
+
+### 3. **docs/**
 
 Armazena documentação do projeto, como arquivos gerados automaticamente para a API (e.g., Swagger) ou manuais escritos.
 
-### 3. **internal/**
+### 4. **internal/**
 
 O núcleo da aplicação está dentro de `internal`, dividido em várias subpastas:
 
@@ -56,7 +68,13 @@ Responsável por conectar o núcleo da aplicação com frameworks, bibliotecas e
 
 - **http/handler/**: Contém os manipuladores HTTP (endpoints da API). Eles recebem requisições, validam dados e chamam os casos de uso.
 
-#### b) **core/**
+- **http/middleware/**: Contém os manipuladores HTTP que rodam antes dos handlers (um bo exemplo seria uma camada de autenticação). Eles recebem requisições, validam dados e permitem que as chamadas cheguem aos handlers enriquecidas.
+
+#### b) **config/**
+
+Configurações da aplicação, como variáveis de ambiente, configuração de banco de dados, etc.
+
+#### c) **core/**
 
 O núcleo central da aplicação, seguindo os conceitos de Clean Architecture:
 
@@ -67,22 +85,16 @@ O núcleo central da aplicação, seguindo os conceitos de Clean Architecture:
 
 - **usecase/**:
   - **dto/**: Define os Data Transfer Objects (DTOs), usados para transferir dados entre as camadas (ex.: entrada e saída de dados nos casos de uso).
+  - **mappers/**: Define as conversões/traduções entre as DTOs e entidades.
   - **ports/**: Define as interfaces dos casos de uso e repositórios, permitindo que o núcleo da aplicação seja desacoplado das implementações externas.
 
-#### c) **di/**
+#### d) **di/**
 
 Contém a configuração de injeção de dependências. Aqui, as implementações concretas são conectadas às interfaces do núcleo, configurando o grafo de dependências da aplicação.
 
-#### d) **config/**
+#### e) **shared/**
 
-Configurações da aplicação, como variáveis de ambiente, configuração de banco de dados, etc.
-
-### 4. **database/**
-
-Contém scripts SQL e outros arquivos relacionados ao banco de dados:
-
-- **migrations/**: Scripts para migrações do banco de dados (ex.: criar tabelas, adicionar colunas).
-- **queries/**: Arquivos SQL usados para consultas específicas, caso estejam fora do código.
+Código compartilhado comum entre os pacotes, como um simples loop, ou algo assim, mas que não afeta em nada as entidades conehcidas pelo app.
 
 ---
 
