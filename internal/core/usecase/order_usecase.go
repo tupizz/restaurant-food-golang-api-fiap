@@ -4,16 +4,16 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto/order_list_dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
 type OrderUseCase interface {
 	CreateOrder(ctx context.Context, order domain.Order) (domain.Order, error)
 	GetOrderById(ctx context.Context, id int) (domain.Order, error)
-	GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]order_list_dto.OrderDTO, error)
+	GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]dto.OrderDTO, error)
 }
 
 type orderUseCase struct {
@@ -34,7 +34,7 @@ func NewOrderUseCase(
 	}
 }
 
-func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]order_list_dto.OrderDTO, error) {
+func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]dto.OrderDTO, error) {
 	if filter.PageSize == 0 {
 		filter.PageSize = 10
 	}
@@ -48,7 +48,7 @@ func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilt
 		return nil, err
 	}
 
-	var mapOrderIdToItems = make(map[int][]order_list_dto.OrderDTO)
+	var mapOrderIdToItems = make(map[int][]dto.OrderDTO)
 	for _, order := range orders {
 		productPrice, _ := order.ProductPrice.Float64Value()
 
@@ -61,23 +61,23 @@ func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilt
 			slog.Error("payment amount is not valid")
 		}
 
-		mapOrderIdToItems[int(order.OrderID)] = append(mapOrderIdToItems[int(order.OrderID)], order_list_dto.OrderDTO{
+		mapOrderIdToItems[int(order.OrderID)] = append(mapOrderIdToItems[int(order.OrderID)], dto.OrderDTO{
 			ID:       int(order.OrderID),
 			ClientID: int(order.ClientID),
-			Client: order_list_dto.ClientDTO{
+			Client: dto.ClientDTO{
 				ID:   int(order.ClientID),
 				Name: order.ClientName,
 				CPF:  order.ClientCpf,
 			},
 			Status: string(order.OrderStatus.String),
-			Items: []order_list_dto.OrderItemDTO{
+			Items: []dto.OrderItemDTO{
 				{
 					ID:        int(order.ProductID),
 					OrderID:   int(order.OrderID),
 					ProductID: int(order.ProductID),
 					Quantity:  int(order.ProductQuantity),
 					Price:     productPrice.Float64,
-					Product: order_list_dto.ProductDTO{
+					Product: dto.ProductDTO{
 						ID:             int(order.ProductID),
 						Name:           order.ProductName,
 						CategoryHandle: order.CategoryHandle.String,
@@ -86,7 +86,7 @@ func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilt
 					},
 				},
 			},
-			Payment: order_list_dto.PaymentDTO{
+			Payment: dto.PaymentDTO{
 				ID:      int(order.PaymentID),
 				OrderID: int(order.OrderID),
 				Status:  string(order.PaymentStatus.String),
@@ -96,7 +96,7 @@ func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilt
 		})
 	}
 
-	var ordersEntity []order_list_dto.OrderDTO
+	var ordersEntity []dto.OrderDTO
 	for _, orders := range mapOrderIdToItems {
 		order := orders[0]
 

@@ -1,14 +1,11 @@
 package di
 
 import (
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/repository"
-	cleanRepository "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/db/repository"
-	cleanHandler "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/service"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/db/repository"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/config"
-	cleanUseCase "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
 	"go.uber.org/dig"
 )
 
@@ -25,37 +22,28 @@ func BuildContainer() *dig.Container {
 	// Router
 	container.Provide(http.NewRouter)
 
-	// Repositories
-	container.Provide(repository.NewUserRepository)
+	// Repositories 2.0
+	container.Provide(repository.NewClientRepository)
+	container.Provide(repository.NewHealthCheckRepository)
+	container.Provide(repository.NewProductRepository)
+	container.Provide(repository.NewOrderRepository)
+	container.Provide(repository.NewPaymentTaxSettingsRepository)
 	container.Provide(repository.NewPaymentRepository)
 
-	// Repositories 2.0
-	container.Provide(cleanRepository.NewClientRepository)
-	container.Provide(cleanRepository.NewHealthCheckRepository)
-	container.Provide(cleanRepository.NewProductRepository)
-	container.Provide(cleanRepository.NewOrderRepository)
-	container.Provide(cleanRepository.NewPaymentTaxSettingsRepository)
-
-	// Services
-	container.Provide(service.NewUserService)
-	container.Provide(service.NewPaymentService)
-
 	// UseCases
-	container.Provide(cleanUseCase.NewClientUseCase)
-	container.Provide(cleanUseCase.NewHealthCheckUseCase)
-	container.Provide(cleanUseCase.NewProductUseCase)
-	container.Provide(cleanUseCase.NewOrderUseCase)
-
-	// Handlers
-	container.Provide(handler.NewUserHandler)
-	container.Provide(handler.NewWebhookHandler)
+	container.Provide(usecase.NewClientUseCase)
+	container.Provide(usecase.NewHealthCheckUseCase)
+	container.Provide(usecase.NewProductUseCase)
+	container.Provide(usecase.NewOrderUseCase)
+	container.Provide(usecase.NewPaymentUseCase)
 
 	// Handlers 2.0
-	container.Provide(cleanHandler.NewClientHandler)
-	container.Provide(cleanHandler.NewHealthcheckHandler)
-	container.Provide(cleanHandler.NewProductHandler)
-	container.Provide(cleanHandler.NewProductAdminHandler)
-	container.Provide(cleanHandler.NewOrderHandler)
+	container.Provide(handler.NewClientHandler)
+	container.Provide(handler.NewHealthcheckHandler)
+	container.Provide(handler.NewProductHandler)
+	container.Provide(handler.NewProductAdminHandler)
+	container.Provide(handler.NewOrderHandler)
+	container.Provide(handler.NewWebhookHandler)
 
 	return container
 }

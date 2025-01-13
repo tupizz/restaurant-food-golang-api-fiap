@@ -5,7 +5,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapter/http/handler"
 	cleanHandler "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
 )
 
@@ -15,12 +14,11 @@ type Router struct {
 
 func NewRouter(
 	healthcheckHandler cleanHandler.HealthcheckHandler,
-	userHandler handler.UserHandler,
 	clientHandler cleanHandler.ClientHandler,
 	productHandler cleanHandler.ProductHandler,
 	adminProductHandler cleanHandler.ProductAdminHandler,
 	orderHandler cleanHandler.OrderHandler,
-	webhookHandler handler.WebhookHandler,
+	webhookHandler cleanHandler.WebhookHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -33,12 +31,6 @@ func NewRouter(
 	// Set up routes
 	v1 := engine.Group("/api/v1")
 	{
-		users := v1.Group("/users")
-		{
-			users.GET("/", userHandler.GetAll)
-			users.POST("/", userHandler.Create)
-		}
-
 		clients := v1.Group("/clients")
 		{
 			clients.POST("/", clientHandler.Create)

@@ -7,27 +7,24 @@ import (
 	pgx "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	fiapRestaurantDb "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
+	sqlcDB "github.com/tupizz/restaurant-food-golang-api-fiap/database/sqlc"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 )
 
 type paymentRepository struct {
-	sqlcDb *fiapRestaurantDb.Queries
+	sqlcDb *sqlcDB.Queries
 	dbPool *pgxpool.Pool
 }
 
-func NewPaymentRepository(
-	sqlcDb *fiapRestaurantDb.Queries,
-	dbPool *pgxpool.Pool,
-) domain.PaymentRepository {
+func NewPaymentRepository(sqlcDb *sqlcDB.Queries, dbPool *pgxpool.Pool) ports.PaymentRepository {
 	return &paymentRepository{
 		sqlcDb: sqlcDb,
 		dbPool: dbPool,
 	}
 }
 
-func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status entity.PaymentStatus) error {
+func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, externalReference string, paymentMethod string, status domain.PaymentStatus) error {
 	tx, err := r.dbPool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		slog.Error("Error starting transaction", "error", err)
@@ -51,7 +48,7 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, extern
 
 	qtx := r.sqlcDb.WithTx(tx)
 
-	err = qtx.UpdateOrderPaymentStatus(ctx, fiapRestaurantDb.UpdateOrderPaymentStatusParams{
+	err = qtx.UpdateOrderPaymentStatus(ctx, sqlcDB.UpdateOrderPaymentStatusParams{
 		ExternalReference: pgtype.Text{
 			String: externalReference,
 			Valid:  true,
@@ -66,14 +63,14 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, extern
 		return err
 	}
 
-	var orderStatusToUpdate entity.OrderStatus
-	if status == entity.PaymentStatusApproved {
-		orderStatusToUpdate = entity.OrderStatusPreparing
+	var orderStatusToUpdate domain.OrderStatus
+	if status == domain.PaymentStatusApproved {
+		orderStatusToUpdate = domain.OrderStatusPreparing
 	} else {
-		orderStatusToUpdate = entity.OrderStatusCanceled
+		orderStatusToUpdate = domain.OrderStatusCanceled
 	}
 
-	orderId, err := qtx.GetOrderIdByExternalReferenceAndMethod(ctx, fiapRestaurantDb.GetOrderIdByExternalReferenceAndMethodParams{
+	orderId, err := qtx.GetOrderIdByExternalReferenceAndMethod(ctx, sqlcDB.GetOrderIdByExternalReferenceAndMethodParams{
 		ExternalReference: pgtype.Text{
 			String: externalReference,
 			Valid:  true,
@@ -84,7 +81,7 @@ func (r *paymentRepository) UpdateOrderPaymentStatus(ctx context.Context, extern
 		return err
 	}
 
-	err = qtx.UpdateOrderStatus(ctx, fiapRestaurantDb.UpdateOrderStatusParams{
+	err = qtx.UpdateOrderStatus(ctx, sqlcDB.UpdateOrderStatusParams{
 		ID: int32(orderId),
 		Status: pgtype.Text{
 			String: string(orderStatusToUpdate),
