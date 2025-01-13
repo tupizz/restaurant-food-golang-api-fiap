@@ -1,42 +1,40 @@
-package service
+package usecase
 
 import (
 	"context"
 	"log/slog"
 
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/application/dto/order_list_dto"
-	domainClean "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain"
+	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
-
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain"
-	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/domain/entity"
 )
 
-type OrderService interface {
-	CreateOrder(ctx context.Context, order entity.Order) (entity.Order, error)
-	GetOrderById(ctx context.Context, id int) (entity.Order, error)
-	GetAllOrders(ctx context.Context, filter *domain.OrderFilter) ([]order_list_dto.OrderDTO, error)
+type OrderUseCase interface {
+	CreateOrder(ctx context.Context, order domain.Order) (domain.Order, error)
+	GetOrderById(ctx context.Context, id int) (domain.Order, error)
+	GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]order_list_dto.OrderDTO, error)
 }
 
-type orderService struct {
-	orderRepo              domain.OrderRepository
+type orderUseCase struct {
+	orderRepo              ports.OrderRepository
 	productRepo            ports.ProductRepository
-	paymentTaxSettingsRepo domain.PaymentTaxSettingsRepository
+	paymentTaxSettingsRepo ports.PaymentTaxSettingsRepository
 }
 
-func NewOrderService(
-	orderRepo domain.OrderRepository,
+func NewOrderUseCase(
+	orderRepo ports.OrderRepository,
 	productRepo ports.ProductRepository,
-	paymentTaxSettingsRepo domain.PaymentTaxSettingsRepository,
-) OrderService {
-	return &orderService{
+	paymentTaxSettingsRepo ports.PaymentTaxSettingsRepository,
+) OrderUseCase {
+	return &orderUseCase{
 		orderRepo:              orderRepo,
 		productRepo:            productRepo,
 		paymentTaxSettingsRepo: paymentTaxSettingsRepo,
 	}
 }
 
-func (s *orderService) GetAllOrders(ctx context.Context, filter *domain.OrderFilter) ([]order_list_dto.OrderDTO, error) {
+func (s *orderUseCase) GetAllOrders(ctx context.Context, filter *ports.OrderFilter) ([]order_list_dto.OrderDTO, error) {
 	if filter.PageSize == 0 {
 		filter.PageSize = 10
 	}
@@ -112,7 +110,7 @@ func (s *orderService) GetAllOrders(ctx context.Context, filter *domain.OrderFil
 	return ordersEntity, nil
 }
 
-func (s *orderService) CreateOrder(ctx context.Context, order entity.Order) (entity.Order, error) {
+func (s *orderUseCase) CreateOrder(ctx context.Context, order domain.Order) (domain.Order, error) {
 	// Validate if the product exists
 	var productIds []int
 	for _, item := range order.Items {
@@ -121,42 +119,42 @@ func (s *orderService) CreateOrder(ctx context.Context, order entity.Order) (ent
 
 	existingProductsFromDB, _, err := s.productRepo.GetByIds(ctx, productIds)
 	if err != nil {
-		return entity.Order{}, err
+		return domain.Order{}, err
 	}
 
-	mappedProducts := make(map[int]domainClean.Product)
+	mappedProducts := make(map[int]domain.Product)
 	for _, product := range existingProductsFromDB {
 		mappedProducts[product.ID] = product
 	}
 
 	systemPaymentTaxSettings, err := s.paymentTaxSettingsRepo.GetAll(ctx)
 	if err != nil {
-		return entity.Order{}, err
+		return domain.Order{}, err
 	}
 
 	err = order.CalculateTotalAmount(mappedProducts, systemPaymentTaxSettings)
 	if err != nil {
-		return entity.Order{}, domain.NewEntityNotProcessableError("order", err.Error())
+		return domain.Order{}, domainError.NewEntityNotProcessableError("order", err.Error())
 	}
 
 	err = order.Payment.Authorize()
 	if err != nil {
-		return entity.Order{}, domain.NewEntityNotProcessableError("payment", err.Error())
+		return domain.Order{}, domainError.NewEntityNotProcessableError("payment", err.Error())
 	}
 
-	// Business logic to create an order
 	createdOrder, err := s.orderRepo.Create(ctx, order)
 	if err != nil {
-		return entity.Order{}, err
+		return domain.Order{}, err
 	}
+
 	return createdOrder, nil
 }
 
-func (s *orderService) GetOrderById(ctx context.Context, id int) (entity.Order, error) {
-	// Business logic to retrieve an order by ID
+func (s *orderUseCase) GetOrderById(ctx context.Context, id int) (domain.Order, error) {
 	order, err := s.orderRepo.GetByID(ctx, id)
 	if err != nil {
-		return entity.Order{}, err
+		return domain.Order{}, err
 	}
+
 	return order, nil
 }

@@ -19,7 +19,7 @@ func NewRouter(
 	clientHandler cleanHandler.ClientHandler,
 	productHandler cleanHandler.ProductHandler,
 	adminProductHandler cleanHandler.ProductAdminHandler,
-	orderHandler handler.OrderHandler,
+	orderHandler cleanHandler.OrderHandler,
 	webhookHandler handler.WebhookHandler,
 ) Router {
 	engine := gin.Default()
