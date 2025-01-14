@@ -22,7 +22,7 @@ func BuildContainer() *dig.Container {
 	// Router
 	container.Provide(http.NewRouter)
 
-	// Repositories 2.0
+	// Repositories
 	container.Provide(repository.NewClientRepository)
 	container.Provide(repository.NewHealthCheckRepository)
 	container.Provide(repository.NewProductRepository)
@@ -31,13 +31,14 @@ func BuildContainer() *dig.Container {
 	container.Provide(repository.NewPaymentRepository)
 
 	// UseCases
-	container.Provide(usecase.NewClientUseCase)
 	container.Provide(usecase.NewHealthCheckPingUseCase)
 	container.Provide(usecase.NewProductUseCase)
 	container.Provide(usecase.NewOrderUseCase)
 	container.Provide(usecase.NewPaymentUseCase)
+	container.Provide(usecase.NewCreateClientUseCase)
+	container.Provide(usecase.NewGetClientByCPFUseCase)
 
-	// Handlers 2.0
+	// Handlers
 	container.Provide(handler.NewClientHandler)
 	container.Provide(handler.NewHealthcheckHandler)
 	container.Provide(handler.NewProductHandler)
