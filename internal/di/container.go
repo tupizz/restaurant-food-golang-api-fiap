@@ -32,9 +32,12 @@ func BuildContainer() *dig.Container {
 
 	// UseCases
 	container.Provide(usecase.NewHealthCheckPingUseCase)
-	container.Provide(usecase.NewProductUseCase)
+	container.Provide(usecase.NewGetProductsUseCase)
+	container.Provide(usecase.NewCreateProductUseCase)
+	container.Provide(usecase.NewUpdateProductUseCase)
+	container.Provide(usecase.NewDeleteProductUseCase)
 	container.Provide(usecase.NewOrderUseCase)
-	container.Provide(usecase.NewPaymentUseCase)
+	container.Provide(usecase.NewProcessPaymentUseCase)
 	container.Provide(usecase.NewCreateClientUseCase)
 	container.Provide(usecase.NewGetClientByCPFUseCase)
 
