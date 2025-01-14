@@ -14,11 +14,11 @@ type HealthcheckHandler interface {
 }
 
 type healthcheckHandler struct {
-	healthCheckUseCase usecase.HealthCheckUseCase
+	healthCheckPingUseCase usecase.HealthCheckPingUseCase
 }
 
-func NewHealthcheckHandler(healthCheckUseCase usecase.HealthCheckUseCase) HealthcheckHandler {
-	return &healthcheckHandler{healthCheckUseCase: healthCheckUseCase}
+func NewHealthcheckHandler(healthCheckPingUseCase usecase.HealthCheckPingUseCase) HealthcheckHandler {
+	return &healthcheckHandler{healthCheckPingUseCase: healthCheckPingUseCase}
 }
 
 // Ping godoc
@@ -31,7 +31,7 @@ func NewHealthcheckHandler(healthCheckUseCase usecase.HealthCheckUseCase) Health
 // @Failure     500     {object}  handler.ErrorResponse
 // @Router      /healthcheck [get]
 func (h *healthcheckHandler) Ping(c *gin.Context) {
-	err := h.healthCheckUseCase.Ping(c.Request.Context())
+	err := h.healthCheckPingUseCase.Run(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
