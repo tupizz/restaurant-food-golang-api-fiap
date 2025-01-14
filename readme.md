@@ -1,372 +1,202 @@
-# Event Storming (DDD)
+# Tech Challenge [Fase 2]
 
-Event Storming é uma técnica colaborativa que ajuda a descobrir, compreender e mapear processos de negócios complexos através da identificação de eventos, comandos, agregados, políticas, participantes, entre outros elementos. É especialmente útil em projetos de DDD, pois facilita a comunicação entre equipes técnicas e de negócio.
+## Resultado no minikube
 
-## Fluxo DDD Miro
+![image](https://github.com/user-attachments/assets/fad55677-9858-4c8f-93dd-863d3710052d)
 
-[Board DDD](https://miro.com/app/board/uXjVLeiK8DM=/)
+```bash
+> kubectl get all
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/go-app-deployment-f6c9fcb67-n47vn   1/1     Running   0          22h
+pod/restaurant-db-5ffddf874-j44sj       1/1     Running   0          5d21h
 
-## Linguagem Ubíqua
+NAME                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/go-app-service          NodePort    10.107.79.74   <none>        8080:30000/TCP   5d20h
+service/kubernetes              ClusterIP   10.96.0.1      <none>        443/TCP          20d
+service/restaurant-db-service   ClusterIP   None           <none>        5432/TCP         5d21h
 
-- Pedido
-- Cliente
-- Pagamento
-- Preparação
-- Entrega
-- Status do Pedido
-- Notificação
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/go-app-deployment   1/1     1            1           22h
+deployment.apps/restaurant-db       1/1     1            1           5d21h
 
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/go-app-deployment-f6c9fcb67   1         1         1       22h
+replicaset.apps/restaurant-db-5ffddf874       1         1         1       5d21h
 
-## Realização do pedido e pagamento
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant SistemaAutoatendimento as Sistema de Autoatendimento
-    participant SistemaPagamento as Sistema de Pagamento
-    participant Cozinha
-    participant PainelCliente as Painel do Cliente
-
-    Cliente->>SistemaAutoatendimento: Iniciar Pedido
-    SistemaAutoatendimento->>Cliente: Exibir Menu de Produtos
-
-    loop Seleção de Itens
-        Cliente->>SistemaAutoatendimento: Adicionar Item ao Pedido
-        SistemaAutoatendimento->>Cliente: Confirmar Adição
-    end
-
-    Cliente->>SistemaAutoatendimento: Confirmar Pedido
-    SistemaAutoatendimento->>SistemaPagamento: Processar Pagamento via QRCode
-    SistemaPagamento-->>Cliente: Exibir QRCode do Mercado Pago
-    Cliente->>SistemaPagamento: Realizar Pagamento
-    SistemaPagamento-->>SistemaAutoatendimento: Pagamento Confirmado
-
-    SistemaAutoatendimento->>Cozinha: Enviar Pedido
-    SistemaAutoatendimento->>PainelCliente: Atualizar Status para "Recebido"
+NAME                                             REFERENCE                      TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/go-app-hpa   Deployment/go-app-deployment   cpu: 1%/50%   1         5         1          23m
 ```
-## Preparação e Entrega do pedido
+
+# Documentação do Projeto
+
+Este documento detalha o desenho da arquitetura do sistema, elaborado para atender aos requisitos do negócio e às necessidades de infraestrutura.
+
+`mermaid` que ilustra um diagrama de sequências, simples, que demonstra como a aplicação conseguirá resolver os problemas funcionais do projeto:
 
 ```mermaid
 sequenceDiagram
-    participant Cozinha
-    participant PainelCliente as Painel do Cliente
-    participant Cliente
+  participant Administrador
+  participant SistemaAdministrativo as Sistema Administrativo
+  participant Cliente
+  participant SistemaAutoatendimento as Sistema de Autoatendimento
+  participant SistemaPagamento as Sistema de Pagamento
+  participant Cozinha
+  participant PainelCliente as Painel do Cliente
 
-    Cozinha->>Cozinha: Iniciar Preparação
-    Cozinha->>PainelCliente: Atualizar Status para "Em Preparação"
+  loop Rotina de backoffice do restaurante
+      Administrador->>SistemaAdministrativo: Cadastrar categoria
+      SistemaAdministrativo->>Administrador: Confirmar adição de categoria
 
-    Cozinha->>Cozinha: Finalizar Preparação
-    Cozinha->>PainelCliente: Atualizar Status para "Pronto"
-    PainelCliente-->>Cliente: Notificar Pedido Pronto
+      Administrador->>SistemaAdministrativo: Cadastrar produto
+      SistemaAdministrativo->>Administrador: Confirmar adição de produto
 
-    Cliente->>Cozinha: Retirar Pedido
-    Cozinha->>PainelCliente: Atualizar Status para "Finalizado"
-```
+      Administrador->>SistemaAdministrativo: Editar produto
+      SistemaAdministrativo->>Administrador: Confirmar edição de produto
 
-## Fluxo detalhado com diagrama de atividades
+      Administrador->>SistemaAdministrativo: Cadastrar imagem de produto
+      SistemaAdministrativo->>Administrador: Confirmar cadastro de imagem de um produto
+  end
 
-```mermaid
-flowchart TD
-    A[Iniciar Pedido] --> B{Cliente Identificado?}
-    B -- Sim --> C[Registrar Cliente]
-    B -- Não --> D[Prosseguir sem Identificação]
-    C --> D
-    D --> E[Selecionar Itens]
-    E --> F[Confirmar Pedido]
-    F --> G[Processar Pagamento]
-    G --> H{Pagamento Aprovado?}
-    H -- Sim --> I[Registrar Pedido]
-    H -- Não --> J[Notificar Falha no Pagamento]
-    I --> K["Atualizar Status para status Recebido"]
-    K --> L[Enviar Pedido para Cozinha]
+  Cliente->>SistemaAutoatendimento: Iniciar pedido
+  SistemaAutoatendimento->>Cliente: Exibir Menu de Produtos
 
-```
+  loop Seleção de itens
+      Cliente->>SistemaAutoatendimento: Adicionar item ao pedido
+      SistemaAutoatendimento->>Cliente: Confirmar adição de item ao pedido
+  end
 
-# Guia de instalação e execução do projeto
+  Cliente->>SistemaAutoatendimento: Fechar pedido (checkout)
 
-Este guia irá ajudá-lo a configurar e executar o projeto **FastFood Golang** em sua máquina, seja utilizando Docker ou rodando a aplicação diretamente. Siga as instruções abaixo para preparar o ambiente de desenvolvimento e executar a aplicação.
+  SistemaAutoatendimento->>SistemaPagamento: Gerar pagamento
+  SistemaPagamento-->>Cliente: Retornar detalhes do pagamento (QRCode mercado pago)
 
-## Pré-requisitos
+  Cliente->>SistemaPagamento: Realizar Pagamento
+  SistemaPagamento-->>SistemaAutoatendimento: Notificar pagamento confirmado
 
-- **Git**: Para clonar o repositório.
-- **Golang**: Versão 1.18 ou superior.
-- **Docker** e **Docker Compose**: Se preferir executar a aplicação em contêineres.
-- **Air**: Ferramenta para live reloading durante o desenvolvimento.
-- **Golang-Migrate**: Para gerenciar migrações de banco de dados.
-- **Swagger**: Para documentação da API.
+  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
+  SistemaAutoatendimento->>Cozinha: Enviar Pedido
 
----
+  Cozinha->>SistemaAutoatendimento: Atualizar Status para "Recebido"
+  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
+  SistemaAutoatendimento->>PainelCliente: Atualiza status do pedido
 
-## Configuração do ambiente
+  Cozinha->>SistemaAutoatendimento: Atualizar Status para "Pronto"
+  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
+  SistemaAutoatendimento->>PainelCliente: Atualiza status do pedido
 
-### 1. Clonar o repositório
-
-Abra o terminal e clone o repositório para a sua máquina local:
-
-```bash
-git clone https://github.com/tupizz/restaurant-food-golang-api-fiap
-cd restaurant-food-golang-api-fiap
-```
-
-### 2. Instalar dependências Go
-
-Certifique-se de ter o Go instalado e configurado em sua máquina. Baixe as dependências do projeto:
-
-```bash
-go mod download
-```
-
-### 3. Instalar o Air para Live Reloading
-
-Air é uma ferramenta que recompila e reinicia automaticamente a aplicação quando mudanças no código são detectadas nos arquivos mapeados.
-
-#### Instalação
-
-Ou, se preferir, instale via Go (confirme que o diretório `$GOPATH/bin` está no seu `PATH`):
-
-```bash
-go install github.com/air-verse/air@latest
-```
-
-### 4. Instalar o Golang-Migrate para migrações de banco de dados
-
-Golang-Migrate é usado para gerenciar migrações do banco de dados.
-
-#### Instalação
-
-```bash
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-```
-
-Certifique-se de que o diretório `$GOPATH/bin` está no seu `PATH` para acessar o comando `migrate`.
-
----
-
-#### Observações (passo 3 e 4):
-
-1. Caso você use alguma ferramenta para gerenciar diferentes versões do Go, como o [ASDF](https://github.com/asdf-vm/asdf), você precisrá regerar os _shims_ para que os binários instalados diretamente com o `go install` estejam disponíveis.
-
-```bash
-# Para o cenário do ASDF, pode ser:
-asdf reshim golang
-```
-
-2. Os seguintes comandos a seguir podem verificar a correta isntalação das ferramentas acima:
-
-```bash
-air -v
-migrate -version
+  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
+  SistemaAutoatendimento->>PainelCliente: Atualizar Status para "Recebido"
 ```
 
 ---
 
-## Executando o projeto com Docker
+## 1. Requisitos do Negócio
 
-### 1. Configurar variáveis de ambiente
+O restaurante enfrenta problemas de performance nos seus totens de autoatendimento, que comprometem a experiência do usuário durante picos de demanda. Os principais objetivos da solução são:
 
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+- **Garantir disponibilidade** do sistema durante períodos de alta carga.
+- **Reduzir o tempo de resposta** das requisições realizadas pelos totens.
+- **Permitir escalabilidade automática** para lidar com flutuações no volume de requisições.
 
-```env
-DATABASE_URL=postgres://postgres:postgres@db:5432/yourdb?sslmode=disable
-```
+---
 
-### 2. Construir e iniciar os serviços com Docker Compose
+## 2. Requisitos de Infraestrutura
 
-Execute o seguinte comando para construir as imagens e iniciar os contêineres:
+A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podendo ser executada em:
 
-```bash
-docker-compose up --build
-```
+- **Ambientes locais**, como Minikube ou Kind.
+- **Provedores de nuvem**, como AKS (Azure), EKS (AWS), ou GKE (Google Cloud).
 
-Isso irá:
+**Principais elementos da infraestrutura:**
 
-- Construir a imagem Docker da aplicação Go.
-- Iniciar o contêiner do banco de dados PostgreSQL.
-- Executar as migrações do banco de dados.
-- Iniciar o contêiner da aplicação Go com o Air para live reloading.
+- **Horizontal Pod Autoscaler (HPA):** Configurado para escalar automaticamente a aplicação "go-app" com base no uso de CPU, garantindo que os recursos sejam alocados conforme a demanda.
+- **Secrets:** Utilizados para armazenar credenciais sensíveis, como a URL de conexão do banco de dados.
+- **Banco de Dados PostgreSQL:** Implantado como um deployment com um PersistentVolumeClaim (PVC) para persistência de dados.
+- **Aplicação em GO (atendendno os requisitos funcionais):** Implantado como um deployment que utiliza de um secrets para ter as credenciais de acesso ao Banco de Dados.
+- **Services:** Configurados para expor a aplicação e o banco de dados, incluindo um NodePort para acesso externo à API.
+- **ConfigMap:** Armazena configurações de aplicação não sensíveis, permitindo flexibilidade sem alterar a imagem do container.
 
-### 3. Acessar a aplicação
+---
 
-A aplicação estará disponível em `http://localhost:8080`.
+## 3. Desenho da Arquitetura
 
-#### Testar endpoints
+### Representação Textual
 
-- **Listar usuários:**
+1. **Aplicação (go-app):**
+  - Uma API desenvolvida em Go, responsável por processar as requisições dos totens.
+  - Configurada com um Deployment que especifica recursos mínimos e máximos para evitar sobrecarga.
+  - Utiliza o HPA para escalar de 1 a 5 réplicas com base na utilização de CPU.
+  - Verificação de saúde implementada com liveness e readiness probes.
 
-  ```bash
-  curl http://localhost:8080/api/v1/users
+2. **Banco de Dados (restaurant-db):**
+  - PostgreSQL configurado com PVC para garantir a persistência dos dados.
+  - ClusterIP Service utilizado para comunicação interna com a aplicação.
+
+3. **Horizontal Pod Autoscaler (HPA):**
+  - Monitora a métrica de utilização de CPU da "go-app" e ajusta dinamicamente o número de réplicas.
+
+  Aqui podemos ver ele em funcionamento (ps: o computador que foi gravado dá um engargalada por conta do uso de memória, além de estar rodando no wsl e um minikube no docker com limitações), e para que funcionasse foi criado um shell script que exonera a api, aumentando o recurso consumido pelo container.
+
+  https://github.com/user-attachments/assets/d3256bf6-6c33-4fbc-874c-7ae1f67006ba
+
+4. **Secrets:**
+   - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "go-app" via variáveis de ambiente. O Secret utilizado é:
+
+  ```yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: go-app-secrets
+  type: Opaque
+  data:
+    DATABASE_URL: cG9zdGdyZXM6Ly9wb3N0Z3Jlczpwb3N0Z3Jlc0ByZXN0YXVyYW50LWRiLXNlcnZpY2U6NTQzMi9maWFwX2Zhc3RfZm9vZD9zc2xtb2RlPWRpc2FibGU=
   ```
 
-- **Criar usuário:**
+5. **Exposição de Serviços:**
+  - NodePort para a "go-app" permite acesso externo na porta 30000.
+  - O banco de dados é acessível internamente via ClusterIP.
 
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"name":"João Silva", "email":"joao.silva@example.com", "age":30}' http://localhost:8080/api/v1/users/
-  ```
+### Diagrama da Arquitetura
 
----
-
-## Executando o projeto sem Docker
-
-### 1. Configurar o banco de dados PostgreSQL (2 formas):
-
-#### 1.1 Rodando o banco de dados localmente
-
-Instale o PostgreSQL em sua máquina e crie um banco de dados chamado `fiap_fast_food`.
-
-Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu banco de dados local:
-
-```env
-DATABASE_URL=postgres://postgres:suasenha@localhost:5432/fiap_fast_food?sslmode=disable
-```
-
-#### 1.2 Rodando o banco de dados em um container Docker
-
-Também é possível utilizar o container para o postgres disponível no `docker-compose.yml`. Neste caso basta subir apenas este container e rodar somente o _app_ localmente:
-
-**Caso prefira rodar o banco em sua máquina, isto é, sem uso de containers, desconsidere este passo**.
-
-```bash
-docker-compose up db --build
-```
-
-Atualize a variável `DATABASE_URL` no arquivo `.env` para apontar para o seu banco de dados do container (as credenciais podem ser vistas como variáveis de ambiente no `docker-compose.yml`):
-
-```env
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable
-```
-
-### 2. Executar migrações do banco de dados
-
-Execute as migrações para criar as tabelas necessárias (subtituindo a DATABASE_URL abaixo):
-
-```bash
-migrate -database "${DATABASE_URL}" -path ./database/migrations up
-```
-
-Ou, se preferir, rode através do [make](https://www.gnu.org/software/make/).
-
-```bash
-make migrate-up
-```
-
-### 3. Iniciar a aplicação com Air
-
-Inicie a aplicação usando o Air para habilitar o live reloading:
-
-```bash
-air
-```
-
-Ou, se preferir, rode através do [make](https://www.gnu.org/software/make/).
-
-```bash
-make run-air
-```
-
-**Observação:** Certifique-se de que o comando `air` está disponível no seu `PATH`. Se instalou o Air via Go, o binário estará em `$GOPATH/bin`.
-
-### 4. Acessar a aplicação
-
-A aplicação estará disponível em `http://localhost:8080`. Utilize os mesmos comandos mencionados anteriormente para testar os endpoints.
+![architecture_diagram](https://github.com/user-attachments/assets/361b71fd-7093-4dfc-84d3-74bfd72d9b3f)
 
 ---
 
-## Dicas e Solução de Problemas
+## 4. Benefícios da Arquitetura
 
-- **Portas em Uso:** Verifique se as portas `8080` (aplicação) e `5432` (banco de dados) estão livres.
-- **Variáveis de Ambiente:** Certifique-se de que o `DATABASE_URL` está corretamente configurado no arquivo `.env`.
-- **Permissões de Arquivo:** Se encontrar problemas de permissão, ajuste as permissões dos arquivos e diretórios:
-
-  ```bash
-  chmod -R 755 ./fastfood-golang
-  ```
-
-- **Logs da aplicação:** Monitore os logs para identificar possíveis erros:
-
-  ```bash
-  docker-compose logs -f
-  ```
-
-- **Reinstalar dependências:** Se encontrar erros relacionados a dependências, execute:
-
-  ```bash
-  go mod tidy
-  go mod download
-  ```
+- **Escalabilidade Automática:** O HPA ajusta dinamicamente os recursos da aplicação conforme a carga.
+- **Alta Disponibilidade:** Configurações de readiness e liveness probes garantem que apenas pods saudáveis recebam tráfego.
+- **Segurança:** Uso de Secrets para proteger informações sensíveis.
+- **Flexibilidade:** ConfigMaps permitem alterações rápidas nas configurações da aplicação sem necessidade de recriar imagens.
+- **Persistência de Dados:** O banco de dados utiliza PVC para garantir que os dados sejam preservados mesmo em caso de falhas.
 
 ---
 
-## Solução de problemas com migrations
-
-Para mais detalhes, consulte o arquivo [MIGRATION_GUIDE.md](./docs/migrations.md).
-
-Sample error:
-```
-error: Dirty database version 7. Fix and force version.
-```
-
-Solution:
-- Force the past version
-- Update again
-
-```bash
-migrate -path ./database/migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" force 6
-migrate -path ./database/migrations -database "postgres://postgres:postgres@localhost:5432/fiap_fast_food?sslmode=disable" up
-```
+Este design assegura que a aplicação seja confiável, escalável e responsiva para atender aos desafios do restaurante.
 
 ---
 
-## Estrutura do projeto
+## 5. Como rodar o cluster localmente
 
-Para mais detalhes, consulte o arquivo [INFRA.md](./docs/infra.md).
+Para detalhes, consulte o arquivo [how-to-tun-k8s.md](./docs/how-to-run-k8s.md).
 
-**Detalhes e decisões:**
+## 6. Collection com todas as APIs desenvolvidas com exemplo  de requisição (que não seja vazia)
 
-- **Uso do `pgxpool`:** Optamos pelo driver `pgx` para melhor performance e recursos avançados na interação com o PostgreSQL.
-- **Injeção de Dependências com Uber Dig:** Facilita o gerenciamento de dependências complexas e aumenta a testabilidade da aplicação.
-- **Centralização das Configurações:** Permite alterar facilmente parâmetros de configuração sem modificar o código-fonte.
+- Para swagger, a documentação se encontra em `./swagger/* (tanto .json quanto o .yaml)`.
+- Para postaman, a collection se encontra em `./postman/fiap_collection.json`.
 
----
+## 7. como rodar a aplicação locamente
 
-## Decisões de Arquitetura e Racionalização
+Para detalhes, consulte o arquivo [how-to-run.md](./docs/how-to-run.md).
 
-### Separação de Responsabilidades
+## 8. Link para vídeo de demonstração
 
-- **Clareza e Manutenibilidade:** Cada camada tem uma responsabilidade distinta, facilitando a compreensão e manutenção do código.
-- **Colaboração entre Equipes:** Diferentes equipes ou desenvolvedores podem trabalhar em camadas específicas sem causar conflitos.
+TO-DO.
 
-### Injeção de Dependências com Uber Dig
+## 9. Dados da arquitetura limpa e suas pastas aplicadas no projeto
 
-- **Gerenciamento Simplificado:** O Uber Dig permite resolver e injetar dependências de forma declarativa.
-- **Testabilidade Aumentada:** Facilita a injeção de mocks ou stubs durante testes unitários.
-- **Redução de Acoplamento:** Evita dependências rígidas entre componentes, promovendo um design mais flexível.
+Para detalhes, consulte o arquivo [infra.md](./docs/infra.md).
 
-### Uso de interfaces e abstrações
+## 10. Informações relacionadas a fase 1
 
-- **Flexibilidade:** Permite trocar implementações (por exemplo, substituir o banco de dados) sem alterar as camadas superiores.
-- **Isolamento da Lógica de Negócios:** A lógica de negócios não depende de detalhes de infraestrutura, seguindo o princípio da inversão de dependência.
-
-### Gerenciamento centralizado de configurações
-
-- **Segurança:** Variáveis sensíveis são gerenciadas em um único lugar, facilitando a proteção de dados.
-- **Facilidade de Configuração:** Alterações nos ambientes (desenvolvimento, teste, produção) são simplificadas.
-
-### Escolha de tecnologias
-
-- **Golang:** Escolhido pela performance, simplicidade e forte suporte à concorrência.
-- **PostgreSQL com `pgxpool`:** Proporciona uma conexão eficiente e recursos avançados para interagir com o banco de dados.
-- **Docker Compose:** Utilizado para orquestrar serviços, garantindo consistência entre ambientes e facilitando a implantação.
-
-## Conclusão
-
-A arquitetura implementada no projeto **FastFood Golang** foi cuidadosamente planejada para promover boas práticas de desenvolvimento de software, como modularidade, separação de preocupações e independência tecnológica. Ao seguir os princípios da Arquitetura Limpa e Hexagonal, garantimos que a aplicação seja:
-
-- **Escalável:** Facilmente expansível para adicionar novos recursos ou módulos.
-- **Manutenível:** Simples de entender e modificar, reduzindo o tempo de desenvolvimento e custos.
-- **Testável:** Com componentes desacoplados, os testes unitários e de integração são mais fáceis de implementar.
-- **Flexível:** Capaz de se adaptar a mudanças tecnológicas sem grandes refatorações.
-
-Esta arquitetura não apenas atende aos requisitos acadêmicos da disciplina de Arquitetura de Software, mas também prepara o terreno para projetos profissionais de alta qualidade.
-
----
-
-**Nota Final:** A compreensão das interações entre as camadas e a racionalização por trás das decisões de arquitetura é fundamental para qualquer desenvolvedor que deseje contribuir para o projeto ou aplicar conceitos semelhantes em outros contextos. Esperamos que esta explicação detalhada facilite esse entendimento e sirva como um guia para futuras implementações.
+Para detalhes, consulte o arquivo [phase-1.md](./docs/old/phase-1.md).

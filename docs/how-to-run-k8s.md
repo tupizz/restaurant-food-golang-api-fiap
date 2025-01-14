@@ -13,6 +13,12 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
 
 ### 1. Inicializar o Minikube
 
+0. **Para limpar o cluster**, basta o seguinte comando:
+   ```bash
+   minikube delete --all --purge
+   ```
+   Esse sinalizador --all deleta todos os perfis, e o sinalizador --purge deleta a pasta '.minikube' do diretório do usuário.
+
 1. **Inicie um cluster Minikube** com o seguinte comando:
    ```bash
    minikube start
@@ -25,7 +31,20 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    Este comando garante que o cluster foi iniciado corretamente e está pronto para uso.
 
-### 2. Configurar os Recursos do Banco de Dados
+### 2. **Subindo o metric server:**
+   ```bash
+   kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+   ```
+
+   e/ou se estiver no minikube
+
+   ```bash
+   minikube addons enable metrics-server
+   ```
+
+   O HPA depende do Metrics Server para coletar métricas como CPU e memória. Instale-o no cluster, caso ainda não esteja configurado.
+
+### 3. Configurar os Recursos do Banco de Dados
 
 1. **Aplique o Persistent Volume Claim (PVC) para o banco de dados:**
    ```bash
@@ -45,7 +64,7 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    O Service expõe o banco de dados internamente no cluster, permitindo que outros serviços, como a API, se conectem a ele.
 
-### 3. Configurar os Recursos da API
+### 4. Configurar os Recursos da API
 
 1. **Crie os segredos necessários para a API:**
    ```bash
@@ -65,13 +84,13 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    Este Service expõe a API dentro do cluster e/ou para o ambiente externo, dependendo da configuração.
 
-4. **Configure o Horizontal Pod Autoscaler (HPA) para a API:**
+5. **Configure o Horizontal Pod Autoscaler (HPA) para a API:**
    ```bash
    kubectl apply -f k8s/hpa-api.yml
    ```
    O HPA ajusta automaticamente o número de réplicas do pod da API com base na carga de trabalho, garantindo escalabilidade e alta disponibilidade.
 
-### 4. Acessar o Aplicativo
+### 5. Acessar o Aplicativo
 
 1. **Liste os serviços disponíveis no cluster:**
    ```bash
