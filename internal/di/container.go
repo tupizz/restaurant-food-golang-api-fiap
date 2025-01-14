@@ -37,6 +37,8 @@ func BuildContainer() *dig.Container {
 	container.Provide(usecase.NewUpdateProductUseCase)
 	container.Provide(usecase.NewDeleteProductUseCase)
 	container.Provide(usecase.NewOrderUseCase)
+	container.Provide(usecase.NewCreateOrderUseCase)
+	container.Provide(usecase.NewGetOrderByIDUseCase)
 	container.Provide(usecase.NewProcessPaymentUseCase)
 	container.Provide(usecase.NewCreateClientUseCase)
 	container.Provide(usecase.NewGetClientByCPFUseCase)
@@ -47,6 +49,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(handler.NewProductHandler)
 	container.Provide(handler.NewProductAdminHandler)
 	container.Provide(handler.NewOrderHandler)
+	container.Provide(handler.NewCheckoutHandler)
 	container.Provide(handler.NewWebhookHandler)
 
 	return container
