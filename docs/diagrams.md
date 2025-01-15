@@ -141,9 +141,3 @@ flowchart TB
     Outbound --> Database
 
 ```
-
-### Clean Architecture Diagram
-
-```
-TO-DO
-```

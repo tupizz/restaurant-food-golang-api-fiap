@@ -75,22 +75,6 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"John Doe"}' http:/
 
 You should receive a JSON response with the details of the newly created user.
 
-## Project Structure Overview
-
-- **`cmd/your-app/main.go`**: Entry point of the application.
-- **`internal/`**: Contains the application's internal code.
-    - **`adapter/`**: Adapters for HTTP handlers and repository implementations.
-        - **`http/`**: HTTP server setup and route definitions.
-        - **`repository/`**: Database interaction implementations.
-    - **`application/`**: Business logic and service definitions.
-    - **`domain/`**: Core business entities and repository interfaces.
-    - **`config/`**: Configuration loading and management.
-    - **`di/`**: Dependency injection setup using Uber's `dig`.
-- **`migrations/`**: Database migration files.
-- **`Dockerfile`**: Dockerfile for building the Go application image.
-- **`docker-compose.yml`**: Docker Compose configuration file.
-- **`go.mod`** and **`go.sum`**: Go modules files.
-
 ## Running Without Docker (Optional)
 
 If you prefer to run the application directly on your machine without Docker:

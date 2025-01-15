@@ -124,13 +124,12 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
 
 1. **Aplicação (restaurant-api):**
   - Uma API desenvolvida em Go, responsável por processar as requisições dos totens.
-  - Configurada com um Deployment que especifica recursos mínimos e máximos para evitar sobrecarga.
+  - Configurada com um **Deployment** que especifica recursos mínimos e máximos para evitar sobrecarga.
   - Utiliza o HPA para escalar de 1 a 5 réplicas com base na utilização de CPU.
   - Verificação de saúde implementada com liveness e readiness probes.
 
 2. **Banco de Dados (restaurant-db):**
-  - PostgreSQL configurado com PVC para garantir a persistência dos dados.
-  - ClusterIP Service utilizado para comunicação interna com a aplicação.
+  - PostgreSQL configurado com um **Deployment** e com **PVC** para garantir a persistência dos dados.
 
 3. **Horizontal Pod Autoscaler (HPA):**
   - Monitora a métrica de utilização de CPU da "restaurant-api" e ajusta dinamicamente o número de réplicas.
@@ -139,22 +138,15 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
 
   https://github.com/user-attachments/assets/8789e2c1-4d21-4c41-a1e8-db7333b53e48
 
-4. **Secrets:**
-   - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "restaurant-api" via variáveis de ambiente. O Secret utilizado é:
+4. **ConfigMap::**
+  - Armazena configurações não sensíveis, como variáveis de ambiente e parâmetros de configuração, que podem ser usadas para configurar dinamicamente seus aplicativos sem alterar o código ou reconstruir imagens de contêineres.
 
-  ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: restaurant-api-secrets
-  type: Opaque
-  data:
-    DATABASE_URL: cG9zdGdyZXM6Ly9wb3N0Z3Jlczpwb3N0Z3Jlc0ByZXN0YXVyYW50LWRiLXNlcnZpY2U6NTQzMi9maWFwX2Zhc3RfZm9vZD9zc2xtb2RlPWRpc2FibGU=
-  ```
+5. **Secrets:**
+  - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "restaurant-api" via variáveis de ambiente. O Secret utilizado é:
 
-5. **Exposição de Serviços:**
-  - NodePort para a "restaurant-api" permite acesso externo na porta 30000+.
-  - O banco de dados é acessível internamente via ClusterIP.
+6. **Exposição de Serviços:**
+  - **NodePort** para a "restaurant-api" permite acesso externo na porta 30000+.
+  - O banco de dados é acessível internamente via **ClusterIP**.
 
 ### Diagrama da Arquitetura
 
@@ -179,6 +171,8 @@ Este design assegura que a aplicação seja confiável, escalável e responsiva 
 ## 5. Como rodar o cluster localmente
 
 Para detalhes, consulte o arquivo [how-to-tun-k8s.md](./docs/how-to-run-k8s.md).
+
+**OBS**: Todos os manifetos se emcontram em [./k8s](./k8s/).
 
 ## 6. Collection com todas as APIs desenvolvidas com exemplo  de requisição (que não seja vazia)
 
