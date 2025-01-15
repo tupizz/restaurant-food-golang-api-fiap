@@ -138,7 +138,7 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
 
   https://github.com/user-attachments/assets/8789e2c1-4d21-4c41-a1e8-db7333b53e48
 
-4. **ConfigMap::**
+4. **ConfigMap:**
   - Armazena configurações não sensíveis, como variáveis de ambiente e parâmetros de configuração, que podem ser usadas para configurar dinamicamente seus aplicativos sem alterar o código ou reconstruir imagens de contêineres.
 
 5. **Secrets:**
