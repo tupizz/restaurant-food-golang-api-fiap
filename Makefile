@@ -12,7 +12,6 @@ AIR := $(GOPATH)/bin/air
 MIGRATE := $(GOPATH)/bin/migrate
 BINARY_NAME := $(APP_NAME)
 
-# Ensure GOPATH/bin is in PATH
 export PATH := $(GOPATH)/bin:$(PATH)
 
 .PHONY: help all build run run-air migrate-up migrate-down swag-init docker-up docker-down test clean install-tools setup
@@ -83,6 +82,7 @@ clean:
 install-tools:
 	@echo "Installing tools..."
 	$(GO) install github.com/swaggo/swag/cmd/swag@latest
+	$(GO) install github.com/go-delve/delve/cmd/dlv@latest
 	$(GO) install github.com/air-verse/air@latest
 	$(GO) install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	$(GO) install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
