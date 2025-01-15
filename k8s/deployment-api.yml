@@ -1,28 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: go-app-deployment
+  name: restaurant-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: go-app
+      app: restaurant-api
   template:
     metadata:
       labels:
-        app: go-app
+        app: restaurant-api
     spec:
       containers:
-      - name: go-app
-        image: kauancarvalhocalasans/restaurant-food-golang-api-fiap-app:0.1.2
+      - name: restaurant-api
+        image: kauancarvalhocalasans/restaurant-food-golang-api-fiap-app:0.1.3
         ports:
         - containerPort: 8080
         env:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: go-app-secrets
+              name: restaurant-api-secrets
               key: DATABASE_URL
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: restaurant-api-config
+              key: APP_ENV
         resources:
           requests:
             memory: "64Mi"
