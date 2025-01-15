@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
+	paymentGateways "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/gateways/payment"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
@@ -48,7 +50,17 @@ func (c *createOrderUseCase) Run(ctx context.Context, order entities.Order) (*en
 		return nil, domainError.NewEntityNotProcessableError("order", err.Error())
 	}
 
-	err = order.Payment.Authorize()
+	var paymentGateway ports.PaymentGateway
+	switch order.Payment.Method {
+	case "qr_code":
+		paymentGateway = paymentGateways.NewQRCodePaymentGateway()
+	case "credit_card":
+		paymentGateway = paymentGateways.NewCreditCardMockGateway()
+	default:
+		return nil, errors.New("payment method not supported")
+	}
+
+	err = paymentGateway.Authorize(&order.Payment)
 	if err != nil {
 		return nil, domainError.NewEntityNotProcessableError("payment", err.Error())
 	}
