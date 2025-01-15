@@ -2,29 +2,29 @@
 
 ## Resultado no minikube
 
-![image](https://github.com/user-attachments/assets/fad55677-9858-4c8f-93dd-863d3710052d)
+![minikube-result](https://github.com/user-attachments/assets/ab71024b-08ee-4080-b11a-643fc5b8c17a)
 
 ```bash
 > kubectl get all
-NAME                                    READY   STATUS    RESTARTS   AGE
-pod/go-app-deployment-f6c9fcb67-n47vn   1/1     Running   0          22h
-pod/restaurant-db-5ffddf874-j44sj       1/1     Running   0          5d21h
+NAME                                  READY   STATUS    RESTARTS   AGE
+pod/restaurant-api-5776d57fc9-8fln4   1/1     Running   0          2m20s
+pod/restaurant-db-5ffddf874-2nm2x     1/1     Running   0          4m33s
 
-NAME                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
-service/go-app-service          NodePort    10.107.79.74   <none>        8080:30000/TCP   5d20h
-service/kubernetes              ClusterIP   10.96.0.1      <none>        443/TCP          20d
-service/restaurant-db-service   ClusterIP   None           <none>        5432/TCP         5d21h
+NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes               ClusterIP   10.96.0.1       <none>        443/TCP          8m59s
+service/restaurant-api-service   NodePort    10.96.134.181   <none>        8080:30000/TCP   106s
+service/restaurant-db-service    ClusterIP   None            <none>        5432/TCP         2m42s
 
-NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/go-app-deployment   1/1     1            1           22h
-deployment.apps/restaurant-db       1/1     1            1           5d21h
+NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/restaurant-api   1/1     1            1           2m20s
+deployment.apps/restaurant-db    1/1     1            1           4m33s
 
-NAME                                          DESIRED   CURRENT   READY   AGE
-replicaset.apps/go-app-deployment-f6c9fcb67   1         1         1       22h
-replicaset.apps/restaurant-db-5ffddf874       1         1         1       5d21h
+NAME                                        DESIRED   CURRENT   READY   AGE
+replicaset.apps/restaurant-api-5776d57fc9   1         1         1       2m20s
+replicaset.apps/restaurant-db-5ffddf874     1         1         1       4m33s
 
-NAME                                             REFERENCE                      TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/go-app-hpa   Deployment/go-app-deployment   cpu: 1%/50%   1         5         1          23m
+NAME                                                     REFERENCE                   TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/restaurant-api-hpa   Deployment/restaurant-api   cpu: 1%/50%   1         5         1          100s
 ```
 
 # Documentação do Projeto
@@ -109,7 +109,7 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
 
 **Principais elementos da infraestrutura:**
 
-- **Horizontal Pod Autoscaler (HPA):** Configurado para escalar automaticamente a aplicação "go-app" com base no uso de CPU, garantindo que os recursos sejam alocados conforme a demanda.
+- **Horizontal Pod Autoscaler (HPA):** Configurado para escalar automaticamente a aplicação "restaurant-api" com base no uso de CPU, garantindo que os recursos sejam alocados conforme a demanda.
 - **Secrets:** Utilizados para armazenar credenciais sensíveis, como a URL de conexão do banco de dados.
 - **Banco de Dados PostgreSQL:** Implantado como um deployment com um PersistentVolumeClaim (PVC) para persistência de dados.
 - **Aplicação em GO (atendendno os requisitos funcionais):** Implantado como um deployment que utiliza de um secrets para ter as credenciais de acesso ao Banco de Dados.
@@ -122,7 +122,7 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
 
 ### Representação Textual
 
-1. **Aplicação (go-app):**
+1. **Aplicação (restaurant-api):**
   - Uma API desenvolvida em Go, responsável por processar as requisições dos totens.
   - Configurada com um Deployment que especifica recursos mínimos e máximos para evitar sobrecarga.
   - Utiliza o HPA para escalar de 1 a 5 réplicas com base na utilização de CPU.
@@ -133,32 +133,32 @@ A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podend
   - ClusterIP Service utilizado para comunicação interna com a aplicação.
 
 3. **Horizontal Pod Autoscaler (HPA):**
-  - Monitora a métrica de utilização de CPU da "go-app" e ajusta dinamicamente o número de réplicas.
+  - Monitora a métrica de utilização de CPU da "restaurant-api" e ajusta dinamicamente o número de réplicas.
 
   Aqui podemos ver ele em funcionamento (ps: o computador que foi gravado dá um engargalada por conta do uso de memória, além de estar rodando no wsl e um minikube no docker com limitações), e para que funcionasse foi criado um shell script que exonera a api, aumentando o recurso consumido pelo container.
 
-  https://github.com/user-attachments/assets/d3256bf6-6c33-4fbc-874c-7ae1f67006ba
+  https://github.com/user-attachments/assets/8789e2c1-4d21-4c41-a1e8-db7333b53e48
 
 4. **Secrets:**
-   - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "go-app" via variáveis de ambiente. O Secret utilizado é:
+   - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "restaurant-api" via variáveis de ambiente. O Secret utilizado é:
 
   ```yaml
   apiVersion: v1
   kind: Secret
   metadata:
-    name: go-app-secrets
+    name: restaurant-api-secrets
   type: Opaque
   data:
     DATABASE_URL: cG9zdGdyZXM6Ly9wb3N0Z3Jlczpwb3N0Z3Jlc0ByZXN0YXVyYW50LWRiLXNlcnZpY2U6NTQzMi9maWFwX2Zhc3RfZm9vZD9zc2xtb2RlPWRpc2FibGU=
   ```
 
 5. **Exposição de Serviços:**
-  - NodePort para a "go-app" permite acesso externo na porta 30000.
+  - NodePort para a "restaurant-api" permite acesso externo na porta 30000+.
   - O banco de dados é acessível internamente via ClusterIP.
 
 ### Diagrama da Arquitetura
 
-![architecture_diagram](https://github.com/user-attachments/assets/361b71fd-7093-4dfc-84d3-74bfd72d9b3f)
+![architecture_diagram](https://github.com/user-attachments/assets/083eb158-df06-4735-b772-8e71b4ac69d2)
 
 ---
 

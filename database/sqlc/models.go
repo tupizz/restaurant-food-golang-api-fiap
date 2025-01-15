@@ -14,7 +14,7 @@ type Category struct {
 	UpdatedAt pgtype.Timestamptz
 	DeletedAt pgtype.Timestamptz
 	Name      string
-	Handle    pgtype.Text
+	Handle    string
 }
 
 type Client struct {
@@ -89,11 +89,4 @@ type ProductsImage struct {
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
 	DeletedAt pgtype.Timestamptz
-}
-
-type User struct {
-	ID    int32
-	Name  string
-	Email pgtype.Text
-	Age   pgtype.Int4
 }

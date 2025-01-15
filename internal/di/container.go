@@ -22,7 +22,7 @@ func BuildContainer() *dig.Container {
 	// Router
 	container.Provide(http.NewRouter)
 
-	// Repositories 2.0
+	// Repositories
 	container.Provide(repository.NewClientRepository)
 	container.Provide(repository.NewHealthCheckRepository)
 	container.Provide(repository.NewProductRepository)
@@ -31,18 +31,27 @@ func BuildContainer() *dig.Container {
 	container.Provide(repository.NewPaymentRepository)
 
 	// UseCases
-	container.Provide(usecase.NewClientUseCase)
-	container.Provide(usecase.NewHealthCheckUseCase)
-	container.Provide(usecase.NewProductUseCase)
+	container.Provide(usecase.NewHealthCheckPingUseCase)
+	container.Provide(usecase.NewGetProductsUseCase)
+	container.Provide(usecase.NewCreateProductUseCase)
+	container.Provide(usecase.NewUpdateProductUseCase)
+	container.Provide(usecase.NewDeleteProductUseCase)
 	container.Provide(usecase.NewOrderUseCase)
-	container.Provide(usecase.NewPaymentUseCase)
+	container.Provide(usecase.NewCreateOrderUseCase)
+	container.Provide(usecase.NewGetOrderByIDUseCase)
+	container.Provide(usecase.NewProcessPaymentUseCase)
+	container.Provide(usecase.NewCreateClientUseCase)
+	container.Provide(usecase.NewGetClientByCPFUseCase)
+	container.Provide(usecase.NewUpdateOrderStatusToReadyUseCase)
+	container.Provide(usecase.NewUpdateOrderStatusToDeliveredUseCase)
 
-	// Handlers 2.0
+	// Handlers
 	container.Provide(handler.NewClientHandler)
 	container.Provide(handler.NewHealthcheckHandler)
 	container.Provide(handler.NewProductHandler)
 	container.Provide(handler.NewProductAdminHandler)
 	container.Provide(handler.NewOrderHandler)
+	container.Provide(handler.NewCheckoutHandler)
 	container.Provide(handler.NewWebhookHandler)
 
 	return container

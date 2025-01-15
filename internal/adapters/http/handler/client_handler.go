@@ -7,6 +7,7 @@ import (
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/mappers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,11 +18,12 @@ type ClientHandler interface {
 }
 
 type clientHandler struct {
-	clientUseCase usecase.ClientUseCase
+	createClientUseCase   usecase.CreateClientUseCase
+	getClientByCPFUseCase usecase.GetClientByCPFUseCase
 }
 
-func NewClientHandler(clientUseCase usecase.ClientUseCase) ClientHandler {
-	return &clientHandler{clientUseCase: clientUseCase}
+func NewClientHandler(createClientUseCase usecase.CreateClientUseCase, getClientByCPFUseCase usecase.GetClientByCPFUseCase) ClientHandler {
+	return &clientHandler{createClientUseCase: createClientUseCase, getClientByCPFUseCase: getClientByCPFUseCase}
 }
 
 // Create CreateClient godoc
@@ -42,13 +44,13 @@ func (h *clientHandler) Create(c *gin.Context) {
 		return
 	}
 
-	client, err := h.clientUseCase.CreateClient(c.Request.Context(), input)
+	client, err := h.createClientUseCase.Run(c.Request.Context(), input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, client)
+	c.JSON(http.StatusCreated, mappers.ToClientDTO(*client))
 }
 
 // GetByCPF SearchClient godoc
@@ -65,7 +67,7 @@ func (h *clientHandler) Create(c *gin.Context) {
 // @Router       /clients/{cpf} [get]
 func (h *clientHandler) GetByCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
-	client, err := h.clientUseCase.GetClientByCpf(c.Request.Context(), cpf)
+	client, err := h.getClientByCPFUseCase.Run(c.Request.Context(), cpf)
 	if err != nil {
 		if errors.Is(err, domainError.ErrNotFound("client")) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
@@ -75,5 +77,5 @@ func (h *clientHandler) GetByCPF(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, client)
+	c.JSON(http.StatusOK, mappers.ToClientDTO(*client))
 }

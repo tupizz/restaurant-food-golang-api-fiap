@@ -72,13 +72,19 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    Os segredos armazenam informações sensíveis, como credenciais de acesso ao banco de dados, de forma segura no cluster.
 
-2. **Implante o Deployment da API:**
+2. **Crie o configmap necessário para a API:**
+   ```bash
+   kubectl apply -f k8s/configmap-api.yml
+   ```
+  Armazena configurações não sensíveis, como variáveis de ambiente e parâmetros de configuração, que podem ser usadas para configurar dinamicamente seus aplicativos sem alterar o código ou reconstruir imagens de contêineres.
+
+3. **Implante o Deployment da API:**
    ```bash
    kubectl apply -f k8s/deployment-api.yml
    ```
    Semelhante ao banco de dados, o Deployment da API gerencia os pods que executam o serviço da aplicação.
 
-3. **Configure o Service para a API:**
+4. **Configure o Service para a API:**
    ```bash
    kubectl apply -f k8s/service-api.yml
    ```
@@ -100,7 +106,7 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
 
 2. **Obtenha a URL para acessar o serviço da API:**
    ```bash
-   minikube service go-app-service --url
+   minikube service restaurant-api-service --url
    ```
    Este comando expõe o serviço da API localmente, retornando uma URL que pode ser acessada pelo navegador ou ferramentas de teste.
 

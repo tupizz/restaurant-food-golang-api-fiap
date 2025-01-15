@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/mappers"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/ports"
 
 	"github.com/gin-gonic/gin"
@@ -15,11 +16,11 @@ type ProductHandler interface {
 }
 
 type productHandler struct {
-	productUseCase usecase.ProductUseCase
+	getProductsUseCase usecase.GetProductsUseCase
 }
 
-func NewProductHandler(productUseCase usecase.ProductUseCase) ProductHandler {
-	return &productHandler{productUseCase: productUseCase}
+func NewProductHandler(getProductsUseCase usecase.GetProductsUseCase) ProductHandler {
+	return &productHandler{getProductsUseCase: getProductsUseCase}
 }
 
 // GetProducts godoc
@@ -49,19 +50,18 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 
 	category := c.DefaultQuery("category", "")
 
-	products, total, err := h.productUseCase.GetProducts(c.Request.Context(), &ports.ProductFilter{
+	products, total, err := h.getProductsUseCase.Run(c.Request.Context(), &ports.ProductFilter{
 		Category: category,
 		Page:     page,
 		PageSize: pageSize,
 	})
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"products": products,
+		"products": mappers.ToProductsDTO(products),
 		"total":    total,
 	})
 }

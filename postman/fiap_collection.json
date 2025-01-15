@@ -19,7 +19,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"Maria Silva\",\n    \"cpf\": \"11723047694\"\n}",
+									"raw": "{\n    \"name\": \"Maria Silva\",\n    \"cpf\": \"60971815070\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -35,39 +35,7 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"url": "http://localhost:8080/api/v1/clients/12345678909"
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Users",
-					"item": [
-						{
-							"name": "Create User",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"tadeu\",\n    \"email\": \"tadeu.tupiz@email.com\",\n    \"age\": 18\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": "http://localhost:8080/api/v1/users"
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Users",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": "http://localhost:8080/api/v1/users"
+								"url": "http://localhost:8080/api/v1/clients/40753450097"
 							},
 							"response": []
 						}
@@ -221,7 +189,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"name\": \"new product name from postman\",\n    \"price\": 12,\n    \"description\": \"some description for the product\",\n    \"category\": \"lanche\",\n    \"images\": [\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\"\n    ]\n}",
+											"raw": "{\n    \"name\": \"new product name from postman b\",\n    \"price\": 12,\n    \"description\": \"some description for the product b\",\n    \"category\": \"lanche\",\n    \"images\": [\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\",\n        \"https://placehold.co/400\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -276,14 +244,14 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": 149, \n    \"name\": \"updated\",\n    \"price\": 13.312,\n    \"description\": \"updated value\",\n    \"category\": \"sobremesa\",\n    \"images\": [\"https://placehold.co/400\"]\n}",
+											"raw": "{\n    \"id\": 6, \n    \"name\": \"updated b\",\n    \"price\": 13.312,\n    \"description\": \"updated value\",\n    \"category\": \"sobremesa\",\n    \"images\": [\"https://placehold.co/400\"]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
 												}
 											}
 										},
-										"url": "http://localhost:8080/api/v1/admin/products/149"
+										"url": "http://localhost:8080/api/v1/admin/products/6"
 									},
 									"response": [
 										{
@@ -329,7 +297,7 @@
 									"request": {
 										"method": "DELETE",
 										"header": [],
-										"url": "http://localhost:8080/api/v1/admin/products/151"
+										"url": "http://localhost:8080/api/v1/admin/products/6"
 									},
 									"response": [
 										{
@@ -364,7 +332,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "http://localhost:8080/api/v1/admin/orders?pageSize=5&page=2",
+											"raw": "http://localhost:8080/api/v1/admin/orders?pageSize=5&page=1",
 											"protocol": "http",
 											"host": [
 												"localhost"
@@ -383,7 +351,7 @@
 												},
 												{
 													"key": "page",
-													"value": "2"
+													"value": "1"
 												}
 											]
 										}
@@ -440,6 +408,24 @@
 											"body": "{\n    \"orders\": [\n        {\n            \"id\": 8,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 8,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 8,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 8,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 8,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                }\n            ],\n            \"payment\": {\n                \"id\": 8,\n                \"order_id\": 8,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 7,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 7,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 7,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 7,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 7,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                }\n            ],\n            \"payment\": {\n                \"id\": 7,\n                \"order_id\": 7,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 6,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 6,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 6,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 6,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 6,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                }\n            ],\n            \"payment\": {\n                \"id\": 6,\n                \"order_id\": 6,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        },\n        {\n            \"id\": 9,\n            \"client_id\": 1,\n            \"client\": {\n                \"id\": 1,\n                \"name\": \"Maria Silva\",\n                \"cpf\": \"12345678909\"\n            },\n            \"status\": \"pending\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"order_id\": 9,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 4,\n                    \"order_id\": 9,\n                    \"product_id\": 4,\n                    \"product\": {\n                        \"id\": 4,\n                        \"name\": \"Batata frita\",\n                        \"description\": \"Acompanhamento de batata frita\",\n                        \"price\": 3,\n                        \"category_handle\": \"acompanhamento\"\n                    },\n                    \"quantity\": 2,\n                    \"price\": 3\n                },\n                {\n                    \"id\": 2,\n                    \"order_id\": 9,\n                    \"product_id\": 2,\n                    \"product\": {\n                        \"id\": 2,\n                        \"name\": \"Coca-Cola\",\n                        \"description\": \"Refrigerante de cola\",\n                        \"price\": 5,\n                        \"category_handle\": \"bebida\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 5\n                },\n                {\n                    \"id\": 1,\n                    \"order_id\": 9,\n                    \"product_id\": 1,\n                    \"product\": {\n                        \"id\": 1,\n                        \"name\": \"X-Burguer\",\n                        \"description\": \"Hambúrguer de carne bovina\",\n                        \"price\": 10,\n                        \"category_handle\": \"lanche\"\n                    },\n                    \"quantity\": 3,\n                    \"price\": 10\n                }\n            ],\n            \"payment\": {\n                \"id\": 9,\n                \"order_id\": 9,\n                \"status\": \"pending\",\n                \"method\": \"credit_card\",\n                \"amount\": 58.06\n            }\n        }\n    ],\n    \"total\": 4\n}"
 										}
 									]
+								},
+								{
+									"name": "Ready",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": "http://localhost:8080/api/v1/admin/orders/4/ready"
+									},
+									"response": []
+								},
+								{
+									"name": "Delivered",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": "http://localhost:8080/api/v1/admin/orders/4/delivered"
+									},
+									"response": []
 								}
 							]
 						}
@@ -551,7 +537,7 @@
 					"name": "Webhooks",
 					"item": [
 						{
-							"name": "New Request",
+							"name": "Notification",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -563,7 +549,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"external_reference\": \"c2a60c35-f337-47a5-a4f6-e5360b28280b\",\r\n    \"payment_method\": \"qr_code\",\r\n    \"status\": \"failed\"\r\n}",
+									"raw": "{\r\n    \"external_reference\": \"428c8a03-b3b1-4734-b97c-d3ce86fad287\",\r\n    \"payment_method\": \"qr_code\",\r\n    \"status\": \"approved\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

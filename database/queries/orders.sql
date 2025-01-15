@@ -2,33 +2,42 @@
 WITH paginated_orders AS (
     SELECT DISTINCT ON (o.id) o.id, o.created_at
     FROM orders o
-    WHERE o.deleted_at IS NULL
+    WHERE o.deleted_at IS NULL 
+      AND o.status IN ('ready', 'preparing', 'pending')
+    ORDER BY o.id, o.created_at DESC
     LIMIT $1
     OFFSET $2
 )
-select o.id         as order_id,
-       o.created_at as order_created_at,
-       o.updated_at as order_updated_at,
-       o.status     as order_status,
-       c.name       as client_name,
-       c.cpf as client_cpf,
-       c.id         as client_id,
-       p.id         as product_id,
-       p.name       as product_name,
-       p.price      as product_price,
-       p.description as product_description,
-       oi.quantity  as product_quantity,
-       py.id as payment_id,
-       py.status as payment_status,
-       py.amount as payment_amount,
-       py.method as payment_method,
-       pt.handle    as category_handle
-from paginated_orders po 
-         join orders o on o.id = po.id
-         join order_items oi on oi.order_id = o.id
-         join products p on oi.product_id = p.id
-         join categories pt on p.category_id = pt.id
-         join payments py on py.order_id = o.id
-         join clients c on c.id = o.client_id
-WHERE o.deleted_at IS NULL
-ORDER BY o.created_at DESC;
+SELECT o.id         AS order_id,
+       o.created_at AS order_created_at,
+       o.updated_at AS order_updated_at,
+       o.status     AS order_status,
+       c.name       AS client_name,
+       c.cpf        AS client_cpf,
+       c.id         AS client_id,
+       p.id         AS product_id,
+       p.name       AS product_name,
+       p.price      AS product_price,
+       p.description AS product_description,
+       oi.quantity  AS product_quantity,
+       py.id        AS payment_id,
+       py.status    AS payment_status,
+       py.amount    AS payment_amount,
+       py.method    AS payment_method,
+       pt.handle    AS category_handle
+FROM paginated_orders po 
+JOIN orders o ON o.id = po.id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products p ON oi.product_id = p.id
+JOIN categories pt ON p.category_id = pt.id
+JOIN payments py ON py.order_id = o.id
+JOIN clients c ON c.id = o.client_id
+WHERE o.deleted_at IS NULL AND o.status IN ('ready', 'preparing', 'pending')
+ORDER BY 
+    CASE 
+        WHEN o.status = 'ready' THEN 1
+        WHEN o.status = 'preparing' THEN 2
+        WHEN o.status = 'pending' THEN 3
+        ELSE 4
+    END,
+    o.created_at DESC;

@@ -10,6 +10,7 @@ import (
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/validator"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/dto"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/usecase/mappers"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/shared"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +23,13 @@ type ProductAdminHandler interface {
 }
 
 type productAdminHandler struct {
-	productUseCase usecase.ProductUseCase
+	createProductUseCase usecase.CreateProductUseCase
+	updateProductUseCase usecase.UpdateProductUseCase
+	deleteProductUseCase usecase.DeleteProductUseCase
 }
 
-func NewProductAdminHandler(productUseCase usecase.ProductUseCase) ProductAdminHandler {
-	return &productAdminHandler{productUseCase: productUseCase}
+func NewProductAdminHandler(updateProductUseCase usecase.UpdateProductUseCase, createProductUseCase usecase.CreateProductUseCase, deleteProductUseCase usecase.DeleteProductUseCase) ProductAdminHandler {
+	return &productAdminHandler{updateProductUseCase: updateProductUseCase, createProductUseCase: createProductUseCase, deleteProductUseCase: deleteProductUseCase}
 }
 
 // Create godoc
@@ -55,7 +58,7 @@ func (h *productAdminHandler) Create(c *gin.Context) {
 
 	slog.Info("Creating product", "input", shared.ToJSON(input))
 
-	product, err := h.productUseCase.CreateProduct(c.Request.Context(), input)
+	product, err := h.createProductUseCase.Run(c.Request.Context(), input)
 	if err != nil {
 		if errors.Is(err, &domainError.NotFoundError{}) {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -65,8 +68,10 @@ func (h *productAdminHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	slog.Info("Product created", "product", shared.ToJSON(product))
-	c.JSON(http.StatusCreated, product)
+
+	c.JSON(http.StatusCreated, mappers.ToProductDTO(*product))
 }
 
 // Update godoc
@@ -96,7 +101,7 @@ func (h *productAdminHandler) Update(c *gin.Context) {
 
 	slog.Info("Updating product", "input", shared.ToJSON(input))
 
-	product, err := h.productUseCase.UpdateProduct(c.Request.Context(), input.ID, input)
+	product, err := h.updateProductUseCase.Run(c.Request.Context(), input.ID, input)
 	if err != nil {
 		if errors.Is(err, &domainError.NotFoundError{}) {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -106,8 +111,10 @@ func (h *productAdminHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	slog.Info("Product updated", "product", shared.ToJSON(product))
-	c.JSON(http.StatusOK, product)
+
+	c.JSON(http.StatusOK, mappers.ToProductDTO(*product))
 }
 
 // Delete godoc
@@ -117,7 +124,7 @@ func (h *productAdminHandler) Update(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id     path     int  true  "Product ID"
-// @Success      204  {object}  dto.ProductOutput
+// @Success      204 "No content"
 // @Failure      400  {object}  handler.ErrorResponse
 // @Failure      500  {object}  handler.ErrorResponse
 // @Router       /admin/products/{id} [delete]
@@ -131,11 +138,12 @@ func (h *productAdminHandler) Delete(c *gin.Context) {
 
 	slog.Info("Deleting product", "id", id)
 
-	err = h.productUseCase.DeleteProduct(c.Request.Context(), id)
+	err = h.deleteProductUseCase.Run(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	slog.Info("Product deleted", "id", id)
 
 	c.Status(http.StatusNoContent)

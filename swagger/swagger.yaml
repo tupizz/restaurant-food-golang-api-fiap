@@ -315,6 +315,52 @@ paths:
       summary: Retrieve all orders
       tags:
       - orders
+  /admin/orders/{id}/delivered:
+    patch:
+      consumes:
+      - application/json
+      description: Mark ordeer as delivered
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Mark order as delivered
+      tags:
+      - orders
+  /admin/orders/{id}/ready:
+    patch:
+      consumes:
+      - application/json
+      description: Mark ordeer as ready
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Mark order as ready
+      tags:
+      - orders
   /admin/products:
     post:
       consumes:
@@ -360,9 +406,7 @@ paths:
       - application/json
       responses:
         "204":
-          description: No Content
-          schema:
-            $ref: '#/definitions/dto.ProductOutput'
+          description: No content
         "400":
           description: Bad Request
           schema:
@@ -437,7 +481,7 @@ paths:
             $ref: '#/definitions/handler.ErrorResponse'
       summary: Cria um novo pedido
       tags:
-      - orders
+      - checkout
   /clients:
     post:
       consumes:

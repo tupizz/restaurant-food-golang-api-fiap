@@ -15,11 +15,11 @@ type WebhookHandler interface {
 }
 
 type webhookHandler struct {
-	paymentUseCase usecase.PaymentUseCase
+	procecssPaymentUseCase usecase.ProcessPaymentUseCase
 }
 
-func NewWebhookHandler(paymentUseCase usecase.PaymentUseCase) WebhookHandler {
-	return &webhookHandler{paymentUseCase: paymentUseCase}
+func NewWebhookHandler(procecssPaymentUseCase usecase.ProcessPaymentUseCase) WebhookHandler {
+	return &webhookHandler{procecssPaymentUseCase: procecssPaymentUseCase}
 }
 
 func (h *webhookHandler) ProcessPayment(c *gin.Context) {
@@ -36,7 +36,7 @@ func (h *webhookHandler) ProcessPayment(c *gin.Context) {
 		return
 	}
 
-	err := h.paymentUseCase.ProcessPayment(c.Request.Context(), paymentInput.ExternalReference, paymentInput.PaymentMethod, paymentInput.Status)
+	err := h.procecssPaymentUseCase.Run(c.Request.Context(), paymentInput.ExternalReference, paymentInput.PaymentMethod, paymentInput.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

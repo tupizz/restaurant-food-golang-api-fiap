@@ -5,7 +5,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
-	cleanHandler "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
+	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/http/handler"
 )
 
 type Router struct {
@@ -13,12 +13,13 @@ type Router struct {
 }
 
 func NewRouter(
-	healthcheckHandler cleanHandler.HealthcheckHandler,
-	clientHandler cleanHandler.ClientHandler,
-	productHandler cleanHandler.ProductHandler,
-	adminProductHandler cleanHandler.ProductAdminHandler,
-	orderHandler cleanHandler.OrderHandler,
-	webhookHandler cleanHandler.WebhookHandler,
+	healthcheckHandler handler.HealthcheckHandler,
+	clientHandler handler.ClientHandler,
+	productHandler handler.ProductHandler,
+	adminProductHandler handler.ProductAdminHandler,
+	orderHandler handler.OrderHandler,
+	checkoutHandler handler.CheckoutHandler,
+	webhookHandler handler.WebhookHandler,
 ) Router {
 	engine := gin.Default()
 
@@ -49,7 +50,7 @@ func NewRouter(
 
 		checkout := v1.Group("/checkout")
 		{
-			checkout.POST("/", orderHandler.Create)
+			checkout.POST("/", checkoutHandler.Create)
 		}
 
 		webhooks := v1.Group("/webhooks")
@@ -62,6 +63,8 @@ func NewRouter(
 			adminOrders := admin.Group("/orders")
 			{
 				adminOrders.GET("/", orderHandler.GetAll)
+				adminOrders.PATCH("/:id/ready", orderHandler.UpdateOrderStatusToReady)
+				adminOrders.PATCH("/:id/delivered", orderHandler.UpdateOrderStatusToDelivered)
 			}
 
 			adminProducts := admin.Group("/products")

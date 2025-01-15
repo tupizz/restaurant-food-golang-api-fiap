@@ -116,6 +116,24 @@ func (r *orderRepository) GetByID(ctx context.Context, id int) (entities.Order, 
 	return order, nil
 }
 
+func (r *orderRepository) UpdateStatus(ctx context.Context, id int, status string) error {
+	query := `
+		UPDATE orders
+		SET status = $2
+		WHERE id = $1 AND deleted_at IS NULL
+	`
+	_, err := r.db.Exec(ctx, query, id, status)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
+}
+
 func (r *orderRepository) Update(ctx context.Context, order entities.Order) error {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
