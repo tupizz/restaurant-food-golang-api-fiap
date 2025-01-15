@@ -42,7 +42,7 @@ func ToCompleteOrdersDTO(rawOrders []fiapRestaurantDb.GetAllOrdersRow) []dto.Ord
 					Product: dto.ProductDTO{
 						ID:             int(order.ProductID),
 						Name:           order.ProductName,
-						CategoryHandle: order.CategoryHandle.String,
+						CategoryHandle: order.CategoryHandle,
 						Description:    order.ProductDescription,
 						Price:          productPrice.Float64,
 					},

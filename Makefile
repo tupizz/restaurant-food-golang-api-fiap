@@ -14,7 +14,7 @@ BINARY_NAME := $(APP_NAME)
 
 export PATH := $(GOPATH)/bin:$(PATH)
 
-.PHONY: help all build run run-air migrate-up migrate-down swag-init docker-up docker-down test clean install-tools setup
+.PHONY: help all build run run-air migrate-up migrate-down swag-init docker-up docker-down test clean install-tools setup sqlc
 
 help:
 	@echo "Usage: make [target]"
@@ -33,6 +33,7 @@ help:
 	@echo "  clean          Remove built binaries"
 	@echo "  install-tools  Install required tools (swag, air, migrate)"
 	@echo "  setup          Install tools, generate docs, and run migrations"
+	@echo "  sqlc           Generate SQLC"
 
 all: build
 
@@ -78,6 +79,10 @@ test:
 clean:
 	@echo "Cleaning up..."
 	rm -rf bin/*
+
+sqlc:
+	@echo "Generating SQLC..."
+	sqlc generate
 
 install-tools:
 	@echo "Installing tools..."
