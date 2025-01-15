@@ -42,6 +42,8 @@ func BuildContainer() *dig.Container {
 	container.Provide(usecase.NewProcessPaymentUseCase)
 	container.Provide(usecase.NewCreateClientUseCase)
 	container.Provide(usecase.NewGetClientByCPFUseCase)
+	container.Provide(usecase.NewUpdateOrderStatusToReadyUseCase)
+	container.Provide(usecase.NewUpdateOrderStatusToDeliveredUseCase)
 
 	// Handlers
 	container.Provide(handler.NewClientHandler)

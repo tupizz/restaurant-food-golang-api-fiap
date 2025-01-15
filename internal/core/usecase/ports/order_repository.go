@@ -18,4 +18,5 @@ type OrderRepository interface {
 	GetByID(ctx context.Context, id int) (entities.Order, error)
 	Delete(ctx context.Context, id int) error
 	GetAll(ctx context.Context, filter *OrderFilter) ([]sqlcDB.GetAllOrdersRow, error)
+	UpdateStatus(ctx context.Context, id int, status string) error
 }

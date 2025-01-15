@@ -124,7 +124,7 @@ func (h *productAdminHandler) Update(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id     path     int  true  "Product ID"
-// @Success      204  {object}  dto.ProductOutput
+// @Success      204 "No content"
 // @Failure      400  {object}  handler.ErrorResponse
 // @Failure      500  {object}  handler.ErrorResponse
 // @Router       /admin/products/{id} [delete]

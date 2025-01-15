@@ -63,6 +63,8 @@ func NewRouter(
 			adminOrders := admin.Group("/orders")
 			{
 				adminOrders.GET("/", orderHandler.GetAll)
+				adminOrders.PATCH("/:id/ready", orderHandler.UpdateOrderStatusToReady)
+				adminOrders.PATCH("/:id/delivered", orderHandler.UpdateOrderStatusToDelivered)
 			}
 
 			adminProducts := admin.Group("/products")

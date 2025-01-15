@@ -15,15 +15,19 @@ import (
 type OrderHandler interface {
 	GetById(c *gin.Context)
 	GetAll(c *gin.Context)
+	UpdateOrderStatusToReady(c *gin.Context)
+	UpdateOrderStatusToDelivered(c *gin.Context)
 }
 
 type orderHandler struct {
-	getAllOrdersUseCase usecase.GetAllOrdersUseCase
-	getOrderByIDUseCase usecase.GetOrderByIDUseCase
+	getAllOrdersUseCase                 usecase.GetAllOrdersUseCase
+	getOrderByIDUseCase                 usecase.GetOrderByIDUseCase
+	updateOrderStatusToReadyUseCase     usecase.UpdateOrderStatusToReadyUseCase
+	updateOrderStatusToDeliveredUseCase usecase.UpdateOrderStatusToDeliveredUseCase
 }
 
-func NewOrderHandler(getAllOrdersUseCase usecase.GetAllOrdersUseCase, getOrderByIDUseCase usecase.GetOrderByIDUseCase) OrderHandler {
-	return &orderHandler{getAllOrdersUseCase: getAllOrdersUseCase, getOrderByIDUseCase: getOrderByIDUseCase}
+func NewOrderHandler(getAllOrdersUseCase usecase.GetAllOrdersUseCase, getOrderByIDUseCase usecase.GetOrderByIDUseCase, updateOrderStatusToReadyUseCase usecase.UpdateOrderStatusToReadyUseCase, updateOrderStatusToDeliveredUseCase usecase.UpdateOrderStatusToDeliveredUseCase) OrderHandler {
+	return &orderHandler{getAllOrdersUseCase: getAllOrdersUseCase, getOrderByIDUseCase: getOrderByIDUseCase, updateOrderStatusToReadyUseCase: updateOrderStatusToReadyUseCase, updateOrderStatusToDeliveredUseCase: updateOrderStatusToDeliveredUseCase}
 }
 
 // GetById godoc
@@ -94,4 +98,58 @@ func (h *orderHandler) GetAll(c *gin.Context) {
 		"orders": mappers.ToCompleteOrdersDTO(orders),
 		"total":  len(orders),
 	})
+}
+
+// UpdateOrderStatusToReady godoc
+// @Summary     Mark order as ready
+// @Description Mark ordeer as ready
+// @Tags        orders
+// @Accept      json
+// @Produce     json
+// @Param       id path     int    true  "Order ID"
+// @Success      204 "No content"
+// @Failure     400      {object}  ErrorResponse
+// @Router      /admin/orders/{id}/ready [patch]
+func (h *orderHandler) UpdateOrderStatusToReady(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	err = h.updateOrderStatusToReadyUseCase.Run(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
+// UpdateOrderStatusToDelivered godoc
+// @Summary     Mark order as delivered
+// @Description Mark ordeer as delivered
+// @Tags        orders
+// @Accept      json
+// @Produce     json
+// @Param       id path     int    true  "Order ID"
+// @Success      204 "No content"
+// @Failure     400      {object}  ErrorResponse
+// @Router      /admin/orders/{id}/delivered [patch]
+func (h *orderHandler) UpdateOrderStatusToDelivered(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	err = h.updateOrderStatusToDeliveredUseCase.Run(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
