@@ -226,7 +226,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "checkout"
                 ],
                 "summary": "Cria um novo pedido",
                 "parameters": [
