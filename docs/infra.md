@@ -18,6 +18,8 @@ Este projeto segue os princípios da **Clean Architecture**, garantindo modulari
 │   ├── adapters/
 │   │   ├── db/
 │   │   │   └── repository/
+│   │   ├── gateways/
+│   │   │   └── payment/
 │   │   └── http/
 │   │       |── handler/
 |   |       └── middleware/
@@ -65,6 +67,8 @@ O núcleo da aplicação está dentro de `internal`, dividido em várias subpast
 Responsável por conectar o núcleo da aplicação com frameworks, bibliotecas externas e tecnologias específicas. Contém as implementações específicas de entrada e saída.
 
 - **db/repository/**: Implementações específicas dos repositórios que interagem com o banco de dados. Esses repositórios são responsáveis por persistir e recuperar dados.
+
+- **gateways/payment/**: Gateways são responsáveis por integrar o sistema com recursos externos, encapsulando a lógica de comunicação e protegendo o domínio de dependências externas, neste caso foram retratadas as comunicações com Gateways de pagmento.
 
 - **http/handler/**: Contém os manipuladores HTTP (endpoints da API). Eles recebem requisições, validam dados e chamam os casos de uso.
 

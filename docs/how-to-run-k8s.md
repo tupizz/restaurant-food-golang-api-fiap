@@ -2,6 +2,8 @@
 
 Este guia fornece instruções para configurar um cluster Kubernetes local utilizando o Minikube e para implantar os recursos de um aplicativo (banco de dados e API).
 
+**OBS**: Todos os manifetos se emcontram em [../k8s](../k8s/).
+
 ## Pré-requisitos
 
 Antes de começar, certifique-se de ter instalado os seguintes componentes:
