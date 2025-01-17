@@ -185,7 +185,7 @@ Para detalhes, consulte o arquivo [how-to-run.md](./docs/how-to-run.md).
 
 ## 8. Link para vídeo de demonstração
 
-TO-DO.
+[Link do vídeo não listado no YouTube](https://youtu.be/1eFxO6Mjl7A).
 
 ## 9. Dados da arquitetura limpa e suas pastas aplicadas no projeto
 
