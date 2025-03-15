@@ -2,6 +2,14 @@ provider "aws" {
   region = var.aws_region
 }
 
+terraform {
+  backend "s3" {
+    bucket = "fiap-tf-state-bucket"
+    key    = "auth-service/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 # Create an archive of the built Lambda code.
 data "archive_file" "lambda_zip" {
   type        = "zip"
