@@ -404,6 +404,8 @@ export const getUserProfile = async (
   try {
     const token = extractToken(event);
 
+    console.log("token", token);
+
     if (!token) {
       return response(401, { message: "Authentication required" });
     }
