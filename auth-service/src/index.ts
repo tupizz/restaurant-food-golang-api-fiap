@@ -12,6 +12,12 @@ export async function handler(
     const httpMethod = event.httpMethod;
     const path = event.path;
 
+    console.log("--------------------------------");
+    console.log("Event received:", JSON.stringify(event));
+    console.log("httpMethod:", httpMethod);
+    console.log("path:", path);
+    console.log("--------------------------------");
+
     // Find the matching route
     const route = routes.find((r) => {
       // Convert API Gateway path parameters to route pattern
