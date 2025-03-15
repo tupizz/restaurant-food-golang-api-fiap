@@ -9,8 +9,14 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/lambda.zip"
 }
 
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda_exec_role"
+  name = "lambda_exec_role_${random_string.suffix.result}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -21,6 +27,10 @@ resource "aws_iam_role" "lambda_exec" {
       }
     }]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
@@ -139,7 +149,7 @@ output "api_gateway_url" {
 
 # Add CloudWatch Logs permissions to the Lambda role
 resource "aws_iam_policy" "lambda_logging" {
-  name        = "lambda_logging_policy"
+  name        = "lambda_logging_policy_${random_string.suffix.result}"
   description = "IAM policy for logging from a lambda"
 
   policy = jsonencode({
@@ -154,6 +164,10 @@ resource "aws_iam_policy" "lambda_logging" {
       Effect   = "Allow"
     }]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
@@ -163,8 +177,12 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 
 # Configure API Gateway logging
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
-  name              = "/aws/apigateway/${aws_apigatewayv2_api.lambda_api.name}"
+  name              = "/aws/apigateway/${aws_apigatewayv2_api.lambda_api.name}_${random_string.suffix.result}"
   retention_in_days = 30
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
