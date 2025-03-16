@@ -3,7 +3,7 @@ name: Deploy to EKS
 on:
   push:
     branches:
-      - master # or main, depending on your default branch name
+      - main
 
 env:
   AWS_REGION: us-east-1 # Match your cluster region from Terraform
