@@ -25,9 +25,10 @@ import (
 // @host      localhost:8080
 // @BasePath  /api/v1
 func main() {
+	slog.Info("[Tadeu] --> Starting server")
 	container := di.BuildContainer()
 
-	slog.Info("Starting server")
+	slog.Info("[Tadeu] --> Container built")
 
 	err := container.Invoke(func(router http.Router) {
 		slog.Info("Server started at port 8080")
