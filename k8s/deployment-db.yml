@@ -24,6 +24,8 @@ spec:
           value: "postgres"
         - name: POSTGRES_DB
           value: "fiap_fast_food"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         ports:
         - containerPort: 5432
         volumeMounts:

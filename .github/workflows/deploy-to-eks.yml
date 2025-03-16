@@ -1,0 +1,75 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - master # or main, depending on your default branch name
+
+env:
+  AWS_REGION: us-east-1 # Match your cluster region from Terraform
+  CLUSTER_NAME: fastfood-eks # Your cluster name from Terraform vars
+  ECR_REPOSITORY: fastfood-api # Name for your ECR repository
+  IMAGE_TAG: ${{ github.sha }} # Use commit SHA as image tag
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Build a docker container and push it to ECR
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
+
+      - name: Update deployment image
+        run: |
+          # Replace the image in the deployment file with the new one
+          sed -i 's|image: .*|image: ${{ steps.build-image.outputs.image }}|' k8s/deployment-api.yml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          # Apply database resources first
+          kubectl apply -f k8s/pvc-db.yml
+          kubectl apply -f k8s/deployment-db.yml
+          kubectl apply -f k8s/service-db.yml
+
+          # Wait for database to be ready
+          kubectl rollout status deployment/restaurant-db
+
+          # Apply API resources
+          kubectl apply -f k8s/configmap-api.yml
+          kubectl apply -f k8s/secrets-api.yml
+          kubectl apply -f k8s/deployment-api.yml
+          kubectl apply -f k8s/service-api.yml
+          kubectl apply -f k8s/hpa-api.yml
+
+          # Wait for API deployment to complete
+          kubectl rollout status deployment/restaurant-api

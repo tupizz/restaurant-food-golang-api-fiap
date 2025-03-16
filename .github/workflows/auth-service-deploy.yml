@@ -2,6 +2,8 @@ name: Deploy to AWS Lambda
 
 on:
   push:
+    paths:
+      - "auth-service/**"
     branches:
       - main
 
