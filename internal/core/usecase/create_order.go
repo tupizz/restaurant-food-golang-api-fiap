@@ -16,14 +16,13 @@ type CreateOrderUseCase interface {
 }
 
 type createOrderUseCase struct {
-	orderRepository              ports.OrderRepository
-	productRepository            ports.ProductRepository
-	paymentTaxSettingsRepository ports.PaymentTaxSettingsRepository
-	redisClient                  *redis.Client
+	orderRepository   ports.OrderRepository
+	productRepository ports.ProductRepository
+	redisClient       *redis.Client
 }
 
-func NewCreateOrderUseCase(orderRepository ports.OrderRepository, productRepository ports.ProductRepository, paymentTaxSettingsRepository ports.PaymentTaxSettingsRepository, redisClient *redis.Client) CreateOrderUseCase {
-	return &createOrderUseCase{orderRepository: orderRepository, productRepository: productRepository, paymentTaxSettingsRepository: paymentTaxSettingsRepository, redisClient: redisClient}
+func NewCreateOrderUseCase(orderRepository ports.OrderRepository, productRepository ports.ProductRepository, redisClient *redis.Client) CreateOrderUseCase {
+	return &createOrderUseCase{orderRepository: orderRepository, productRepository: productRepository, redisClient: redisClient}
 }
 
 func (c *createOrderUseCase) Run(ctx context.Context, order entities.Order) (*entities.Order, error) {
@@ -42,12 +41,7 @@ func (c *createOrderUseCase) Run(ctx context.Context, order entities.Order) (*en
 		mappedProducts[product.ID] = product
 	}
 
-	systemPaymentTaxSettings, err := c.paymentTaxSettingsRepository.GetAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	err = order.CalculateTotalAmount(mappedProducts, systemPaymentTaxSettings)
+	err = order.CalculateTotalAmount(mappedProducts)
 	if err != nil {
 		return nil, domainError.NewEntityNotProcessableError("order", err.Error())
 	}

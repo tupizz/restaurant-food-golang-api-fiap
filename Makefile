@@ -14,7 +14,7 @@ BINARY_NAME := $(APP_NAME)
 
 export PATH := $(GOPATH)/bin:$(PATH)
 
-.PHONY: help all build run run-air migrate-up migrate-down swag-init docker-up docker-down test clean install-tools setup sqlc
+.PHONY: help all build run run-air migration migrate-up migrate-down swag-init docker-up docker-down test clean install-tools setup sqlc
 
 help:
 	@echo "Usage: make [target]"
@@ -24,6 +24,7 @@ help:
 	@echo "  build          Build the application binary"
 	@echo "  run            Run the application"
 	@echo "  run-air        Run the application with live reloading using Air"
+	@echo "  migration      Create a new database migration"
 	@echo "  migrate-up     Apply all database migrations"
 	@echo "  migrate-down   Revert the last database migration"
 	@echo "  swag-init      Generate Swagger documentation"
@@ -51,6 +52,10 @@ build-debug: clean
 run-air:
 	@echo "Running application with Air..."
 	$(AIR)
+
+migration:
+	@echo "Creating migration files for '$(filter-out $@,$(MAKECMDGOALS))'..."
+	@migrate create -ext sql -dir ./database/migrations -seq $(filter-out $@,$(MAKECMDGOALS))
 
 migrate-up:
 	@echo "Applying database migrations..."

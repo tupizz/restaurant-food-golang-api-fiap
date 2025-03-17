@@ -66,7 +66,27 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    O Service expõe o banco de dados internamente no cluster, permitindo que outros serviços, como a API, se conectem a ele.
 
-### 4. Configurar os Recursos da API
+### 4. Configurar os Recursos da camda de cache
+
+1. **Aplique o Persistent Volume Claim (PVC) para o redis:**
+   ```bash
+   kubectl apply -f k8s/pvc-redis.yml
+   ```
+   O PVC garante que o redis tenha armazenamento persistente, mesmo que o pod seja reiniciado.
+
+2. **Implante o Deployment do redis:**
+   ```bash
+   kubectl apply -f k8s/deployment-redis.yml
+   ```
+   O Deployment gerencia a criação e atualização dos pods do redis, garantindo a alta disponibilidade e a replicação, se configurada.
+
+3. **Configure o Service para o redis:**
+   ```bash
+   kubectl apply -f k8s/service-redis.yml
+   ```
+   O Service expõe o redis internamente no cluster, permitindo que outros serviços, como a API, se conectem a ele.
+
+### 5. Configurar os Recursos da API
 
 1. **Crie os segredos necessários para a API:**
    ```bash
@@ -98,7 +118,7 @@ Antes de começar, certifique-se de ter instalado os seguintes componentes:
    ```
    O HPA ajusta automaticamente o número de réplicas do pod da API com base na carga de trabalho, garantindo escalabilidade e alta disponibilidade.
 
-### 5. Acessar o Aplicativo
+### 6. Acessar o Aplicativo
 
 1. **Liste os serviços disponíveis no cluster:**
    ```bash
