@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: restaurant-api-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: restaurant-api
   ports:

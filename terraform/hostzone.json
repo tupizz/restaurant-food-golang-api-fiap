@@ -1,0 +1,14 @@
+{
+  "HostedZones": [
+    {
+      "Id": "/hostedzone/Z03405433555P9319H6R2",
+      "Name": "tadeutupinamba.com.br.",
+      "CallerReference": "terraform-20250316230953781400000001",
+      "Config": {
+        "Comment": "Managed by Terraform",
+        "PrivateZone": false
+      },
+      "ResourceRecordSetCount": 3
+    }
+  ]
+}

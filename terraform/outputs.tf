@@ -17,3 +17,7 @@ output "cluster_certificate_authority_data" {
   description = "Base64 encoded certificate data required to communicate with the cluster"
   value       = module.eks.cluster_certificate_authority_data
 }
+
+output "api_cert_arn" {
+  value = aws_acm_certificate.api_cert.arn
+}
