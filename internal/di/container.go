@@ -19,6 +19,9 @@ func BuildContainer() *dig.Container {
 	container.Provide(NewDatabaseConnection)
 	container.Provide(NewSQLCDB)
 
+	// Cache Connection
+	container.Provide(NewRedisConnection)
+
 	// Router
 	container.Provide(http.NewRouter)
 

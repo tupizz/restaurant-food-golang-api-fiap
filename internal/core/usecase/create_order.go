@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/redis/go-redis/v9"
 	paymentGateways "github.com/tupizz/restaurant-food-golang-api-fiap/internal/adapters/gateways/payment"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 	domainError "github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/error"
@@ -18,10 +19,11 @@ type createOrderUseCase struct {
 	orderRepository              ports.OrderRepository
 	productRepository            ports.ProductRepository
 	paymentTaxSettingsRepository ports.PaymentTaxSettingsRepository
+	redisClient                  *redis.Client
 }
 
-func NewCreateOrderUseCase(orderRepository ports.OrderRepository, productRepository ports.ProductRepository, paymentTaxSettingsRepository ports.PaymentTaxSettingsRepository) CreateOrderUseCase {
-	return &createOrderUseCase{orderRepository: orderRepository, productRepository: productRepository, paymentTaxSettingsRepository: paymentTaxSettingsRepository}
+func NewCreateOrderUseCase(orderRepository ports.OrderRepository, productRepository ports.ProductRepository, paymentTaxSettingsRepository ports.PaymentTaxSettingsRepository, redisClient *redis.Client) CreateOrderUseCase {
+	return &createOrderUseCase{orderRepository: orderRepository, productRepository: productRepository, paymentTaxSettingsRepository: paymentTaxSettingsRepository, redisClient: redisClient}
 }
 
 func (c *createOrderUseCase) Run(ctx context.Context, order entities.Order) (*entities.Order, error) {
@@ -53,7 +55,7 @@ func (c *createOrderUseCase) Run(ctx context.Context, order entities.Order) (*en
 	var paymentGateway ports.PaymentGateway
 	switch order.Payment.Method {
 	case "qr_code":
-		paymentGateway = paymentGateways.NewQRCodePaymentGateway()
+		paymentGateway = paymentGateways.NewQRCodePaymentGateway(c.redisClient)
 	case "credit_card":
 		paymentGateway = paymentGateways.NewCreditCardMockGateway()
 	default:
