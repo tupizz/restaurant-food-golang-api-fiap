@@ -355,26 +355,26 @@ resource "aws_acm_certificate" "api_cert" {
   }
 }
 
-resource "aws_route53_record" "api_cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
-      name  = dvo.resource_record_name
-      type  = dvo.resource_record_type
-      value = dvo.resource_record_value
-    }
-  }
+# resource "aws_route53_record" "api_cert_validation" {
+#   for_each = {
+#     for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
+#       name  = dvo.resource_record_name
+#       type  = dvo.resource_record_type
+#       value = dvo.resource_record_value
+#     }
+#   }
 
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.value]
-  ttl     = 60
-}
+#   zone_id = aws_route53_zone.primary.zone_id
+#   name    = each.value.name
+#   type    = each.value.type
+#   records = [each.value.value]
+#   ttl     = 60
+# }
 
-resource "aws_acm_certificate_validation" "api_cert_validation" {
-  certificate_arn         = aws_acm_certificate.api_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
-}
+# resource "aws_acm_certificate_validation" "api_cert_validation" {
+#   certificate_arn         = aws_acm_certificate.api_cert.arn
+#   validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
+# }
 
 
 # Add this null resource to wait for the ingress to be fully provisioned
@@ -408,19 +408,19 @@ data "kubernetes_ingress_v1" "fastfood_ingress" {
 }
 
 # Create Route53 record for the API endpoint conditionally
-resource "aws_route53_record" "api" {
-  count      = length(try(data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress, [])) > 0 ? 1 : 0
-  depends_on = [null_resource.wait_for_ingress]
-  zone_id    = aws_route53_zone.primary.zone_id
-  name       = "api.${var.domain_name}"
-  type       = "A"
+# resource "aws_route53_record" "api" {
+#   count      = length(try(data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress, [])) > 0 ? 1 : 0
+#   depends_on = [null_resource.wait_for_ingress]
+#   zone_id    = aws_route53_zone.primary.zone_id
+#   name       = "api.${var.domain_name}"
+#   type       = "A"
 
-  alias {
-    name                   = data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress[0].hostname
-    zone_id                = "Z35SXDOTRQ7X7K" # This is the fixed zone ID for us-east-1 ALBs
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress[0].hostname
+#     zone_id                = "Z35SXDOTRQ7X7K" # This is the fixed zone ID for us-east-1 ALBs
+#     evaluate_target_health = true
+#   }
+# }
 
 # Add a new policy attachment to the actual role being used by the controller
 resource "aws_iam_role_policy_attachment" "existing_lb_controller" {
@@ -485,3 +485,12 @@ resource "aws_iam_role_policy_attachment" "lb_controller_additional" {
   policy_arn = aws_iam_policy.lb_controller_additional_permissions.arn
   role       = "fastfood-fiap-eks-lb-controller" # Use the exact role name from your AWS account
 }
+
+# # Add this data source to properly reference your Route53 zone
+# data "aws_route53_zone" "selected" {
+#   name         = var.domain_name
+#   private_zone = false # Specify whether it's a private zone
+
+#   # If the zone is associated with a VPC, add this filter
+#   # vpc_id = var.vpc_id
+# }
