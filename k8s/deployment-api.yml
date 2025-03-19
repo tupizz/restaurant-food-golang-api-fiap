@@ -19,7 +19,7 @@ spec:
         - containerPort: 8080
         env:
         - name: REDIS_URL
-          value: "restaurant-redis:6379"
+          value: "restaurant-redis-service:6379"
         - name: REDIS_PASSWORD
           value: ""
         - name: DATABASE_URL
