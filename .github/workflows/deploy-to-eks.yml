@@ -61,6 +61,10 @@ jobs:
       - name: Apply Kubernetes manifests
         run: |
           # Apply database resources first
+          kubectl apply -f k8s/pvc-redis.yml
+          kubectl apply -f k8s/deployment-redis.yml
+          kubectl apply -f k8s/service-redis.yml
+
           kubectl apply -f k8s/pvc-db.yml
           kubectl apply -f k8s/deployment-db.yml
           kubectl apply -f k8s/service-db.yml
