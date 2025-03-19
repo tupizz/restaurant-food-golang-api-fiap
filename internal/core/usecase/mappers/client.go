@@ -14,6 +14,6 @@ func ToClientDTO(client entities.Client) dto.ClientOutput {
 		CPF:         client.CPF,
 		CreatedAt:   client.CreatedAt,
 		UpdatedAt:   client.UpdatedAt,
-		Description: fmt.Sprintf("Cliente %s", client.Name),
+		Description: fmt.Sprintf("Cliente Tadeu Teste %s", client.Name),
 	}
 }
