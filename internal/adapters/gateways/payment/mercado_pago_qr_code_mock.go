@@ -1,27 +1,49 @@
 package gateways
 
 import (
+	"context"
 	"encoding/base64"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/skip2/go-qrcode"
 	"github.com/tupizz/restaurant-food-golang-api-fiap/internal/core/domain/entities"
 )
 
-type mercadoPagoQRCodeMock struct{}
+const QrCodeTTL = 10 * time.Minute
 
-func NewQRCodePaymentGateway() PaymentGateway {
-	return &mercadoPagoQRCodeMock{}
+type mercadoPagoQRCodeMock struct {
+	redisClient *redis.Client
+}
+
+func NewQRCodePaymentGateway(redisClient *redis.Client) PaymentGateway {
+	return &mercadoPagoQRCodeMock{
+		redisClient: redisClient,
+	}
 }
 
 func (g *mercadoPagoQRCodeMock) Authorize(payment *entities.Payment) error {
-	png, err := qrcode.Encode("https://https://www.fiap.com.br", qrcode.Medium, 256)
+	payment.ExternalReference = uuid.New().String()
+
+	ctx := context.Background()
+	redisKey := "qrcode:" + payment.ExternalReference
+
+	cachedQR, err := g.redisClient.Get(ctx, redisKey).Result()
+	if err == nil {
+		payment.QRData = cachedQR
+		return nil
+	}
+
+	png, err := qrcode.Encode("https://www.fiap.com.br", qrcode.Medium, 256)
 	if err != nil {
 		return err
 	}
 
-	payment.QRData = base64.StdEncoding.EncodeToString(png)
-	payment.ExternalReference = uuid.New().String()
+	qrData := base64.StdEncoding.EncodeToString(png)
+	payment.QRData = qrData
+
+	_ = g.redisClient.Set(ctx, redisKey, qrData, QrCodeTTL).Err()
 
 	return nil
 }

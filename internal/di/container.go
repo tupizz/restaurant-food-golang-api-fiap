@@ -19,6 +19,9 @@ func BuildContainer() *dig.Container {
 	container.Provide(NewDatabaseConnection)
 	container.Provide(NewSQLCDB)
 
+	// Cache Connection
+	container.Provide(NewRedisConnection)
+
 	// Router
 	container.Provide(http.NewRouter)
 
@@ -27,7 +30,6 @@ func BuildContainer() *dig.Container {
 	container.Provide(repository.NewHealthCheckRepository)
 	container.Provide(repository.NewProductRepository)
 	container.Provide(repository.NewOrderRepository)
-	container.Provide(repository.NewPaymentTaxSettingsRepository)
 	container.Provide(repository.NewPaymentRepository)
 
 	// UseCases

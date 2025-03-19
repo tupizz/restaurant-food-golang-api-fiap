@@ -48,7 +48,7 @@ type OrderItem struct {
 // 3. Sets the final amount to the Payment.Amount field of the Order
 //
 // Returns an error if any product in the order is not found in the existingMappedProducts map.
-func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, existingPaymentTaxes []PaymentTaxSettings) error {
+func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product) error {
 	totalAmount := 0.0
 
 	// Calculate base total amount from order items
@@ -62,27 +62,7 @@ func (o *Order) CalculateTotalAmount(existingMappedProducts map[int]Product, exi
 		o.Items[idx] = item
 	}
 
-	if o.Payment.Method == "qr_code" {
-		o.Payment.Amount = totalAmount
-		return nil
-	}
-
-	// Apply taxes
-	for _, tax := range existingPaymentTaxes {
-		// Skip credit card taxes if payment method is not credit card
-		if o.Payment.Method != "credit_card" && tax.ApplicableTo == ApplicableToCreditCard {
-			continue
-		}
-
-		// Apply percentage or fixed amount taxes
-		if tax.AmountType == AmountTypePercentage {
-			totalAmount = totalAmount * (1 + tax.AmountValue/100)
-		} else if tax.AmountType == AmountTypeFixed {
-			totalAmount += tax.AmountValue
-		}
-	}
-
-	// Set the final amount to the Payment.Amount field
 	o.Payment.Amount = totalAmount
+
 	return nil
 }
