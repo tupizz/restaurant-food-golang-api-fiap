@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: us-east-1 # Match your cluster region from Terraform
-  CLUSTER_NAME: fastfood-eks # Your cluster name from Terraform vars
+  CLUSTER_NAME: fastfood-fiap-eks # Your cluster name from Terraform vars
   ECR_REPOSITORY: fastfood-api # Name for your ECR repository
   IMAGE_TAG: ${{ github.sha }} # Use commit SHA as image tag
 
