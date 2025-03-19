@@ -122,12 +122,12 @@ module "eks" {
   # These are the EC2 instances that will run your containerized applications
   eks_managed_node_groups = {
     general = {
-      desired_size = 1 # CHANGE: Reduced from 2 to 1
+      desired_size = 2 # CHANGE: Increased from 1 to 2
       min_size     = 1
-      max_size     = 1 # CHANGE: Reduced from 3 to 1
+      max_size     = 3 # CHANGE: Increased from 1 to 3
 
-      instance_types = ["t3.small"] # CHANGE: Reduced from t3.medium to t3.small
-      capacity_type  = "SPOT"       # CHANGE: Use Spot instances for 70-90% cost savings
+      instance_types = ["t3.medium"] # CHANGE: Increased from t3.small to t3.medium
+      capacity_type  = "SPOT"        # Keeping SPOT for cost savings
 
       labels = {
         Environment = var.environment

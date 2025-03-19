@@ -18,6 +18,10 @@ spec:
         ports:
         - containerPort: 8080
         env:
+        - name: REDIS_URL
+          value: "redis://restaurant-redis:6379"
+        - name: REDIS_PASSWORD
+          value: ""
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
