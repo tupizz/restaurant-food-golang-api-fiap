@@ -8,72 +8,242 @@ resource "aws_route53_zone" "primary" {
   name = var.domain_name
 }
 
-# Create Route53 record for the API endpoint
-resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.primary.zone_id # Reference existing zone resource
-  name    = "api.${var.domain_name}"
-  type    = "A"
-
-  alias {
-    name                   = kubernetes_ingress_v1.fastfood_ingress.status.0.load_balancer.0.ingress.0.hostname
-    zone_id                = "Z35SXDOTRQ7X7K" # This is the fixed zone ID for us-east-1 ALBs
-    evaluate_target_health = true
-  }
+resource "time_sleep" "wait_for_kubernetes" {
+  depends_on      = [module.eks]
+  create_duration = "90s"
 }
 
-resource "aws_acm_certificate" "api_cert" {
-  domain_name       = "api.${var.domain_name}"
-  validation_method = "DNS"
-  tags = {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-}
 
-resource "aws_route53_record" "api_cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
-      name  = dvo.resource_record_name
-      type  = dvo.resource_record_type
-      value = dvo.resource_record_value
-    }
-  }
 
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.value]
-  ttl     = 60
-}
-
-resource "aws_acm_certificate_validation" "api_cert_validation" {
-  certificate_arn         = aws_acm_certificate.api_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
-}
 
 # AWS Load Balancer Controller IAM Policy
+# AWS Load Balancer Controller IAM Policy
 resource "aws_iam_policy" "aws_load_balancer_controller" {
-  name        = "AWSLoadBalancerControllerIAMPolicy"
+  name        = "AWSLoadBalancerControllerIAMPolicy-${var.cluster_name}"
   description = "Policy for AWS Load Balancer Controller"
 
-  policy = file("${path.module}/iam-policy.json")
-  # You'll need to download this file:
-  # curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+  # Replace the existing policy with this updated one
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeAccountAttributes",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeVpcPeeringConnections",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeInstances",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeTags",
+                "ec2:GetCoipPoolUsage",
+                "ec2:DescribeCoipPools",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeListeners",
+                "elasticloadbalancing:DescribeListenerCertificates",
+                "elasticloadbalancing:DescribeSSLPolicies",
+                "elasticloadbalancing:DescribeRules",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTargetGroupAttributes",
+                "elasticloadbalancing:DescribeTargetHealth",
+                "elasticloadbalancing:DescribeTags"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:DescribeUserPoolClient",
+                "acm:ListCertificates",
+                "acm:DescribeCertificate",
+                "iam:ListServerCertificates",
+                "iam:GetServerCertificate",
+                "waf-regional:GetWebACL",
+                "waf-regional:GetWebACLForResource",
+                "waf-regional:AssociateWebACL",
+                "waf-regional:DisassociateWebACL",
+                "wafv2:GetWebACL",
+                "wafv2:GetWebACLForResource",
+                "wafv2:AssociateWebACL",
+                "wafv2:DisassociateWebACL",
+                "shield:GetSubscriptionState",
+                "shield:DescribeProtection",
+                "shield:CreateProtection",
+                "shield:DeleteProtection"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:RevokeSecurityGroupIngress"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateSecurityGroup"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": "arn:aws:ec2:*:*:security-group/*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:CreateAction": "CreateSecurityGroup"
+                },
+                "Null": {
+                    "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags",
+                "ec2:DeleteTags"
+            ],
+            "Resource": "arn:aws:ec2:*:*:security-group/*",
+            "Condition": {
+                "Null": {
+                    "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
+                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:DeleteSecurityGroup"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Null": {
+                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:CreateTargetGroup"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Null": {
+                    "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:CreateListener",
+                "elasticloadbalancing:DeleteListener",
+                "elasticloadbalancing:CreateRule",
+                "elasticloadbalancing:DeleteRule"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:AddTags",
+                "elasticloadbalancing:RemoveTags"
+            ],
+            "Resource": [
+                "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
+                "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+                "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:AddTags",
+                "elasticloadbalancing:RemoveTags"
+            ],
+            "Resource": [
+                "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
+                "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
+                "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
+                "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                "elasticloadbalancing:SetIpAddressType",
+                "elasticloadbalancing:SetSecurityGroups",
+                "elasticloadbalancing:SetSubnets",
+                "elasticloadbalancing:DeleteLoadBalancer",
+                "elasticloadbalancing:ModifyTargetGroup",
+                "elasticloadbalancing:ModifyTargetGroupAttributes",
+                "elasticloadbalancing:DeleteTargetGroup"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Null": {
+                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:RegisterTargets",
+                "elasticloadbalancing:DeregisterTargets"
+            ],
+            "Resource": "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:SetWebAcl",
+                "elasticloadbalancing:ModifyListener",
+                "elasticloadbalancing:AddListenerCertificates",
+                "elasticloadbalancing:RemoveListenerCertificates",
+                "elasticloadbalancing:ModifyRule"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }
 
-# IAM Role for Service Account (IRSA)
-module "lb_controller_role" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "~> 4.0"
-  create_role                   = true
-  role_name                     = "eks-alb-controller"
-  provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = [aws_iam_policy.aws_load_balancer_controller.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
-}
-
-# Kubernetes service account for the controller
+# Update your kubernetes_service_account resource to wait
 resource "kubernetes_service_account" "aws_load_balancer_controller" {
+  depends_on = [time_sleep.wait_for_kubernetes, null_resource.cluster_check]
+
   metadata {
     name      = "aws-load-balancer-controller"
     namespace = "kube-system"
@@ -82,10 +252,11 @@ resource "kubernetes_service_account" "aws_load_balancer_controller" {
       "app.kubernetes.io/component" = "controller"
     }
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.lb_controller_role.iam_role_arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.lb_controller.arn
     }
   }
 }
+
 resource "helm_release" "aws_load_balancer_controller" {
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
@@ -109,30 +280,20 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.lb_controller_role.iam_role_arn
+    value = aws_iam_role.lb_controller.arn
   }
 
-  depends_on = [
-    module.eks,
-    kubernetes_service_account.aws_load_balancer_controller
-  ]
+  depends_on = [kubernetes_service_account.aws_load_balancer_controller]
 }
 
-# IngressClass resource
-# resource "kubernetes_ingress_class_v1" "alb" {
-#   depends_on = [helm_release.aws_load_balancer_controller]
-
-#   metadata {
-#     name = "alb"
-#   }
-
-#   spec {
-#     controller = "ingress.k8s.aws/alb"
-#   }
-# }
+# Add a new wait resource after the load balancer controller is installed
+resource "time_sleep" "wait_for_lb_controller" {
+  depends_on      = [helm_release.aws_load_balancer_controller]
+  create_duration = "30s"
+}
 
 resource "kubernetes_ingress_v1" "fastfood_ingress" {
-  depends_on = [helm_release.aws_load_balancer_controller]
+  depends_on = [time_sleep.wait_for_lb_controller]
 
   metadata {
     name = "fastfood-ingress"
@@ -169,4 +330,158 @@ resource "kubernetes_ingress_v1" "fastfood_ingress" {
       }
     }
   }
+}
+
+# Create Route53 record for the API endpoint
+# resource "aws_route53_record" "api" {
+#   depends_on = [kubernetes_ingress_v1.fastfood_ingress]
+#   zone_id    = aws_route53_zone.primary.zone_id
+#   name       = "api.${var.domain_name}"
+#   type       = "A"
+
+#   alias {
+#     name                   = kubernetes_ingress_v1.fastfood_ingress.status.0.load_balancer.0.ingress.0.hostname
+#     zone_id                = "Z35SXDOTRQ7X7K" # This is the fixed zone ID for us-east-1 ALBs
+#     evaluate_target_health = true
+#   }
+# }
+
+resource "aws_acm_certificate" "api_cert" {
+  domain_name       = "api.${var.domain_name}"
+  validation_method = "DNS"
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_route53_record" "api_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
+
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  records = [each.value.value]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "api_cert_validation" {
+  certificate_arn         = aws_acm_certificate.api_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
+}
+
+
+# Add this null resource to wait for the ingress to be fully provisioned
+resource "null_resource" "wait_for_ingress" {
+  depends_on = [kubernetes_ingress_v1.fastfood_ingress]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      for i in {1..30}; do
+        HOSTNAME=$(kubectl get ingress fastfood-ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+        if [ -n "$HOSTNAME" ]; then
+          echo "Ingress hostname: $HOSTNAME"
+          exit 0
+        fi
+        echo "Waiting for ingress hostname... ($i/30)"
+        sleep 10
+      done
+      echo "Timed out waiting for ingress hostname"
+      exit 1
+    EOT
+  }
+}
+
+# Use a data source to get the ingress information after it's fully deployed
+data "kubernetes_ingress_v1" "fastfood_ingress" {
+  depends_on = [null_resource.wait_for_ingress]
+
+  metadata {
+    name = "fastfood-ingress"
+  }
+}
+
+# Create Route53 record for the API endpoint conditionally
+resource "aws_route53_record" "api" {
+  count      = length(try(data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress, [])) > 0 ? 1 : 0
+  depends_on = [null_resource.wait_for_ingress]
+  zone_id    = aws_route53_zone.primary.zone_id
+  name       = "api.${var.domain_name}"
+  type       = "A"
+
+  alias {
+    name                   = data.kubernetes_ingress_v1.fastfood_ingress.status[0].load_balancer[0].ingress[0].hostname
+    zone_id                = "Z35SXDOTRQ7X7K" # This is the fixed zone ID for us-east-1 ALBs
+    evaluate_target_health = true
+  }
+}
+
+# Add a new policy attachment to the actual role being used by the controller
+resource "aws_iam_role_policy_attachment" "existing_lb_controller" {
+  policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
+  role       = "fastfood-fiap-eks-lb-controller" # Use the exact role name from your AWS account
+}
+
+# Create a new policy that explicitly grants all the necessary permissions
+resource "aws_iam_policy" "lb_controller_additional_permissions" {
+  name        = "AWSLoadBalancerControllerAdditionalPermissions"
+  description = "Additional permissions for AWS Load Balancer Controller"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RemoveTags",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeSSLPolicies",
+        "elasticloadbalancing:DescribeRules",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:DescribeTargetGroupAttributes",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:DescribeListenerAttributes",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:CreateLoadBalancer",
+        "elasticloadbalancing:CreateRule",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:DeleteRule",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:ModifyListener",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+        "elasticloadbalancing:ModifyRule",
+        "elasticloadbalancing:ModifyTargetGroup",
+        "elasticloadbalancing:ModifyTargetGroupAttributes",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:SetIpAddressType",
+        "elasticloadbalancing:SetSecurityGroups",
+        "elasticloadbalancing:SetSubnets",
+        "elasticloadbalancing:SetWebAcl"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+# Attach this additional policy directly to the existing role
+resource "aws_iam_role_policy_attachment" "lb_controller_additional" {
+  policy_arn = aws_iam_policy.lb_controller_additional_permissions.arn
+  role       = "fastfood-fiap-eks-lb-controller" # Use the exact role name from your AWS account
 }

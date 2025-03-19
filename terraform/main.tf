@@ -1,37 +1,44 @@
+# Define AWS as the provider for this infrastructure
+# This tells Terraform to use AWS APIs for creating resources
 provider "aws" {
-  region = var.aws_region
+  region = var.aws_region # Use the region defined in variables
 }
 
+# Define required Terraform providers and versions
+# This ensures compatibility and consistent behavior
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source  = "hashicorp/aws" # Official AWS provider from HashiCorp
+      version = "~> 5.0"        # Use version 5.x
     }
     kubernetes = {
-      source  = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes" # Provider to manage Kubernetes resources
       version = "~> 2.10"
     }
     helm = {
-      source  = "hashicorp/helm"
+      source  = "hashicorp/helm" # Provider to deploy Helm charts in Kubernetes
       version = "~> 2.5"
     }
   }
 
   # Configure Terraform backend to store state in S3
   # This allows team collaboration and state persistence
+  # Without this, Terraform state would be stored locally, making team collaboration difficult
   backend "s3" {
-    bucket = "fiap-tf-state-bucket"  # S3 bucket to store Terraform state
-    key    = "k8s/terraform.tfstate" # Path within the bucket
-    region = "us-east-1"             # Region where the S3 bucket is located
+    bucket = "fiap-tf-state-bucket"       # S3 bucket to store Terraform state
+    key    = "k8s/terraform-base.tfstate" # Path within the bucket
+    region = "us-east-1"                  # Region where the S3 bucket is located
   }
 }
 
-# Add Kubernetes provider configuration
+# Configure Kubernetes provider to interact with the EKS cluster
+# This provider allows Terraform to manage Kubernetes resources
 provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  host                   = module.eks.cluster_endpoint                                 # API endpoint of the cluster
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # Cluster CA cert
 
+  # Authentication method using AWS CLI to get an authentication token
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
@@ -39,12 +46,14 @@ provider "kubernetes" {
   }
 }
 
-# Add Helm provider configuration
+# Configure Helm provider to deploy applications to Kubernetes
+# Helm is a package manager for Kubernetes that simplifies application deployment
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
 
+    # Same authentication method as the Kubernetes provider
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
@@ -53,89 +62,101 @@ provider "helm" {
   }
 }
 
-
-# Create VPC for EKS
+# Create VPC (Virtual Private Cloud) for EKS
+# A VPC is a virtual network dedicated to your AWS account
+# EKS requires a VPC with specific configurations to function properly
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws" # Using official AWS VPC module
   version = "5.0.0"
 
-  name = "${var.project_name}-vpc"
-  cidr = var.vpc_cidr
+  name = "${var.project_name}-vpc" # Name the VPC based on project
+  cidr = var.vpc_cidr              # IP address range for the VPC
 
-  azs             = var.availability_zones
-  private_subnets = var.private_subnets
-  public_subnets  = var.public_subnets
+  azs             = var.availability_zones # Availability zones for redundancy
+  private_subnets = var.private_subnets    # Private subnets for EKS nodes
+  public_subnets  = var.public_subnets     # Public subnets for load balancers
 
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  enable_nat_gateway   = false # NAT gateway allows private subnet resources to access internet
+  single_nat_gateway   = true  # Use single NAT to reduce costs (less redundant but cheaper)
+  enable_dns_hostnames = true  # Enable DNS hostnames for the VPC
+  enable_dns_support   = true  # Enable DNS resolution in the VPC
 
+  # Add this line to enable auto-assign public IPs in public subnets
+  map_public_ip_on_launch = true
+
+  # Tags are key-value pairs attached to AWS resources for identification and automation
   tags = {
     Environment                                 = var.environment
     Project                                     = var.project_name
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared" # Required tag for EKS to identify VPC resources
   }
 
+  # Special tags for subnets used by EKS
+  # These tags are required for EKS to discover and use the subnets correctly
   private_subnet_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"           = "1"
+    "kubernetes.io/role/internal-elb"           = "1" # Marks subnets for internal load balancers
   }
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                    = "1"
+    "kubernetes.io/role/elb"                    = "1" # Marks subnets for external load balancers
   }
 }
 
 # Create EKS Cluster
+# EKS is AWS's managed Kubernetes service
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws" # Using official AWS EKS module
   version = "~> 19.0"
 
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
+  cluster_name    = var.cluster_name    # Name of the EKS cluster
+  cluster_version = var.cluster_version # Kubernetes version to use
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id         # Use the VPC we created above
+  subnet_ids = module.vpc.public_subnets # Use public subnets for node groups when NAT gateway is disabled
 
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access = true # Allow public access to cluster API endpoint
 
+  # Define the worker node groups for the cluster
+  # These are the EC2 instances that will run your containerized applications
   eks_managed_node_groups = {
     general = {
-      desired_size = 2
+      desired_size = 1 # CHANGE: Reduced from 2 to 1
       min_size     = 1
-      max_size     = 3
+      max_size     = 1 # CHANGE: Reduced from 3 to 1
 
-      instance_types = ["t3.medium"]
-      capacity_type  = "ON_DEMAND"
+      instance_types = ["t3.small"] # CHANGE: Reduced from t3.medium to t3.small
+      capacity_type  = "SPOT"       # CHANGE: Use Spot instances for 70-90% cost savings
 
       labels = {
         Environment = var.environment
         Project     = var.project_name
       }
 
-      # Add all required IAM policies for node groups
+      # Attach IAM policies to node group for required AWS permissions
+      # These policies allow worker nodes to access various AWS services
       iam_role_additional_policies = {
-        AmazonEBSCSIDriverPolicy           = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-        AmazonEKSWorkerNodePolicy          = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-        AmazonEKS_CNI_Policy               = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-        AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        AmazonEBSCSIDriverPolicy           = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" # For persistent storage
+        AmazonEKSWorkerNodePolicy          = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"             # Core EKS permissions
+        AmazonEKS_CNI_Policy               = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"                  # For pod networking
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"    # To pull container images
+        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"           # For monitoring
+        AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"          # For SSM access
       }
     }
   }
 
-  # Updated IAM configuration
-  create_iam_role = true
-  iam_role_name   = "${var.cluster_name}-cluster-role"
+  # IAM configuration for the EKS cluster
+  create_iam_role = true                               # Create IAM role for cluster
+  iam_role_name   = "${var.cluster_name}-cluster-role" # Name of the IAM role
 
-  # Attach policies using the newer method
-  attach_cluster_encryption_policy = true
+  # Encryption configuration
+  attach_cluster_encryption_policy = true # Encrypt cluster data
   cluster_encryption_policy_name   = "${var.cluster_name}-encryption-policy"
 
   enable_irsa = true # Enable IAM roles for service accounts
+  # This allows Kubernetes pods to have specific AWS permissions
 
   tags = {
     Environment = var.environment
@@ -143,25 +164,29 @@ module "eks" {
   }
 }
 
-# Create separate IAM policies
+# Attach additional IAM policies to the EKS cluster role
+# These provide the cluster control plane with necessary AWS permissions
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy" # Core permissions for EKS management
   role       = module.eks.cluster_iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "eks_vpc_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController" # For managing VPC resources
   role       = module.eks.cluster_iam_role_name
 }
 
+# Retry settings for cluster operations
+# Ensures more reliable execution of operations
 locals {
   retry_join_enabled = true
-  max_retry_attempts = 3
+  max_retry_attempts = 3 # Maximum number of times to retry connecting to the cluster
 }
 
-# Add a null resource for additional error handling
+# Check that the cluster is available after creation
+# This helps ensure that subsequent resources depending on the cluster can be created
 resource "null_resource" "cluster_check" {
-  depends_on = [module.eks]
+  depends_on = [module.eks] # Wait for EKS cluster to be created first
 
   provisioner "local-exec" {
     command = <<-EOT
@@ -176,44 +201,50 @@ resource "null_resource" "cluster_check" {
   }
 }
 
-# Get AWS account ID for OIDC provider
+# Get AWS account ID for use in OIDC provider configuration
 data "aws_caller_identity" "current" {}
 
-# EKS Add-ons - Adding multiple required add-ons
+# Install EKS add-ons
+# Add-ons provide essential functionality to the Kubernetes cluster
 resource "aws_eks_addon" "addons" {
   for_each = {
-    coredns    = {}
-    kube-proxy = {}
-    vpc-cni    = {}
+    coredns    = {} # DNS service for Kubernetes service discovery
+    kube-proxy = {} # Network proxy for Kubernetes service abstraction
   }
 
   cluster_name = module.eks.cluster_name
   addon_name   = each.key
 
-  # Correct conflict resolution settings
+  # Conflict resolution settings
+  # OVERWRITE on create means we'll replace any existing versions
+  # PRESERVE on update means we won't override custom configurations during updates
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "PRESERVE"
 
   depends_on = [module.eks]
 }
 
-# Add a separate resource for EBS CSI driver to handle the existing installation
+# Add EBS CSI driver separately (requires special IAM configuration)
+# This driver allows Kubernetes pods to use EBS volumes for persistent storage
 resource "aws_eks_addon" "ebs_csi_driver" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
-  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
+  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn # Use the IAM role defined below
 
-  # Correct conflict resolution settings
+  # Same conflict resolution settings as other add-ons
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "PRESERVE"
 
   depends_on = [module.eks]
 }
 
-# Create IAM role for Load Balancer Controller
+# Create IAM role for AWS Load Balancer Controller
+# This controller manages AWS load balancers for Kubernetes services
 resource "aws_iam_role" "lb_controller" {
   name = "${var.cluster_name}-lb-controller"
 
+  # Trust policy allowing the Kubernetes service account to assume this role
+  # This uses OIDC federation, which links Kubernetes service accounts with AWS IAM
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -233,231 +264,22 @@ resource "aws_iam_role" "lb_controller" {
   })
 }
 
-# Load Balancer Controller Policy
+# Policy for the Load Balancer Controller
+# These permissions allow managing AWS load balancers from Kubernetes
 resource "aws_iam_policy" "lb_controller" {
   name        = "${var.cluster_name}-lb-controller-policy"
   description = "Policy for AWS Load Balancer Controller"
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iam:CreateServiceLinkedRole",
-                "ec2:DescribeAccountAttributes",
-                "ec2:DescribeAddresses",
-                "ec2:DescribeAvailabilityZones",
-                "ec2:DescribeInternetGateways",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DescribeInstances",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeTags",
-                "ec2:GetCoipPoolUsage",
-                "ec2:DescribeCoipPools",
-                "elasticloadbalancing:DescribeLoadBalancers",
-                "elasticloadbalancing:DescribeLoadBalancerAttributes",
-                "elasticloadbalancing:DescribeListeners",
-                "elasticloadbalancing:DescribeListenerCertificates",
-                "elasticloadbalancing:DescribeSSLPolicies",
-                "elasticloadbalancing:DescribeRules",
-                "elasticloadbalancing:DescribeTargetGroups",
-                "elasticloadbalancing:DescribeTargetGroupAttributes",
-                "elasticloadbalancing:DescribeTargetHealth",
-                "elasticloadbalancing:DescribeTags"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "cognito-idp:DescribeUserPoolClient",
-                "acm:ListCertificates",
-                "acm:DescribeCertificate",
-                "iam:ListServerCertificates",
-                "iam:GetServerCertificate",
-                "waf-regional:GetWebACL",
-                "waf-regional:GetWebACLForResource",
-                "waf-regional:AssociateWebACL",
-                "waf-regional:DisassociateWebACL",
-                "wafv2:GetWebACL",
-                "wafv2:GetWebACLForResource",
-                "wafv2:AssociateWebACL",
-                "wafv2:DisassociateWebACL",
-                "shield:GetSubscriptionState",
-                "shield:DescribeProtection",
-                "shield:CreateProtection",
-                "shield:DeleteProtection"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:RevokeSecurityGroupIngress"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateSecurityGroup"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateTags"
-            ],
-            "Resource": "arn:aws:ec2:*:*:security-group/*",
-            "Condition": {
-                "StringEquals": {
-                    "ec2:CreateAction": "CreateSecurityGroup"
-                },
-                "Null": {
-                    "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateTags",
-                "ec2:DeleteTags"
-            ],
-            "Resource": "arn:aws:ec2:*:*:security-group/*",
-            "Condition": {
-                "Null": {
-                    "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
-                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:RevokeSecurityGroupIngress",
-                "ec2:DeleteSecurityGroup"
-            ],
-            "Resource": "*",
-            "Condition": {
-                "Null": {
-                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:CreateLoadBalancer",
-                "elasticloadbalancing:CreateTargetGroup"
-            ],
-            "Resource": "*",
-            "Condition": {
-                "Null": {
-                    "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:CreateListener",
-                "elasticloadbalancing:DeleteListener",
-                "elasticloadbalancing:CreateRule",
-                "elasticloadbalancing:DeleteRule"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:AddTags",
-                "elasticloadbalancing:RemoveTags"
-            ],
-            "Resource": [
-                "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
-                "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
-                "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*"
-            ],
-            "Condition": {
-                "Null": {
-                    "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
-                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:AddTags",
-                "elasticloadbalancing:RemoveTags"
-            ],
-            "Resource": [
-                "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
-                "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
-                "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
-                "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:ModifyLoadBalancerAttributes",
-                "elasticloadbalancing:SetIpAddressType",
-                "elasticloadbalancing:SetSecurityGroups",
-                "elasticloadbalancing:SetSubnets",
-                "elasticloadbalancing:DeleteLoadBalancer",
-                "elasticloadbalancing:ModifyTargetGroup",
-                "elasticloadbalancing:ModifyTargetGroupAttributes",
-                "elasticloadbalancing:DeleteTargetGroup"
-            ],
-            "Resource": "*",
-            "Condition": {
-                "Null": {
-                    "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:RegisterTargets",
-                "elasticloadbalancing:DeregisterTargets"
-            ],
-            "Resource": "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "elasticloadbalancing:SetWebAcl",
-                "elasticloadbalancing:ModifyListener",
-                "elasticloadbalancing:AddListenerCertificates",
-                "elasticloadbalancing:RemoveListenerCertificates",
-                "elasticloadbalancing:ModifyRule"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "lb_controller" {
-  policy_arn = aws_iam_policy.lb_controller.arn
-  role       = aws_iam_role.lb_controller.name
+  # Extensive policy allowing the controller to manage load balancers, target groups, etc.
+  policy = aws_iam_policy.aws_load_balancer_controller.policy
 }
 
 # Create IAM role for Cluster Autoscaler
+# This component automatically adjusts the size of node groups based on demand
 resource "aws_iam_role" "cluster_autoscaler" {
   name = "${var.cluster_name}-cluster-autoscaler"
 
+  # Similar OIDC trust policy but for the autoscaler service account
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -477,7 +299,8 @@ resource "aws_iam_role" "cluster_autoscaler" {
   })
 }
 
-# Cluster Autoscaler Policy
+# Policy for Cluster Autoscaler
+# These permissions allow scaling node groups up and down
 resource "aws_iam_policy" "cluster_autoscaler" {
   name        = "${var.cluster_name}-cluster-autoscaler-policy"
   description = "Policy for Cluster Autoscaler"
@@ -521,9 +344,11 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 }
 
 # Create IAM role for External DNS
+# This component automatically manages DNS records for Kubernetes services
 resource "aws_iam_role" "external_dns" {
   name = "${var.cluster_name}-external-dns"
 
+  # OIDC trust policy for External DNS service account
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -543,7 +368,8 @@ resource "aws_iam_role" "external_dns" {
   })
 }
 
-# External DNS Policy
+# Policy for External DNS
+# These permissions allow managing Route 53 DNS records
 resource "aws_iam_policy" "external_dns" {
   name        = "${var.cluster_name}-external-dns-policy"
   description = "Policy for External DNS"
@@ -581,10 +407,12 @@ resource "aws_iam_role_policy_attachment" "external_dns" {
   role       = aws_iam_role.external_dns.name
 }
 
-# Create IAM role for Secrets Manager access
+# Create IAM role for accessing AWS Secrets Manager
+# This allows securely storing and retrieving sensitive configuration
 resource "aws_iam_role" "secrets_manager" {
   name = "${var.cluster_name}-secrets-manager"
 
+  # OIDC trust policy for External Secrets service account
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -604,7 +432,8 @@ resource "aws_iam_role" "secrets_manager" {
   })
 }
 
-# Secrets Manager Policy
+# Policy for Secrets Manager access
+# These permissions allow reading secrets from AWS Secrets Manager
 resource "aws_iam_policy" "secrets_manager" {
   name        = "${var.cluster_name}-secrets-manager-policy"
   description = "Policy for Secrets Manager access"
@@ -634,9 +463,11 @@ resource "aws_iam_role_policy_attachment" "secrets_manager" {
 }
 
 # Create IAM role for EBS CSI Driver
+# This driver allows Kubernetes pods to use EBS volumes for persistent storage
 resource "aws_iam_role" "ebs_csi_driver" {
   name = "${var.cluster_name}-ebs-csi-driver"
 
+  # OIDC trust policy for EBS CSI Driver service account
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -656,7 +487,8 @@ resource "aws_iam_role" "ebs_csi_driver" {
   })
 }
 
-# Attach EBS CSI Driver policy to role
+# Attach managed EBS CSI Driver policy to the role
+# This AWS-managed policy provides the necessary permissions to manage EBS volumes
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   role       = aws_iam_role.ebs_csi_driver.name

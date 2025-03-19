@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "fastfood"
+  default     = "fastfood-fiap"
 }
 
 variable "environment" {
@@ -19,7 +19,7 @@ variable "environment" {
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "fastfood-eks"
+  default     = "fastfood-fiap-eks"
 }
 
 variable "cluster_version" {
