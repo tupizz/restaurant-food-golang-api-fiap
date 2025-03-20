@@ -11,7 +11,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Base URL - change this to your API Gateway URL
-BASE_URL=${API_URL:-"https://k9ugdqojic.execute-api.us-east-1.amazonaws.com"}
+BASE_URL=${API_URL:-"https://auth.tadeutupinamba.com.br"}
 
 # Generate more unique test data with timestamp and random string
 RANDOM_SUFFIX=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)

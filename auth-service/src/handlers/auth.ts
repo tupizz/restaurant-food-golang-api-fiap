@@ -428,6 +428,8 @@ export const getUserProfile = async (
     return response(200, {
       username: result.Username,
       attributes: userAttributes,
+      userStatus: "Success",
+      "X-Amz-Date": Date.now(),
     });
   } catch (error: any) {
     console.error("Error in getUserProfile:", error);
