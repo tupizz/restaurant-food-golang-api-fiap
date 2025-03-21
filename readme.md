@@ -1,6 +1,6 @@
 # Tech Challenge [Fase 3]
 
-[Vídeo de entrega da fase 3](https://youtu.be/DWNlpdIsfuE).
+[Vídeo de entrega da fase 3](https://youtu.be/6J4QaEhm38k).
 
 ## Entregáveis.
 
@@ -11,6 +11,35 @@ Focando no que é considerado entregável para esta etapa, dado que nesta fase d
 #### a. Integrar ao sistema de autenticação para identificar o cliente.
 
 ##### Arquitetura da Solução.
+
+```mermaid
+sequenceDiagram
+    participant Usuário as "Usuário (Frontend)"
+    participant API_Gateway as "API Gateway"
+    participant Lambda as "Função Lambda"
+    participant Cognito as "Cognito"
+
+    Usuário->>API_Gateway: Requisição (login, atualização, etc)
+    API_Gateway->>Lambda: Roteia requisição para Lambda
+
+    loop Fluxo de autenticação
+        Lambda->>Cognito: AdminInitiateAuthCommand (login)
+        Cognito-->>Lambda: Retorna tokens JWT (AccessToken, IDToken, RefreshToken)
+        Lambda->>Usuário: Retorna tokens para o Cliente
+    end
+
+    loop Fluxo de atualização de CPF
+        Lambda->>Cognito: AdminUpdateUserAttributesCommand (atualização de CPF)
+        Cognito-->>Lambda: Retorno de sucesso na atualização
+        Lambda->>Usuário: Confirma atualização de CPF
+    end
+
+    loop Fluxo de Logout
+        Lambda->>Cognito: GlobalSignOutCommand (logout)
+        Cognito-->>Lambda: Confirmação de logout
+        Lambda->>Usuário: Confirma logout
+    end
+```
 
 A arquitetura da solução inclui:
 
