@@ -1,196 +1,173 @@
-# Tech Challenge [Fase 2]
+# Tech Challenge [Fase 3]
 
-## Resultado no minikube
+[Vídeo de entrega da fase 3](https://youtu.be/DWNlpdIsfuE).
 
-![minikube-result](https://github.com/user-attachments/assets/ab71024b-08ee-4080-b11a-643fc5b8c17a)
+## Entregáveis.
 
-```bash
-> kubectl get all
-NAME                                  READY   STATUS    RESTARTS   AGE
-pod/restaurant-api-5776d57fc9-8fln4   1/1     Running   0          2m20s
-pod/restaurant-db-5ffddf874-2nm2x     1/1     Running   0          4m33s
+Focando no que é considerado entregável para esta etapa, dado que nesta fase do projeto, foram realizadas melhorias e alterações conforme os requisitos definidos. Abaixo estão os entregáveis organizados e numerados:
 
-NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-service/kubernetes               ClusterIP   10.96.0.1       <none>        443/TCP          8m59s
-service/restaurant-api-service   NodePort    10.96.134.181   <none>        8080:30000/TCP   106s
-service/restaurant-db-service    ClusterIP   None            <none>        5432/TCP         2m42s
+### 1. Implementação de API Gateway e Function Serverless.
 
-NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/restaurant-api   1/1     1            1           2m20s
-deployment.apps/restaurant-db    1/1     1            1           4m33s
+#### a. Integrar ao sistema de autenticação para identificar o cliente.
 
-NAME                                        DESIRED   CURRENT   READY   AGE
-replicaset.apps/restaurant-api-5776d57fc9   1         1         1       2m20s
-replicaset.apps/restaurant-db-5ffddf874     1         1         1       4m33s
+##### Arquitetura da Solução.
 
-NAME                                                     REFERENCE                   TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/restaurant-api-hpa   Deployment/restaurant-api   cpu: 1%/50%   1         5         1          100s
-```
+A arquitetura da solução inclui:
 
-# Documentação do Projeto
+**API Gateway**: Expõe as APIs de autenticação e roteia requisições para a função serverless.
+**Function Serverless (AWS Lambda)**: Processa a autenticação do cliente com base no CPF.
+**AWS Cognito**: Serviço de autenticação e autorização que gerencia usuários e valida credenciais.
+**Route 53 + ACM**: Configuração de domínio personalizado para a API.
 
-Este documento detalha o desenho da arquitetura do sistema, elaborado para atender aos requisitos do negócio e às necessidades de infraestrutura.
+##### Configuração do Cognito.
 
-`mermaid` que ilustra um diagrama de sequências, simples, que demonstra como a aplicação conseguirá resolver os problemas funcionais do projeto:
+A autenticação dos usuários é gerenciada pelo AWS Cognito, conforme definido no arquivo cognito.tf. As principais configurações incluem:
 
-```mermaid
-sequenceDiagram
-  participant Administrador
-  participant SistemaAdministrativo as Sistema Administrativo
-  participant Cliente
-  participant SistemaAutoatendimento as Sistema de Autoatendimento
-  participant SistemaPagamento as Sistema de Pagamento
-  participant Cozinha
-  participant PainelCliente as Painel do Cliente
+1. User Pool: Criado para armazenar e gerenciar usuários.
+2. Autenticação via CPF: O CPF é usado como identificador único, configurado como um atributo customizado (custom:cpf).
+3. Política de Senhas: Requer no mínimo 8 caracteres, incluindo números, símbolos e letras maiúsculas e minúsculas.
+4. MFA Opcional: O usuário pode ativar autenticação multifator via TOTP (Time-based One-Time Password).
+5. Recuperação de Conta: Pode ser feita via telefone ou e-mail.
 
-  loop Rotina de backoffice do restaurante
-      Administrador->>SistemaAdministrativo: Cadastrar categoria
-      SistemaAdministrativo->>Administrador: Confirmar adição de categoria
+##### Configuração de Tokens:
 
-      Administrador->>SistemaAdministrativo: Cadastrar produto
-      SistemaAdministrativo->>Administrador: Confirmar adição de produto
+1. Token de acesso válido por 1 hora.
+2. Token de ID válido por 1 hora.
+3. Refresh Token válido por 30 dias.
+4. Configuração do API Gateway
 
-      Administrador->>SistemaAdministrativo: Editar produto
-      SistemaAdministrativo->>Administrador: Confirmar edição de produto
+##### O API Gateway gerencia todas as requisições de autenticação, conforme definido em routes.tf. As principais rotas incluem:
 
-      Administrador->>SistemaAdministrativo: Cadastrar imagem de produto
-      SistemaAdministrativo->>Administrador: Confirmar cadastro de imagem de um produto
-  end
+1. POST /auth/register → Cadastro de novos usuários.
+2. POST /auth/login → Login tradicional com e-mail e senha.
+3. POST /auth/login/cpf → Login via CPF.
+4. GET /auth/user/cpf/{cpf} → Recuperação de dados do usuário pelo CPF.
+5. POST /auth/token → Geração de novo token JWT.
+6. POST /auth/forgot-password → Esqueci minha senha.
+7. POST /auth/reset-password → Reset de senha.
+8. POST /auth/change-password → Alteração de senha.
+9. POST /auth/logout → Logout do sistema.
 
-  Cliente->>SistemaAutoatendimento: Iniciar pedido
-  SistemaAutoatendimento->>Cliente: Exibir Menu de Produtos
+##### Configuração de Domínio Personalizado.
 
-  loop Seleção de itens
-      Cliente->>SistemaAutoatendimento: Adicionar item ao pedido
-      SistemaAutoatendimento->>Cliente: Confirmar adição de item ao pedido
-  end
+O domínio personalizado para a API é configurado via Route 53 e ACM, conforme definido em domain.tf. Principais recursos:
 
-  Cliente->>SistemaAutoatendimento: Fechar pedido (checkout)
+1. Certificado SSL (ACM): Criado e validado via DNS para auth.tadeutupinamba.com.br.
+2. Registro DNS (Route 53): Entrada A criada para apontar para o API Gateway.
+3. Mapeamento no API Gateway: Definição do domínio personalizado para o estágio da API.
+4. Configuração da Infraestrutura via Terraform
+5. O Terraform provisiona todos os recursos, conforme definido em main.tf. Principais configurações:
+6. S3 Backend: Armazena o estado do Terraform para controle de mudanças.
+7. Lambda Deployment: Empacotamento do código e envio para a AWS.
+8. IAM Roles: Configuração de permissões para Lambda interagir com Cognito e CloudWatch.
 
-  SistemaAutoatendimento->>SistemaPagamento: Gerar pagamento
-  SistemaPagamento-->>Cliente: Retornar detalhes do pagamento (QRCode mercado pago)
+##### Monitoramento:
 
-  Cliente->>SistemaPagamento: Realizar Pagamento
-  SistemaPagamento-->>SistemaAutoatendimento: Notificar pagamento confirmado
+1. Logs do API Gateway no CloudWatch.
+2. Logs da Lambda no CloudWatch.
+3. Variáveis da Infraestrutura
 
-  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
-  SistemaAutoatendimento->>Cozinha: Enviar Pedido
+##### Os valores dinâmicos são definidos no arquivo variables.tf. Algumas principais variáveis:
 
-  Cozinha->>SistemaAutoatendimento: Atualizar Status para "Recebido"
-  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
-  SistemaAutoatendimento->>PainelCliente: Atualiza status do pedido
+1. aws_region → Região AWS onde os recursos são implantados (us-east-1).
+2. lambda_name → Nome da função Lambda (auth-service-lambda).
+3. lambda_runtime → Ambiente de execução (nodejs18.x).
+4. lambda_memory → Memória alocada para a Lambda (256MB).
+5. lambda_timeout → Tempo máximo de execução (30s).
+6. log_retention_days → Tempo de retenção de logs no CloudWatch (30 dias).
 
-  Cozinha->>SistemaAutoatendimento: Atualizar Status para "Pronto"
-  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
-  SistemaAutoatendimento->>PainelCliente: Atualiza status do pedido
+### 2. Implementar as melhores práticas de CI/CD para a aplicação, segregando os códigos em repositórios.
 
-  SistemaAutoatendimento->>SistemaAutoatendimento: Atualizar status do pedido
-  SistemaAutoatendimento->>PainelCliente: Atualizar Status para "Recebido"
-```
+Estas são as seguintes regras e padrões que foram usados como boas práticas:
 
----
+##### 1. Estrutura de Projeto.
 
-## 1. Requisitos do Negócio
+- **Organização por módulos**: Foi usado módulos Terraform para separar e reutilizar a configuração de infraestrutura. Exemplo: um módulo para EKS, outro para Lambda e outro para API Gateway.
 
-O restaurante enfrenta problemas de performance nos seus totens de autoatendimento, que comprometem a experiência do usuário durante picos de demanda. Os principais objetivos da solução são:
+##### 2. Gerenciamento de Estado.
 
-- **Garantir disponibilidade** do sistema durante períodos de alta carga.
-- **Reduzir o tempo de resposta** das requisições realizadas pelos totens.
-- **Permitir escalabilidade automática** para lidar com flutuações no volume de requisições.
+- **Estado remoto**: Usado o backend remoto para armazenar o estado do Terraform, como o `S3`.
+- **Criptografia do estado**: Habilitado a criptografia no `S3` para proteger o estado.
 
----
+## 3. Qualidade da Versão.
 
-## 2. Requisitos de Infraestrutura
+- **`terraform fmt` e `terraform validate`**: Antes de realizar o deploy, o código deve ser formatado com `terraform fmt` e validado a configuração com `terraform validate` para garantir que a sintaxe e a estrutura estão corretas.
 
-A arquitetura foi projetada para ser implantada em um cluster Kubernetes, podendo ser executada em:
+## 4. Autenticação e Autorização.
 
-- **Ambientes locais**, como Minikube ou Kind.
-- **Provedores de nuvem**, como AKS (Azure), EKS (AWS), ou GKE (Google Cloud).
+- **Princípios do IAM**: Definido roles e permissões baseadas em privilégios mínimos, garantindo que cada serviço tenha acesso apenas ao que é necessário.
 
-**Principais elementos da infraestrutura:**
+## 5. Módulos e Recursos.
 
-- **Horizontal Pod Autoscaler (HPA):** Configurado para escalar automaticamente a aplicação "restaurant-api" com base no uso de CPU, garantindo que os recursos sejam alocados conforme a demanda.
-- **Secrets:** Utilizados para armazenar credenciais sensíveis, como a URL de conexão do banco de dados.
-- **Banco de Dados PostgreSQL:** Implantado como um deployment com um PersistentVolumeClaim (PVC) para persistência de dados.
-- **Aplicação em GO (atendendno os requisitos funcionais):** Implantado como um deployment que utiliza de um secrets para ter as credenciais de acesso ao Banco de Dados.
-- **Services:** Configurados para expor a aplicação e o banco de dados, incluindo um NodePort para acesso externo à API.
-- **ConfigMap:** Armazena configurações de aplicação não sensíveis, permitindo flexibilidade sem alterar a imagem do container.
+- **Evitado hardcoding de valores**: Evitado hardcode de valores no código Terraform (como credenciais ou IDs de recursos). Usado variáveis e arquivos como `variables.tf`.
+- **Utilizado output para referência de recursos**: Utilizadp outputs para pegar informações de recursos criados por um módulo e usá-los em outro.
 
----
+## 6. EKS.
 
-## 3. Desenho da Arquitetura
+- **Automação de deployments**: `kubectl` para automatizar o deployment de aplicações dentro do EKS.
+- **Configuração de auto-scaling**: Configurado auto-scaling para os nodes do EKS e também para os pods, ajustando automaticamente os recursos conforme a carga.
+- **Monitoramento e logging**: Habilitado o Amazon CloudWatch para coletar logs e métricas do cluster EKS.
 
-### Representação Textual
+## 7. Lambda.
 
-1. **Aplicação (restaurant-api):**
-  - Uma API desenvolvida em Go, responsável por processar as requisições dos totens.
-  - Configurada com um **Deployment** que especifica recursos mínimos e máximos para evitar sobrecarga.
-  - Utiliza o HPA para escalar de 1 a 5 réplicas com base na utilização de CPU.
-  - Verificação de saúde implementada com liveness e readiness probes.
+- **Gerenciado a versão do código da Lambda**: Usado variáveis para definir a versão do código da Lambda e atualizado conforme necessário.
+- **Timeout e memória**: Definido corretamente o timeout e a memória da Lambda com base na carga e tipo de processamento.
+- **Gerenciamento de variáveis de ambiente**: Evitado hardcode de variáveis dentro do código Lambda e use variáveis de ambiente para gerenciar configurações e segredos.
 
-2. **Banco de Dados (restaurant-db):**
-  - PostgreSQL configurado com um **Deployment** e com **PVC** para garantir a persistência dos dados.
+## 8. API Gateway.
 
-3. **Horizontal Pod Autoscaler (HPA):**
-  - Monitora a métrica de utilização de CPU da "restaurant-api" e ajusta dinamicamente o número de réplicas.
+- **Defina recursos e métodos de maneira clara**: Usado o API Gateway para criar recursos RESTful de forma organizada.
+- **Implementação de CORS**: Configurado o CORS adequadamente no API Gateway.
+- **Integração com Lambda**: Lógica abstraída para o lambda.
+- **Autenticação e Autorização**: Usado o Amazon Cognito para proteger suas APIs.
 
-  Aqui podemos ver ele em funcionamento (ps: o computador que foi gravado dá um engargalada por conta do uso de memória, além de estar rodando no wsl e um minikube no docker com limitações), e para que funcionasse foi criado um shell script que exonera a api, aumentando o recurso consumido pelo container.
+## 9. Segurança.
 
-  https://github.com/user-attachments/assets/8789e2c1-4d21-4c41-a1e8-db7333b53e48
+- **Criptografia de dados**: Usado sempre criptografia para dados em repouso (S3, RDS) e em trânsito (TLS).
+- **Políticas de IAM restritivas**: Criado políticas de IAM o mais restritivas possível para cada recurso e serviço.
 
-4. **ConfigMap:**
-  - Armazena configurações não sensíveis, como variáveis de ambiente e parâmetros de configuração, que podem ser usadas para configurar dinamicamente seus aplicativos sem alterar o código ou reconstruir imagens de contêineres.
+## 10. Testes e Validação.
 
-5. **Secrets:**
-  - Protegem informações sensíveis como a URL de conexão ao banco de dados. Estes dados são consumidos pela aplicação "restaurant-api" via variáveis de ambiente. O Secret utilizado é:
+- **Plano de execução (`terraform plan`)**: Usado o `terraform plan` antes de aplicar as mudanças, isso garante que você está ciente do que será alterado.
 
-6. **Exposição de Serviços:**
-  - **NodePort** para a "restaurant-api" permite acesso externo na porta 30000+.
-  - O banco de dados é acessível internamente via **ClusterIP**.
+## 11. CI/CD e Automação.
 
-### Diagrama da Arquitetura
+- **Pipeline de CI/CD**: Integrado Terraform com pipeline de CI/CD para automação de deploy (GitHub Actions).
 
-![architecture_diagram](https://github.com/user-attachments/assets/083eb158-df06-4735-b772-8e71b4ac69d2)
+## 12. Contextos.
 
----
+- Mesmo que foi usado somente um repositório contendo todas as informações, elas estaõ separadas em contextos, como o `auth-service`, que é isolado da aplicação princial, e seu deploy só é engatilhado com alterações na aplicação ou em sua camada de infraestrutura, assim como as outras camadas no `terraform`.
 
-## 4. Benefícios da Arquitetura
+- [auth-service](./auth-service/terraform/)
+- [k8s](./k8s/)
+- [infra-database](./k8s/deployment-db.yml)
+- [terraform-geral](./terraform/)
 
-- **Escalabilidade Automática:** O HPA ajusta dinamicamente os recursos da aplicação conforme a carga.
-- **Alta Disponibilidade:** Configurações de readiness e liveness probes garantem que apenas pods saudáveis recebam tráfego.
-- **Segurança:** Uso de Secrets para proteger informações sensíveis.
-- **Flexibilidade:** ConfigMaps permitem alterações rápidas nas configurações da aplicação sem necessidade de recriar imagens.
-- **Persistência de Dados:** O banco de dados utiliza PVC para garantir que os dados sejam preservados mesmo em caso de falhas.
+### 3. Os repositórios devem fazer deploy automatizado na conta da nuvem utilizando actions. As branchs main/master devem ser protegidas, não permitindo commits direto.
 
----
+- **Action auth-service**: [here](./.github/workflows/auth-service-deploy.yml)
+- **Action eks**: [here](./.github/workflows/deploy-to-eks.yml)
+- **Action terraform**: [here](./.github/workflows/terraform-eks.yml)
 
-Este design assegura que a aplicação seja confiável, escalável e responsiva para atender aos desafios do restaurante.
+### 4. Melhorar a estrutura do banco de dados escolhido, documentar seguindo os padrões de modelagem de dados e justificar a escolha do banco de dados.
 
----
+#### Remoção de tabelas desnecessárias que foram criadas anteriormente.
 
-## 5. Como rodar o cluster localmente
+Basicamente removemos camadas que não tem utilização da área de negócio e nem implicações técnicas, com o propósito de reduzir o custo com storage, e melhorar a performance.
 
-Para detalhes, consulte o arquivo [how-to-tun-k8s.md](./docs/how-to-run-k8s.md).
+#### Adicionado banco chave-valor redis.
 
-**OBS**: Todos os manifetos se emcontram em [./k8s](./k8s/).
+- Com o propósito de melhorar a performance no sistema, foi implantado o redis na aplicação para melhorar a performance em certas camadas, cache na listagem de produtos, entre outros endpoints.
+- Cache na interação mockada com o mercado pago para gerar o qrcode e reduzir a latência da aplicação.
+- Foi utilizado o redis também para evitar condições de corrida ao procecssar os webhooks da integração do mercado pago, onde é definida uma chave e a mesma é liberada após o processamento.
 
-## 6. Collection com todas as APIs desenvolvidas com exemplo  de requisição (que não seja vazia)
+As melhorias para contemplar este entregável podem ser vistas nos commits desta fase, um importante commit pode ser visto [aqui](https://github.com/tupizz/restaurant-food-golang-api-fiap/commit/e32ace3a9d20c64ef682e450de33ce72b264fe4e).
 
-- Para swagger, a documentação se encontra em `./swagger/* (tanto .json quanto o .yaml)`.
-- Para postaman, a collection se encontra em `./postman/fiap_collection.json`.
+### 5. Você tem a liberdade para escolher qual a infra de nuvem desejar, mas terá de utilizar os serviços serverless: functions (AWS Lamba), banco de  dados gerenciáveis (AWS RDS), sistema de autenticação (AWS Cognito).
 
-## 7. como rodar a aplicação locamente
+Todos os requisitos acima pode ser visto do vídeo demonstrativo, além em partes acima no **Readme**.
 
-Para detalhes, consulte o arquivo [how-to-run.md](./docs/how-to-run.md).
+## Para o acesso as informações das fases antigas:
 
-## 8. Link para vídeo de demonstração
-
-[Link do vídeo não listado no YouTube](https://youtu.be/1eFxO6Mjl7A).
-
-## 9. Dados da arquitetura limpa e suas pastas aplicadas no projeto
-
-Para detalhes, consulte o arquivo [infra.md](./docs/infra.md).
-
-## 10. Informações relacionadas a fase 1
-
-Para detalhes, consulte o arquivo [phase-1.md](./docs/old/phase-1.md).
+- [phase-1](./docs/old/phase-1.md).
+- [phase-2](./docs/old/phase-2.md).
